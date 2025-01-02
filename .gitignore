@@ -43,7 +43,6 @@ bin/
 
 ### JPro ###
 .history
-.idea
 .gradle
 bin/*
 build/*
@@ -51,8 +50,4 @@ logs/*
 tmp/*
 RUNNING_PID
 *.log
-logs/application.gradle.log
-logs/jpro.activity.log
-logs/jpro.console.log
-logs/jpro.info.log
 RUNNING_PID
