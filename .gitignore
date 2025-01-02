@@ -40,3 +40,13 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### JPro ###
+.history
+.idea
+.gradle
+bin/
+build/
+logs/
+tmp/
+RUNNING_PID
