@@ -12,6 +12,9 @@ version '1.0-SNAPSHOT'
 
 repositories {
   mavenCentral()
+  maven {
+    url "https://sandec.jfrog.io/artifactory/repo"
+  }
 }
 
 ext {
@@ -48,6 +51,32 @@ dependencies {
   implementation('eu.hansolo:tilesfx:21.0.7') {
     exclude(group: 'org.openjfx')
   }
+
+  // JPro spezifische Plugins
+  implementation group: 'one.jpro.platform', name: 'jpro-auth-core', version: '0.5.0-ikmdev'
+  implementation group: 'one.jpro.platform', name: 'jpro-webrtc', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-youtube', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-routing-popup', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-auth-routing', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-utils', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-sipjs', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-routing-core', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-routing-dev', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-session', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-scenegraph', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-media', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-mdfx', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-mail', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-image-manager', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-html-scrollpane', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-file', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-internal-util', version: '0.4.4'
+  implementation group: 'one.jpro.platform', name: 'jpro-internal-openlink', version: '0.4.4'
+  implementation group: 'one.jpro.platform', name: 'tree-showing', version: '0.4.4'
+  implementation group: 'one.jpro.platform', name: 'freeze-detector', version: '0.4.4'
+  implementation group: 'one.jpro.platform', name: 'internal-util', version: '0.4.3'
+  implementation group: 'one.jpro.platform', name: 'internal-openlink', version: '0.4.3'
+  implementation group: 'one.jpro.platform', name: 'jpro-routing-core', version: '0.5.0'
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
