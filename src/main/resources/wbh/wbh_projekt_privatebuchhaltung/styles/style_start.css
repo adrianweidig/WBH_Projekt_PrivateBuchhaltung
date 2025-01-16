@@ -1,0 +1,42 @@
+/* Stil für die VBox */
+.vbox {
+    -fx-alignment: center; /* Zentriert den Inhalt der VBox */
+    -fx-padding: 0; /* Kein zusätzlicher Rand */
+    -fx-spacing: 10px; /* Abstand zwischen den Buttons */
+}
+
+/* Stil für die Buttons */
+.button {
+    -fx-font-size: 16px; /* Standard-Schriftgröße */
+    -fx-pref-width: 150px; /* Breite der Buttons */
+    -fx-pref-height: 40px; /* Höhe der Buttons */
+    -fx-background-color: #007BFF; /* Primärfarbe */
+    -fx-text-fill: white; /* Schriftfarbe */
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.button:hover {
+    -fx-background-color: #0056b3; /* Farbe beim Hover-Effekt */
+}
+
+.button:pressed {
+    -fx-background-color: #003f7f; /* Farbe beim Klick */
+}
+
+/* Responsiveness */
+@media screen and (max-width: 600px) {
+    .button {
+        -fx-font-size: 14px; /* Kleinere Schrift für kleine Geräte */
+        -fx-pref-width: 120px; /* Kleinere Breite */
+        -fx-pref-height: 35px; /* Kleinere Höhe */
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .button {
+        -fx-font-size: 12px;
+        -fx-pref-width: 100px;
+        -fx-pref-height: 30px;
+    }
+}
