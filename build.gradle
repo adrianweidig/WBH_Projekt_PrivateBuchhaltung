@@ -30,7 +30,7 @@ tasks.withType(JavaCompile).configureEach {
 
 application {
   mainModule = 'wbh.wbh_projekt_privatebuchhaltung'
-  mainClass = 'wbh.wbh_projekt_privatebuchhaltung.HelloApplication'
+  mainClass = 'wbh.wbh_projekt_privatebuchhaltung.Main'
 }
 
 javafx {
