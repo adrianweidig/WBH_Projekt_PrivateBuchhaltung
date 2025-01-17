@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
- * The type Main.
+ * Application Starting Point
  */
 public class Main extends JProApplication {
 
