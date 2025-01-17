@@ -10,6 +10,7 @@ module wbh.wbh_projekt_privatebuchhaltung {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires jpro.webapi;
+    requires org.slf4j;
 
     opens wbh.wbh_projekt_privatebuchhaltung to javafx.fxml;
     exports wbh.wbh_projekt_privatebuchhaltung;
