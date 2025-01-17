@@ -14,8 +14,8 @@ jobs:
     # Specify the runner environment
     runs-on: ubuntu-latest
     permissions:
-      # Allow read-only access to repository contents
-      contents: read
+      # Allow write access to repository contents and dependency graph
+      contents: write
 
     steps:
     # Step 1: Check out the repository code
