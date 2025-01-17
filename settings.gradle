@@ -1,25 +1,13 @@
 rootProject.name = "WBH_Projekt_PrivateBuchhaltung"
 
 buildscript {
-
     repositories {
-
         gradlePluginPortal()
-
-
         maven {
-
             url "https://sandec.jfrog.io/artifactory/repo"
-
         }
-
     }
-
-
     dependencies {
-
         classpath "one.jpro:jpro-gradle-plugin:2024.4.1"
-
     }
-
 }
