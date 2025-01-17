@@ -27,7 +27,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         java-version: '21'   # Specify the Java version
-        distribution: 'azul' # Use Azul Zulu OpenJDK
+        distribution: 'zulu' # Use Azul Zulu OpenJDK
 
     # Step 3: Cache Gradle dependencies to speed up builds by reusing previously downloaded dependencies
     - name: Cache Gradle dependencies
