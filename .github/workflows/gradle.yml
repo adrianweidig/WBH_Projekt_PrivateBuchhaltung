@@ -14,10 +14,15 @@ jobs:
     # Specify the runner environment
     runs-on: ubuntu-latest
     permissions:
-      # Allow write access to repository contents and dependency graph
+      # Allow write access to repository content
       contents: write
 
     steps:
+
+    # Permission preparation
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+    
     # Step 1: Check out the repository code
     - name: Checkout code
       uses: actions/checkout@v4
@@ -47,7 +52,7 @@ jobs:
     # Specify the runner environment
     runs-on: ubuntu-latest
     permissions:
-      # Allow write access to repository contents and dependency graph
+      # Allow write access to repository content
       contents: write
 
     steps:
