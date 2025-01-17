@@ -1,67 +1,68 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
 name: Java CI with Gradle
 
+# Trigger the workflow on push and pull request events targeting the "main" branch
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
+# Define the jobs in this workflow
 jobs:
+  # First job: Build the Java project
   build:
-
-    runs-on: debian-latest
+    # Specify the runner environment
+    runs-on: ubuntu-latest
     permissions:
+      # Allow read-only access to repository contents
       contents: read
 
     steps:
-    - uses: actions/checkout@v4
+    # Step 1: Check out the repository code
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Step 2: Set up Java Development Kit (JDK) version 21
     - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
-        distribution: 'azul-21'
+        java-version: '21'   # Specify the Java version
+        distribution: 'azul' # Use Azul Zulu OpenJDK
 
-    # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
-    # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+    # Step 3: Cache Gradle dependencies to speed up builds by reusing previously downloaded dependencies
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.gradle/caches # Path to the Gradle cache directory
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }} # Unique cache key based on OS and Gradle files
+        restore-keys: |
+          ${{ runner.os }}-gradle- # Fallback keys for partial cache matches
 
+    # Step 4: Build the project using the Gradle Wrapper
     - name: Build with Gradle Wrapper
-      run: ./gradlew build
+      run: ./gradlew build # Execute the Gradle build command
 
-    # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
-    # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
-    #
-    # - name: Setup Gradle
-    #   uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-    #   with:
-    #     gradle-version: '8.9'
-    #
-    # - name: Build with Gradle 8.9
-    #   run: gradle build
-
+  # Second job: Submit the dependency graph for security analysis and Dependabot alerts
   dependency-submission:
-
-    runs-on: debian-latest
+    # Specify the runner environment
+    runs-on: ubuntu-latest
     permissions:
+      # Allow write access to repository contents and dependency graph
       contents: write
+      dependency-graph: write
 
     steps:
-    - uses: actions/checkout@v4
+    # Step 1: Check out the repository code
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Step 2: Set up Java Development Kit (JDK) version 21
     - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
-        distribution: 'azul-21'
+        java-version: '21'   # Specify the Java version
+        distribution: 'azul' # Use Azul Zulu OpenJDK
 
-    # Generates and submits a dependency graph, enabling Dependabot Alerts for all project dependencies.
-    # See: https://github.com/gradle/actions/blob/main/dependency-submission/README.md
+    # Step 3: Generate and submit the dependency graph
     - name: Generate and submit dependency graph
-      uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      uses: gradle/actions/dependency-submission@v4 # Use the Gradle dependency submission action
