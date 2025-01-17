@@ -49,7 +49,6 @@ jobs:
     permissions:
       # Allow write access to repository contents and dependency graph
       contents: write
-      dependency-graph: write
 
     steps:
     # Step 1: Check out the repository code
