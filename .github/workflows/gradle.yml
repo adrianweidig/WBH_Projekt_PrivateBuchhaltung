@@ -60,7 +60,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         java-version: '21'   # Specify the Java version
-        distribution: 'azul' # Use Azul Zulu OpenJDK
+        distribution: 'zulu' # Use Azul Zulu OpenJDK
 
     # Step 3: Generate and submit the dependency graph
     - name: Generate and submit dependency graph
