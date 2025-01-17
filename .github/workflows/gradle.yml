@@ -18,10 +18,6 @@ jobs:
       contents: write
 
     steps:
-
-    # Permission preparation
-    - name: Make gradlew executable
-      run: chmod +x ./gradlew
     
     # Step 1: Check out the repository code
     - name: Checkout code
@@ -33,6 +29,10 @@ jobs:
       with:
         java-version: '21'   # Specify the Java version
         distribution: 'zulu' # Use Azul Zulu OpenJDK
+
+    # Permission preparation
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
 
     # Step 3: Cache Gradle dependencies to speed up builds by reusing previously downloaded dependencies
     - name: Cache Gradle dependencies
