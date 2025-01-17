@@ -10,6 +10,9 @@ import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * The type Controller start.
+ */
 public class Controller_start {
 
     private WebAPI webAPI = null;

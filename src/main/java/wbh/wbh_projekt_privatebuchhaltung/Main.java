@@ -14,6 +14,9 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * The type Main.
+ */
 public class Main extends JProApplication {
 
     // Logger defined as an instance variable
