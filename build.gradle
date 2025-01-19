@@ -39,16 +39,22 @@ javafx {
 }
 
 dependencies {
-  implementation('org.controlsfx:controlsfx:11.2.1')
+  // Standard JavaFX Zusätze
+  implementation('org.controlsfx:controlsfx:11.2.1'){
+    exclude(group: 'org.openjfx')
+  }
+
+
   implementation('com.dlsc.formsfx:formsfx-core:11.6.0') {
     exclude(group: 'org.openjfx')
   }
   implementation('net.synedra:validatorfx:0.5.1') {
     exclude(group: 'org.openjfx')
   }
-  implementation('org.kordamp.ikonli:ikonli-javafx:12.3.1')
-  implementation('org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0')
-  implementation('eu.hansolo:tilesfx:21.0.7') {
+  implementation('org.kordamp.ikonli:ikonli-javafx:12.3.1'){
+    exclude(group: 'org.openjfx')
+  }
+  implementation('org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0'){
     exclude(group: 'org.openjfx')
   }
 
@@ -78,6 +84,16 @@ dependencies {
   implementation group: 'one.jpro.platform', name: 'internal-openlink', version: '0.4.3'
   implementation group: 'one.jpro.platform', name: 'jpro-routing-core', version: '0.5.0'
 
+  // Weitere GUI Frameworks
+  implementation 'com.dlsc.workbenchfx:workbenchfx-core:11.3.1'
+  implementation 'com.calendarfx:calendar:11.12.7'
+  implementation 'com.dlsc.gemsfx:gemsfx:2.81.0'
+  implementation 'io.github.palexdev:materialfx:11.17.0'
+  implementation 'com.dlsc.formsfx:formsfx-core:11.6.0'
+  implementation 'eu.hansolo:tilesfx:21.0.9'
+
+
+  // Test Framework
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
