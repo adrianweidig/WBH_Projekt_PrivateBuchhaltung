@@ -92,6 +92,15 @@ public class Controller_start {
         {
             logger.info(profile.Categories.get(i).GetName());
         }
+        for(int i = 0; i < profile.BankAccounts.size();i++)
+        {
+            logger.info(profile.BankAccounts.get(i).getName());
+        }
+        for(int i = 0; i < profile.Incomes.size();i++)
+        {
+            logger.info(profile.Incomes.get(i).GetDescription());
+        }
+
         try {
             loadMainController(profile);
         } catch (IOException e) {

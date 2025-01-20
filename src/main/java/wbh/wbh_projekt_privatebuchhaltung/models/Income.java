@@ -14,8 +14,8 @@ public class Income extends Transaction {
      * @param bankAccount the bank account
      * @param date        the date
      */
-    public Income(double value, TransactionCategory category, BankAccount bankAccount, Date date) {
-        super(value, category, bankAccount, date);
+    public Income(int id, double value, TransactionCategory category, BankAccount bankAccount, Date date, String description) {
+        super(id, value, category, bankAccount, date, description);
     }
 
     @Override

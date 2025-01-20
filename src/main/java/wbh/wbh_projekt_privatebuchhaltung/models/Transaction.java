@@ -11,6 +11,7 @@ public abstract class Transaction {
     private TransactionCategory category;
     private BankAccount bankaccount;
     private Date date;
+    private String description;
 
     /**
      * Instantiates a new Transaction.
@@ -20,19 +21,21 @@ public abstract class Transaction {
      * @param bankaccount the bankaccount
      * @param date        the date
      */
-    public Transaction(double value, TransactionCategory category, BankAccount bankaccount, Date date) {
+    public Transaction(double value, TransactionCategory category, BankAccount bankaccount, Date date, String description) {
         this.value = value;
         this.category = category;
         this.bankaccount = bankaccount;
         this.date = date;
+        this.description = description;
     }
 
-    public Transaction(int id, double value, TransactionCategory category, BankAccount bankaccount, Date date) {
+    public Transaction(int id, double value, TransactionCategory category, BankAccount bankaccount, Date date, String description) {
         this.id = id;
         this.value = value;
         this.category = category;
         this.bankaccount = bankaccount;
         this.date = date;
+        this.description = description;
     }
 
     /**
@@ -107,10 +110,18 @@ public abstract class Transaction {
         this.date = date;
     }
 
+    public String GetDescription(){
+        return description;
+    }
+
+    public void setDescription (String description){
+        this.description = description;
+    }
     /**
      * Gets typ.
      *
      * @return the typ
      */
     public abstract String getTyp();
+
 }
