@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"Alle Packages","u":"allpackages-index.html"},{"m":"wbh.wbh_projekt_privatebuchhaltung","l":"wbh.wbh_projekt_privatebuchhaltung"},{"m":"wbh.wbh_projekt_privatebuchhaltung","l":"wbh.wbh_projekt_privatebuchhaltung.controller"},{"m":"wbh.wbh_projekt_privatebuchhaltung","l":"wbh.wbh_projekt_privatebuchhaltung.models"}];updateSearchResults();
