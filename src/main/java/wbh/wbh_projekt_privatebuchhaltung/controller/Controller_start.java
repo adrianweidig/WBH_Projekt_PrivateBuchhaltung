@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -66,6 +67,8 @@ public class Controller_start {
      */
     @FXML
     void onaction_createprofile(ActionEvent event) {
+        DataController d = new DataController();
+        d.createTables();
         Profile profile = new Profile();
         try {
             loadMainController(profile);
@@ -83,6 +86,12 @@ public class Controller_start {
     @FXML
     void onaction_loadprofile(ActionEvent event) {
         Profile profile = new Profile();
+        DataController d = new DataController();
+        profile = d.loadData("jdbc:sqlite:db.sqlite");
+        for(int i = 0; i < profile.Categories.size();i++)
+        {
+            logger.info(profile.Categories.get(i).GetName());
+        }
         try {
             loadMainController(profile);
         } catch (IOException e) {
