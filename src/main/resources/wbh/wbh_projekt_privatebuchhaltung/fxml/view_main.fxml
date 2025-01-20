@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="wbh.wbh_projekt_privatebuchhaltung.controller.Controller_main">
+    <!-- Linke Seitenleiste -->
+    <left>
+        <fx:include source="view_sidebar.fxml"/>
+    </left>
+
+    <!-- Dynamischer Hauptbereich -->
+    <center>
+        <StackPane fx:id="contentPane">
+            <!-- Initiale Ansicht -->
+            <fx:include source="view_dashboard.fxml"/>
+        </StackPane>
+    </center>
+</BorderPane>
