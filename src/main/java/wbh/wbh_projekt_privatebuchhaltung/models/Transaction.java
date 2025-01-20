@@ -6,6 +6,7 @@ import java.util.Date;
  * The type Transaction.
  */
 public abstract class Transaction {
+    private int id;
     private double value;
     private TransactionCategory category;
     private BankAccount bankaccount;
@@ -20,6 +21,14 @@ public abstract class Transaction {
      * @param date        the date
      */
     public Transaction(double value, TransactionCategory category, BankAccount bankaccount, Date date) {
+        this.value = value;
+        this.category = category;
+        this.bankaccount = bankaccount;
+        this.date = date;
+    }
+
+    public Transaction(int id, double value, TransactionCategory category, BankAccount bankaccount, Date date) {
+        this.id = id;
         this.value = value;
         this.category = category;
         this.bankaccount = bankaccount;

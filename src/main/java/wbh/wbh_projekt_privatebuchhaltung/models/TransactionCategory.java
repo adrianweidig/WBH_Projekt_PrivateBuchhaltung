@@ -5,16 +5,23 @@ package wbh.wbh_projekt_privatebuchhaltung.models;
  */
 public class TransactionCategory
 {
-    /**
-     * The Id.
-     */
-    public int id;
-    /**
-     * The Name.
-     */
-    public String name;
-    /**
-     * The Description.
-     */
-    public String description;
+    private int id;
+    private String name;
+
+    public TransactionCategory(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public String GetName(){
+        return name;
+    }
+
+    public int GetId(){
+        return id;
+    }
+
+    public void SetName(String name){
+        this.name = name;
+    }
 }

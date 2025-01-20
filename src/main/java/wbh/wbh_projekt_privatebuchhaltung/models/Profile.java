@@ -27,4 +27,6 @@ public class Profile {
      * The Expenses.
      */
     public List<Expense> Expenses = Collections.emptyList();
+
+    public List<TransactionCategory> Categories = Collections.emptyList();
 }

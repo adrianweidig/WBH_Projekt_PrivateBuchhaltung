@@ -5,11 +5,11 @@ package wbh.wbh_projekt_privatebuchhaltung.models;
  */
 public enum Language {
     /**
-     * English language.
-     */
-    English,
-    /**
      * German language.
      */
-    German
+    German,
+    /**
+     * English language.
+     */
+    English
 }
