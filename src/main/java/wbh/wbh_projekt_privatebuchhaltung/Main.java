@@ -15,17 +15,24 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
- * Application Starting Point
+ * Application Starting Point for the Private Buchhaltung Project.
+ * Initializes the JavaFX application, loads the start view, and sets up the main stage.
  */
 public class Main extends JProApplication {
 
-    // Logger defined as an instance variable
+    /* -------------------------------- */
+    /* ------ Instance Variables ------ */
+    /* -------------------------------- */
+
     private final Logger logger = LoggerFactory.getLogger(Main.class);
 
+    /* -------------------------------- */
+    /* ------ Application Start ------ */
+    /* -------------------------------- */
+
     /**
-     * This method is the entry point for the JavaFX application.
-     * It initializes the main application window, sets the title,
-     * loads the FXML view, and manages the primary stage.
+     * The entry point for the JavaFX application.
+     * Initializes the primary stage, sets up the title, loads the FXML view, and manages the window.
      *
      * @param primaryStage The primary stage for the JavaFX application.
      * @throws Exception If an error occurs during the loading of the FXML or other resources.
@@ -34,12 +41,12 @@ public class Main extends JProApplication {
     public void start(Stage primaryStage) throws Exception {
         logger.info("Application is starting.");
 
-        // Load resources for internationalization (i18n)
+        // Load internationalization resources (i18n)
         ResourceBundle resourceBundle = ResourceBundle.getBundle(
                 "wbh/wbh_projekt_privatebuchhaltung/i18n/text_controls", Locale.ENGLISH
         );
 
-        // Set the title from the resource bundle
+        // Set application title from the resource bundle
         String appTitle = resourceBundle.getString("app.title");
         primaryStage.setTitle(appTitle);
 
@@ -50,26 +57,24 @@ public class Main extends JProApplication {
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setResources(resourceBundle);
 
-        // Configure and load the main scene
+        // Load the start view FXML file
         Parent fxmlScene = fxmlLoader.load(
                 this.getClass().getResourceAsStream("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_start.fxml")
         );
 
-        // Configure the scene
+        // Configure the scene and apply the corresponding styles
         Scene scene = new Scene(fxmlScene);
         scene.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("styles/style_start.css")).toExternalForm());
 
         // Set the scene and show the stage
         primaryStage.setScene(scene);
-        primaryStage.setResizable(true);
+        primaryStage.setResizable(true);  // Allow window resizing
         primaryStage.show();
 
         logger.info("Start window loaded successfully.");
 
-        // Get the controller and configure it
+        // Initialize the controller and set additional dependencies
         Controller_start startController = fxmlLoader.getController();
-
-        // Use Web-API and HostServices for JPro
         try {
             startController.setHostServices(this.getHostServices());
             startController.setWebAPI(this.getWebAPI());
@@ -79,9 +84,13 @@ public class Main extends JProApplication {
         }
     }
 
+    /* -------------------------------- */
+    /* ------ Main Method ----------- */
+    /* -------------------------------- */
+
     /**
-     * This is the main entry point for running the application.
-     * It launches the JPro application and logs the starting and closing events.
+     * Main entry point for running the application.
+     * Launches the JPro application, logging the start and shutdown events.
      *
      * @param args Command-line arguments passed to the application.
      */
@@ -92,11 +101,13 @@ public class Main extends JProApplication {
         logger.info("Application has been closed.");
     }
 
+    /* -------------------------------- */
+    /* ------ Application Stop ------ */
+    /* -------------------------------- */
+
     /**
-     * This method is called when the application is stopped.
-     * It has been overridden to allow additional functionality to be added in the future
-     * when the application is being shut down. Currently, it logs the stopping event
-     * and calls the superclass's stop method to handle the default shutdown behavior.
+     * Called when the application is stopped.
+     * Currently logs the stop event and calls the superclass's stop method to handle the default shutdown behavior.
      *
      * @throws Exception If an error occurs while stopping the application.
      */
@@ -105,5 +116,4 @@ public class Main extends JProApplication {
         logger.info("Application is stopping.");
         super.stop();  // Call the superclass stop method to handle default shutdown behavior.
     }
-
 }

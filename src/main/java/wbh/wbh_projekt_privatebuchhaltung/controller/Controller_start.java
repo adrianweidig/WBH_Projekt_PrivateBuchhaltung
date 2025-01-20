@@ -21,14 +21,23 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
- * The type Controller start.
+ * Controller for the start view of the application.
+ * Manages profile creation and loading, and transitions to the main view.
  */
 public class Controller_start {
+
+    /* -------------------------------- */
+    /* ------ Instance Variables ------ */
+    /* -------------------------------- */
 
     private final Logger logger = LoggerFactory.getLogger(Controller_start.class);
 
     private WebAPI webAPI = null;
     private HostServices hostServices = null;
+
+    /* -------------------------------- */
+    /* ------ FXML Variables     ------ */
+    /* -------------------------------- */
 
     @FXML
     private ResourceBundle resources;
@@ -45,52 +54,61 @@ public class Controller_start {
     @FXML
     private VBox vbox_background;
 
+    /* -------------------------------- */
+    /* ------ FXML Methods       ------ */
+    /* -------------------------------- */
+
     /**
-     * This method is triggered when the "Create Profile" button is clicked.
-     * The current implementation is empty, but it can be extended to handle
-     * the profile creation logic.
+     * Handles the action for creating a new profile.
+     * Navigates to the main view after initializing a new profile.
      *
-     * @param event The event triggered by the button click.
+     * @param event The button click event.
      */
     @FXML
     void onaction_createprofile(ActionEvent event) {
-        // This is where you would load or create the profile logic.
-        // For now, both methods do the same thing.
         Profile profile = new Profile();
-
-        // Load the main controller and pass the profile object
         try {
-            this.loadMainController(profile);
+            loadMainController(profile);
         } catch (IOException e) {
             logger.error("Failed to load the main controller with the provided profile.", e);
         }
     }
 
     /**
-     * This method is triggered when the "Load Profile" button is clicked.
-     * The current implementation is empty, but it can be extended to handle
-     * the logic for loading a profile.
+     * Handles the action for loading an existing profile.
+     * Navigates to the main view after initializing a profile.
      *
-     * @param event The event triggered by the button click.
+     * @param event The button click event.
      */
     @FXML
     void onaction_loadprofile(ActionEvent event) {
-        // This is where you would load or create the profile logic.
-        // For now, both methods do the same thing.
         Profile profile = new Profile();
-
-        // Load the main controller and pass the profile object
         try {
-            this.loadMainController(profile);
+            loadMainController(profile);
         } catch (IOException e) {
             logger.error("Failed to load the main controller with the provided profile.", e);
         }
     }
 
     /**
-     * Loads the main controller and passes the profile object to it.
+     * Ensures that all FXML components are properly injected and available.
+     * Called during the initialization phase of the controller.
+     */
+    @FXML
+    void initialize() {
+        assert btn_createprofile != null : "fx:id=\"btn_createprofile\" was not injected: check your FXML file 'view_start.fxml'.";
+        assert btn_loadprofile != null : "fx:id=\"btn_loadprofile\" was not injected: check your FXML file 'view_start.fxml'.";
+        assert vbox_background != null : "fx:id=\"vbox_background\" was not injected: check your FXML file 'view_start.fxml'.";
+    }
+
+    /* -------------------------------- */
+    /* ------ Private Methods    ------ */
+    /* -------------------------------- */
+
+    /**
+     * Loads the main controller and initializes it with the given profile.
      *
-     * @param profile The profile object to be passed to the main controller.
+     * @param profile The profile object to pass to the main controller.
      * @throws IOException If there is an issue loading the FXML file.
      */
     private void loadMainController(Profile profile) throws IOException {
@@ -98,35 +116,34 @@ public class Controller_start {
 
         Stage primaryStage = (Stage) this.vbox_background.getScene().getWindow();
 
-        // Load resources for internationalization (i18n)
+        // Load internationalized resources
         ResourceBundle resourceBundle = ResourceBundle.getBundle(
                 "wbh/wbh_projekt_privatebuchhaltung/i18n/text_controls", Locale.ENGLISH
         );
 
-        // Load the FXML file with the ResourceBundle
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setResources(resourceBundle);
 
-        // Configure and load the main scene
+        // Load the main view FXML file
         Parent fxmlScene = fxmlLoader.load(
-                this.getClass().getResourceAsStream("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_main.fxml")
+                Objects.requireNonNull(this.getClass().getResourceAsStream("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_main.fxml"))
         );
 
-        // Configure the scene
+        // Configure and set the scene
         Scene scene = new Scene(fxmlScene);
-        scene.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/styles/style_main.css")).toExternalForm());
+        scene.getStylesheets().add(
+                Objects.requireNonNull(this.getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/styles/style_main.css"))
+                        .toExternalForm()
+        );
 
-        // Set the scene and show the stage
         primaryStage.setScene(scene);
-
         logger.info("Main window loaded successfully.");
 
-        // Get the controller and configure it
+        // Initialize the main controller
         Controller_main mainController = fxmlLoader.getController();
-
         mainController.setProfile(profile);
 
-        // Use Web-API and HostServices for JPro
+        // Pass WebAPI and HostServices to the main controller (for JPro)
         try {
             mainController.setHostServices(this.hostServices);
             mainController.setWebAPI(this.webAPI);
@@ -136,25 +153,15 @@ public class Controller_start {
         }
     }
 
-    /**
-     * This method is called when the controller is initialized.
-     * It ensures that all FXML components are properly injected and available.
-     * If any component is not injected, an assertion error will be thrown.
-     */
-    @FXML
-    void initialize() {
-        assert btn_createprofile != null : "fx:id=\"btn_createprofile\" was not injected: check your FXML file 'view_start.fxml'.";
-        assert btn_loadprofile != null : "fx:id=\"btn_loadprofile\" was not injected: check your FXML file 'view_start.fxml'.";
-        assert vbox_background != null : "fx:id=\"vbox_background\" was not injected: check your FXML file 'view_start.fxml'.";
-    }
-
-    // Getter and Setter
+    /* -------------------------------- */
+    /* ------ Public Methods     ------ */
+    /* -------------------------------- */
 
     /**
-     * Sets the WebAPI instance to be used by this controller.
-     * This method ensures that the WebAPI is only set once.
+     * Sets the WebAPI instance for this controller.
+     * Ensures the WebAPI is only initialized once.
      *
-     * @param webAPI The WebAPI instance to be set.
+     * @param webAPI The WebAPI instance to set.
      */
     public void setWebAPI(final WebAPI webAPI) {
         if (this.webAPI == null) {
@@ -163,10 +170,10 @@ public class Controller_start {
     }
 
     /**
-     * Sets the HostServices instance to be used by this controller.
-     * This method ensures that the HostServices is only set once.
+     * Sets the HostServices instance for this controller.
+     * Ensures the HostServices is only initialized once.
      *
-     * @param hostServices The HostServices instance to be set.
+     * @param hostServices The HostServices instance to set.
      */
     public void setHostServices(final HostServices hostServices) {
         if (this.hostServices == null) {

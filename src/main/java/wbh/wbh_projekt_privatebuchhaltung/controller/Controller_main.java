@@ -16,15 +16,15 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * Controller for the main application view.
+ * Manages navigation between different views and handles global application settings.
+ */
 public class Controller_main {
 
-    private final Logger logger = LoggerFactory.getLogger(Controller_main.class);
-
-    private Profile profile = null;
-
-    private WebAPI webAPI = null;
-
-    private HostServices hostServices = null;
+    /* -------------------------------- */
+    /* ------ FXML Variables     ------ */
+    /* -------------------------------- */
 
     @FXML
     private StackPane contentPane;
@@ -44,23 +44,56 @@ public class Controller_main {
     @FXML
     private VBox vbox_background;
 
+    /* -------------------------------- */
+    /* ------ Instance Variables ------ */
+    /* -------------------------------- */
+
+    private final Logger logger = LoggerFactory.getLogger(Controller_main.class);
+
+    private Profile profile = null;
+
+    private WebAPI webAPI = null;
+
+    private HostServices hostServices = null;
+
+    /* -------------------------------- */
+    /* ------ FXML Methods       ------ */
+    /* -------------------------------- */
+
+    /**
+     * Handles the action of navigating to the Dashboard view.
+     * Triggered when the corresponding button is clicked.
+     */
     @FXML
     private void handleDashboard() {
         logger.info("Navigating to Dashboard view.");
         loadView("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_dashboard.fxml");
     }
 
+    /**
+     * Handles the action of navigating to the Settings view.
+     * Triggered when the corresponding button is clicked.
+     */
     @FXML
     private void handleSettings() {
         logger.info("Navigating to Settings view.");
         loadView("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_settings.fxml");
     }
 
+    /* -------------------------------- */
+    /* ------ Private Methods    ------ */
+    /* -------------------------------- */
+
+    /**
+     * Loads an FXML file and displays it in the contentPane.
+     *
+     * @param fxmlFile Path to the FXML file to be loaded.
+     */
     private void loadView(String fxmlFile) {
         try {
             logger.debug("Loading FXML file: {}", fxmlFile);
-            this.contentPane.getChildren().clear();
-            // Load the FXML file and add it to the content pane
+            contentPane.getChildren().clear();
+
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource(fxmlFile)));
             contentPane.getChildren().add(loader.load());
         } catch (IOException e) {
@@ -68,7 +101,9 @@ public class Controller_main {
         }
     }
 
-    // Getter and Setter
+    /* -------------------------------- */
+    /* ------ Public Methods     ------ */
+    /* -------------------------------- */
 
     /**
      * Sets the profile object that is passed from the start screen.
