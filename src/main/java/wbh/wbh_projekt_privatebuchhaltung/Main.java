@@ -64,13 +64,14 @@ public class Main extends JProApplication {
         primaryStage.setResizable(true);
         primaryStage.show();
 
-        logger.info("Main window loaded successfully.");
+        logger.info("Start window loaded successfully.");
 
         // Get the controller and configure it
         Controller_start startController = fxmlLoader.getController();
 
         // Use Web-API and HostServices for JPro
         try {
+            startController.setHostServices(this.getHostServices());
             startController.setWebAPI(this.getWebAPI());
             logger.info("Web-API successfully initialized.");
         } catch (RuntimeException e) {
