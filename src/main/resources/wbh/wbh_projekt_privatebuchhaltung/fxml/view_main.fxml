@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="wbh.wbh_projekt_privatebuchhaltung.controller.Controller_main">
     <!-- Linke Seitenleiste -->
     <left>
-        <fx:include source="view_sidebar.fxml"/>
+        <VBox fx:id="vbox_background" spacing="10">
+            <Button fx:id="btnDashboard" onAction="#handleDashboard" text="Dashboard" />
+            <Button fx:id="btnSettings" onAction="#handleSettings" text="Settings" />
+        </VBox>
     </left>
 
-    <!-- Dynamischer Hauptbereich -->
+  <!-- Dynamischer Hauptbereich -->
     <center>
         <StackPane fx:id="contentPane">
             <!-- Initiale Ansicht -->
-            <fx:include source="view_dashboard.fxml"/>
+            <fx:include source="/wbh/wbh_projekt_privatebuchhaltung/fxml/view_dashboard.fxml"/>
         </StackPane>
     </center>
 </BorderPane>

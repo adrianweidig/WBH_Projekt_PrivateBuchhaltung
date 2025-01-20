@@ -57,7 +57,7 @@ public class Main extends JProApplication {
 
         // Configure the scene
         Scene scene = new Scene(fxmlScene);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/style_start.css")).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("styles/style_start.css")).toExternalForm());
 
         // Set the scene and show the stage
         primaryStage.setScene(scene);
