@@ -11,6 +11,7 @@ module wbh.wbh_projekt_privatebuchhaltung {
     requires eu.hansolo.tilesfx;
     requires jpro.webapi;
     requires org.slf4j;
+    requires java.sql;
 
     opens wbh.wbh_projekt_privatebuchhaltung to javafx.fxml;
     exports wbh.wbh_projekt_privatebuchhaltung;
