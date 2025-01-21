@@ -1,7 +1,6 @@
 package wbh.wbh_projekt_privatebuchhaltung.models;
 
-import java.util.Collections;
-import java.util.List;
+import javafx.collections.ObservableList;
 
 /**
  * The type Profile.
@@ -14,19 +13,19 @@ public class Profile {
     /**
      * The Bank accounts.
      */
-    public List<BankAccount> BankAccounts = Collections.emptyList();
+    public ObservableList<BankAccount> BankAccounts = javafx.collections.FXCollections.observableArrayList();
     /**
      * The Goals.
      */
-    public List<Goal> Goals = Collections.emptyList();
+    public ObservableList<Goal> Goals= javafx.collections.FXCollections.observableArrayList();
     /**
      * The Incomes.
      */
-    public List<Income> Incomes = Collections.emptyList();
+    public ObservableList<Income> Incomes = javafx.collections.FXCollections.observableArrayList();
     /**
      * The Expenses.
      */
-    public List<Expense> Expenses = Collections.emptyList();
+    public ObservableList<Expense> Expenses = javafx.collections.FXCollections.observableArrayList();
 
-    public List<TransactionCategory> Categories = Collections.emptyList();
+    public ObservableList<TransactionCategory> Categories = javafx.collections.FXCollections.observableArrayList();
 }

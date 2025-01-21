@@ -32,7 +32,7 @@ public class Controller_start {
     /* -------------------------------- */
 
     private final Logger logger = LoggerFactory.getLogger(Controller_start.class);
-
+    private DataController dataController = new DataController();
     private WebAPI webAPI = null;
     private HostServices hostServices = null;
 
@@ -67,8 +67,7 @@ public class Controller_start {
      */
     @FXML
     void onaction_createprofile(ActionEvent event) {
-        DataController d = new DataController();
-        d.createTables();
+        dataController.createTables("jdbc:sqlite:db.sqlite");
         Profile profile = new Profile();
         try {
             loadMainController(profile);
@@ -85,9 +84,9 @@ public class Controller_start {
      */
     @FXML
     void onaction_loadprofile(ActionEvent event) {
-        Profile profile = new Profile();
-        DataController d = new DataController();
-        profile = d.loadData("jdbc:sqlite:db.sqlite");
+        Profile profile = dataController.loadData("jdbc:sqlite:db.sqlite");
+
+        //For Debugging
         for(int i = 0; i < profile.Categories.size();i++)
         {
             logger.info(profile.Categories.get(i).GetName());

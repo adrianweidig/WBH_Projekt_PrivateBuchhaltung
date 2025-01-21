@@ -1,23 +1,23 @@
 package wbh.wbh_projekt_privatebuchhaltung.controller;
 
+import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wbh.wbh_projekt_privatebuchhaltung.models.*;
 
 import java.sql.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 public class DataController {
 
     private final Logger logger = LoggerFactory.getLogger(DataController.class);
 
-    public void createTables() {
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:db.sqlite");
+    public void createTables(String path) {
+        try (Connection connection = DriverManager.getConnection(path);
          Statement statement = connection.createStatement()) {
 
             statement.execute("""
@@ -88,60 +88,55 @@ public class DataController {
     }
 
     public Profile loadData(String path)  {
-        if(path == null)
-        {
-            path = "jdbc:sqlite:db.sqlite";
-        }
         Profile profile = new Profile();
 
         profile.Categories = getAllTransactionCategories(path);
         profile.BankAccounts = getAllBankAccounts(path);
 
         getTransactions(profile, path);
+
         return profile;
     }
 
     public void getTransactions(Profile profile, String dbFilePath) {
-
         String query = "SELECT id, [amount], date, description, categoryId, bankAccountId FROM [Transaction]";
 
-        // Verbindungsaufbau zur Datenbank
         try (Connection connection = DriverManager.getConnection(dbFilePath);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
 
-            // Alle Transaktionen durchgehen und in Transaction-Objekte umwandeln
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 double amount = resultSet.getDouble("amount");
-                Date date = new Date(2025,1,20); // TODO Solve Date Problems
+
+                Date date = java.sql.Date.valueOf(LocalDate.of(2025, 1, 20));
+                // TODO Solve Date Problems
                 String description = resultSet.getString("description");
                 int categoryId = resultSet.getInt("categoryId");
                 int bankAccountId = resultSet.getInt("bankAccountId");
 
                 TransactionCategory category =  profile.Categories.getFirst();
-
-               BankAccount account = profile.BankAccounts.getFirst();
+                BankAccount account = profile.BankAccounts.getFirst();
 
                 if(amount >= 0){
-                    Income transaction = new Income(id, amount,category, account, date, description);
-                    //profile.Incomes.add(transaction);
+                    Income income = new Income(id, amount ,category, account, date, description);
+                    logger.info("Income created");
+                    logger.info(id +" "+ String.valueOf(amount)+" " + category.GetName() +" "+ account.getName()+" "+ date.toString()+" "+ description);
+                    profile.Incomes.add(income);
+                    logger.info("Done");
                     //TODO  InvocationTargetExeption  Cant Add the transactions
                 }else{
                     Expense expense = new Expense(id, amount, category, account,date,description);
                     //profile.Expenses.add(expense);
                 }
-
             }
-            logger.info("allDone");
         } catch (SQLException e) {
            logger.error("Fehler beim Abrufen der Transaktionen aus der Datenbank: " + e.getMessage(), e);
         }
     }
 
-
-    public List<TransactionCategory> getAllTransactionCategories(String dbFilePath){
-        List<TransactionCategory> categories = new ArrayList<>();
+    public ObservableList<TransactionCategory> getAllTransactionCategories(String dbFilePath){
+        ObservableList<TransactionCategory> categories = javafx.collections.FXCollections.observableArrayList() ;
 
         String query = "SELECT id, name FROM TransactionCategory";
 
@@ -159,12 +154,11 @@ public class DataController {
         } catch (SQLException e) {
            logger.error("Fehler beim Abrufen der Kategorien: " + e.getMessage(), e);
         }
-
         return categories;
     }
 
-    public List<BankAccount> getAllBankAccounts(String dbFilePath) {
-        List<BankAccount> bankAccounts = new ArrayList<>();
+    public ObservableList<BankAccount> getAllBankAccounts(String dbFilePath) {
+        ObservableList<BankAccount> bankAccounts = javafx.collections.FXCollections.observableArrayList();
         String query = "SELECT id, Name, balance, lastInteraction FROM BankAccount";
 
         try (Connection connection = DriverManager.getConnection(dbFilePath);
@@ -172,8 +166,6 @@ public class DataController {
              ResultSet resultSet = statement.executeQuery(query)) {
             // Iteriere durch das ResultSet, um Kontodaten abzurufen
             while (resultSet.next()) {
-                SimpleDateFormat Simple_Date_Format =
-                        new SimpleDateFormat("yyyy-dd-MM", Locale.GERMAN);
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("Name");
                 double balance = resultSet.getDouble("balance");
@@ -188,7 +180,6 @@ public class DataController {
         }
         return bankAccounts;
     }
-
 
     // TODO muss noch getestet werden
     public void addTransactionCategory(TransactionCategory category) {
