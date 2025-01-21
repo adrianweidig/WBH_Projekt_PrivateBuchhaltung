@@ -13,15 +13,15 @@ public class TransactionCategory
         this.name = name;
     }
 
-    public String GetName(){
+    public String getName(){
         return name;
     }
 
-    public int GetId(){
+    public int getId(){
         return id;
     }
 
-    public void SetName(String name){
+    public void setName(String name){
         this.name = name;
     }
 }

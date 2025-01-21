@@ -12,6 +12,7 @@ module wbh.wbh_projekt_privatebuchhaltung {
     requires jpro.webapi;
     requires org.slf4j;
     requires java.sql;
+    requires scala.library;
 
     opens wbh.wbh_projekt_privatebuchhaltung to javafx.fxml;
     exports wbh.wbh_projekt_privatebuchhaltung;

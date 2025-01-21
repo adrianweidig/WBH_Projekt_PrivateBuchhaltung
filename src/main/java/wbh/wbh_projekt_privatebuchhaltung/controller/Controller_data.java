@@ -92,6 +92,8 @@ public class Controller_data {
 
         profile.Categories = getAllTransactionCategories(path);
         profile.BankAccounts = getAllBankAccounts(path);
+        profile.setCategories(getAllTransactionCategories(path));
+        profile.setBankAccounts(getAllBankAccounts(path));
 
         getTransactions(profile, path);
 
@@ -125,9 +127,11 @@ public class Controller_data {
                     profile.Incomes.add(income);
                     logger.info("Done");
                     //TODO  InvocationTargetExeption  Cant Add the transactions
+                    profile.getIncomes().add(income);
                 }else{
                     Expense expense = new Expense(id, amount, category, account,date,description);
                     //profile.Expenses.add(expense);
+                    profile.getExpenses().add(expense);
                 }
             }
         } catch (SQLException e) {
@@ -165,6 +169,7 @@ public class Controller_data {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             // Iteriere durch das ResultSet, um Kontodaten abzurufen
+
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("Name");

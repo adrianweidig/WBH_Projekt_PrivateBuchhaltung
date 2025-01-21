@@ -32,7 +32,7 @@ public class Controller_start {
     /* -------------------------------- */
 
     private final Logger logger = LoggerFactory.getLogger(Controller_start.class);
-    private Controller_data dataController = new Controller_data();
+    private final Controller_data dataController = new Controller_data();
     private WebAPI webAPI = null;
     private HostServices hostServices = null;
 
@@ -87,17 +87,25 @@ public class Controller_start {
         Profile profile = dataController.loadData("jdbc:sqlite:db.sqlite");
 
         //For Debugging
-        for(int i = 0; i < profile.Categories.size();i++)
+        logger.info("Categories:");
+        for(int i = 0; i < profile.getCategories().size();i++)
         {
-            logger.info(profile.Categories.get(i).GetName());
+            logger.info(profile.getCategories().get(i).getName());
         }
-        for(int i = 0; i < profile.BankAccounts.size();i++)
+        logger.info("Bank Accounts:");
+        for(int i = 0; i < profile.getBankAccounts().size();i++)
         {
-            logger.info(profile.BankAccounts.get(i).getName());
+            logger.info(profile.getBankAccounts().get(i).getName()+" "+ profile.getBankAccounts().get(i).getBalance());
         }
-        for(int i = 0; i < profile.Incomes.size();i++)
+        logger.info("Incomes:");
+        for(int i = 0; i < profile.getIncomes().size();i++)
         {
-            logger.info(profile.Incomes.get(i).GetDescription());
+            logger.info(profile.getIncomes().get(i).GetDescription());
+        }
+        logger.info("Expenses:");
+        for(int i = 0; i < profile.getExpenses().size();i++)
+        {
+            logger.info(profile.getExpenses().get(i).GetDescription());
         }
 
         try {
