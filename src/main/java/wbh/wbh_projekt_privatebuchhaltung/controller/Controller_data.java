@@ -6,21 +6,21 @@ import org.slf4j.LoggerFactory;
 import wbh.wbh_projekt_privatebuchhaltung.models.*;
 
 import java.sql.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 import java.util.Locale;
 
 public class Controller_data {
 
     private final Logger logger = LoggerFactory.getLogger(Controller_data.class);
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
 
     public void createTables(String path) {
         try (Connection connection = DriverManager.getConnection(path);
-         Statement statement = connection.createStatement()) {
+             Statement statement = connection.createStatement()) {
 
-            statement.execute("""
+            statement.execute( """
                 drop Table If Exists BankAccount;
             """);
 
@@ -77,9 +77,14 @@ public class Controller_data {
             """);
 
             statement.execute("""               
-              INSERT INTO [Transaction] (amount, categoryID, bankAccountId, [date], description)
+              INSERT INTO [Transaction] ([amount], categoryID, bankAccountId, [date], description)
               VALUES
               (50.00, 1,1,'2023-11-01', 'Einkauf im Supermarkt')
+            """);
+            statement.execute("""               
+              INSERT INTO [Transaction] ([amount], categoryID, bankAccountId, [date], description)
+              VALUES
+              (-99.00, 2,1,'2025-01-21', 'Essen')
             """);
 
         } catch (SQLException e) {
@@ -90,8 +95,6 @@ public class Controller_data {
     public Profile loadData(String path)  {
         Profile profile = new Profile();
 
-        profile.Categories = getAllTransactionCategories(path);
-        profile.BankAccounts = getAllBankAccounts(path);
         profile.setCategories(getAllTransactionCategories(path));
         profile.setBankAccounts(getAllBankAccounts(path));
 
@@ -107,35 +110,38 @@ public class Controller_data {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
 
+
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 double amount = resultSet.getDouble("amount");
-
-                Date date = java.sql.Date.valueOf(LocalDate.of(2025, 1, 20));
-                // TODO Solve Date Problems
+                Date date = dateFormat.parse(resultSet.getString("date"));
                 String description = resultSet.getString("description");
                 int categoryId = resultSet.getInt("categoryId");
                 int bankAccountId = resultSet.getInt("bankAccountId");
 
-                TransactionCategory category =  profile.Categories.getFirst();
-                BankAccount account = profile.BankAccounts.getFirst();
+                TransactionCategory category = profile.getCategories()
+                        .stream()
+                        .filter(c -> c.getId() == categoryId)
+                        .findFirst()
+                        .orElse(null);
+
+                BankAccount account = profile.getBankAccounts()
+                        .stream()
+                        .filter(a -> a.getId() == bankAccountId)
+                        .findFirst().orElse(null);
 
                 if(amount >= 0){
                     Income income = new Income(id, amount ,category, account, date, description);
-                    logger.info("Income created");
-                    logger.info(id +" "+ String.valueOf(amount)+" " + category.GetName() +" "+ account.getName()+" "+ date.toString()+" "+ description);
-                    profile.Incomes.add(income);
-                    logger.info("Done");
-                    //TODO  InvocationTargetExeption  Cant Add the transactions
                     profile.getIncomes().add(income);
                 }else{
                     Expense expense = new Expense(id, amount, category, account,date,description);
-                    //profile.Expenses.add(expense);
                     profile.getExpenses().add(expense);
                 }
             }
         } catch (SQLException e) {
-           logger.error("Fehler beim Abrufen der Transaktionen aus der Datenbank: " + e.getMessage(), e);
+           logger.error("Error while loading Transactions from DB. " + e.getMessage(), e);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -156,7 +162,7 @@ public class Controller_data {
                 categories.add(category);
             }
         } catch (SQLException e) {
-           logger.error("Fehler beim Abrufen der Kategorien: " + e.getMessage(), e);
+           logger.error("Error while loading TransactionCategories from DB: " + e.getMessage(), e);
         }
         return categories;
     }
@@ -168,37 +174,21 @@ public class Controller_data {
         try (Connection connection = DriverManager.getConnection(dbFilePath);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
-            // Iteriere durch das ResultSet, um Kontodaten abzurufen
 
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("Name");
                 double balance = resultSet.getDouble("balance");
-                Date lastInteraction = new Date(2025,1,20);
-                // TODO How can i get the Date from SQL to Date class
+                Date lastInteraction = dateFormat.parse(resultSet.getString("lastInteraction"));
 
                 BankAccount account = new BankAccount(id, name, balance, lastInteraction);
                 bankAccounts.add(account);
             }
         } catch (SQLException e) {
-           logger.error("Fehler beim Abrufen der Bankkonten: " + e.getMessage(), e);
+           logger.error("Error while loading BankAccount from DB. " + e.getMessage(), e);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
         return bankAccounts;
-    }
-
-    // TODO muss noch getestet werden
-    public void addTransactionCategory(TransactionCategory category) {
-        String insertSQL = "INSERT INTO TransactionCategory (name) VALUES (?)";
-
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:db.sqlite");
-             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
-
-            preparedStatement.setString(1, category.GetName());
-
-            preparedStatement.executeUpdate();
-
-        } catch (SQLException e) {
-            logger.error("Fehler beim Einfügen der Kategorie: " + e.getMessage(), e);
-        }
     }
 }
