@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class DataController {
+public class Controller_data {
 
-    private final Logger logger = LoggerFactory.getLogger(DataController.class);
+    private final Logger logger = LoggerFactory.getLogger(Controller_data.class);
 
     public void createTables(String path) {
         try (Connection connection = DriverManager.getConnection(path);

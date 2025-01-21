@@ -32,7 +32,7 @@ public class Controller_start {
     /* -------------------------------- */
 
     private final Logger logger = LoggerFactory.getLogger(Controller_start.class);
-    private DataController dataController = new DataController();
+    private Controller_data dataController = new Controller_data();
     private WebAPI webAPI = null;
     private HostServices hostServices = null;
 
