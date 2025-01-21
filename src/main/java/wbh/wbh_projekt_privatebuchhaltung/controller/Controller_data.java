@@ -5,16 +5,14 @@ import org.slf4j.LoggerFactory;
 import wbh.wbh_projekt_privatebuchhaltung.models.*;
 
 import java.sql.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
-public class DataController {
+public class Controller_data {
 
-    private final Logger logger = LoggerFactory.getLogger(DataController.class);
+    private final Logger logger = LoggerFactory.getLogger(Controller_data.class);
 
     public void createTables() {
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite:db.sqlite");
