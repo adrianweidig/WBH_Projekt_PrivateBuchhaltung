@@ -73,7 +73,7 @@ public class Controller_start {
         dataController.createTables("jdbc:sqlite:db.sqlite");
         Profile profile = new Profile();
         try {
-            loadMainController(profile);
+            this.loadMainController(profile);
         } catch (IOException e) {
             logger.error("Failed to load the main controller with the provided profile.", e);
         }
@@ -112,7 +112,7 @@ public class Controller_start {
         }
 
         try {
-            loadMainController(profile);
+            this.loadMainController(profile);
         } catch (IOException e) {
             logger.error("Failed to load the main controller with the provided profile.", e);
         }
