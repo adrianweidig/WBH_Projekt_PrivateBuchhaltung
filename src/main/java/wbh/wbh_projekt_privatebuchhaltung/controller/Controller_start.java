@@ -53,6 +53,9 @@ public class Controller_start {
     private Button btn_loadprofile;
 
     @FXML
+    private Button btn_saveprofile;
+
+    @FXML
     private VBox vbox_background;
 
     /* -------------------------------- */
@@ -116,6 +119,16 @@ public class Controller_start {
     }
 
     /**
+     * Handles the action for saving a profile.
+     *
+     * @param event The button click event.
+     */
+    @FXML
+    void onaction_saveprofile(ActionEvent event) {
+        // TODO: Implement logic
+    }
+
+    /**
      * Ensures that all FXML components are properly injected and available.
      * Called during the initialization phase of the controller.
      */
@@ -123,6 +136,7 @@ public class Controller_start {
     void initialize() {
         assert btn_createprofile != null : "fx:id=\"btn_createprofile\" was not injected: check your FXML file 'view_start.fxml'.";
         assert btn_loadprofile != null : "fx:id=\"btn_loadprofile\" was not injected: check your FXML file 'view_start.fxml'.";
+        assert btn_saveprofile != null : "fx:id=\"btn_saveprofile\" was not injected: check your FXML file 'view_start.fxml'.";
         assert vbox_background != null : "fx:id=\"vbox_background\" was not injected: check your FXML file 'view_start.fxml'.";
     }
 
