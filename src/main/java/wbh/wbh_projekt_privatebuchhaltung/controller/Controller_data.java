@@ -3,7 +3,6 @@ package wbh.wbh_projekt_privatebuchhaltung.controller;
 import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.math.ScalaNumber;
 import wbh.wbh_projekt_privatebuchhaltung.models.*;
 
 import java.sql.*;
@@ -76,6 +75,23 @@ public class Controller_data {
                 )
             """);
 
+            statement.execute("""
+            DROP TABLE IF EXISTS [Goal];
+            """);
+
+            statement.execute("""
+                CREATE TABLE IF NOT EXISTS Goal (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    description TEXT,
+                    goalValue REAL NOT NULL,
+                    bankAccountId INTEGER NOT NULL,
+                    startDate DATE NOT NULL,
+                    endDate DATE,
+                      FOREIGN KEY (bankAccountId) REFERENCES BankAccount(id)
+                );
+            """);
+
             logger.info("Tables were created successful.");
         } catch (SQLException e) {
             logger.error("Error creating tables: " + e.getMessage());
@@ -89,6 +105,7 @@ public class Controller_data {
         profile.setBankAccounts(getAllBankAccounts(path));
         profile.setUserSettings(getUserSettings(path));
 
+        getGoals(path, profile);
         getTransactions(profile, path);
 
         return profile;
@@ -128,7 +145,10 @@ public class Controller_data {
               ("Marco",'1994-04-21', 1)
             """);
 
-
+            statement.execute("""            
+            INSERT INTO Goal ([name], description, goalValue, bankAccountId, startDate, endDate)
+            VALUES ('Sparen für Urlaub', 'Sparen für eine Reise in den Sommerferien', 2000.00, 1, '2023-10-01', '2024-07-01')
+            """);
 
             logger.info("Test data written successful.");
 
@@ -247,6 +267,41 @@ public class Controller_data {
             throw new RuntimeException(e);
         }
         return bankAccounts;
+    }
+
+    public void getGoals(String dbFilePath, Profile profile) {
+
+        String query = "SELECT id, name, description, goalValue, bankAccountId, startDate, endDate FROM Goal";
+
+        try (Connection connection = DriverManager.getConnection(dbFilePath);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String description = resultSet.getString("description");
+                double goalValue = resultSet.getDouble("goalValue");
+                int bankAccountId = resultSet.getInt("bankAccountId");
+                Date startDate = dateFormat.parse(resultSet.getString("startDate"));
+                Date endDate = dateFormat.parse(resultSet.getString("endDate"));
+
+                BankAccount bankAccount = profile.getBankAccounts().stream()
+                        .filter(account -> account.getId() == bankAccountId)
+                        .findFirst()
+                        .orElse(null);
+
+                if (bankAccount != null) {
+                    Goal goal = new Goal(id, name, description, goalValue, bankAccount, startDate, endDate);
+                    profile.getGoals().add(goal);
+                }
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error while loading Goals from DB: " + e.getMessage());
+        } catch (ParseException e) {
+            logger.error("Error while parsing Date: " + e.getMessage());
+        }
     }
 
     public void SaveData(String dbFilePath, Profile profile) {

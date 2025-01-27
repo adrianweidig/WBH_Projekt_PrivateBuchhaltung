@@ -14,7 +14,6 @@ public class Goal
     private BankAccount bankAccount;
     private Date startDate = new Date();
     private Date endDate;
-    private boolean completed;
 
     /**
      * Instantiates a new Goal.
@@ -117,4 +116,9 @@ public class Goal
     public double getCompletionRate(){
         return 1 / goalValue * bankAccount.getBalance();
     }
+
+    public boolean isCompleted(){
+        return bankAccount.getBalance() >= goalValue;
+    }
+
 }

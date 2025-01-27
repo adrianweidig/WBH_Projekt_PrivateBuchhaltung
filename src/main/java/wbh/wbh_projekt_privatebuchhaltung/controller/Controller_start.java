@@ -113,6 +113,12 @@ public class Controller_start {
         logger.info("UserSetting:");
         logger.info(profile.getUserSettings().GetName() + " " + profile.getUserSettings().GetBirthday() + " " + profile.getUserSettings().GetLanguage());
 
+        logger.info("Goals: (" + profile.getGoals().size() + ")");
+        for(int i = 0; i < profile.getGoals().size();i++)
+        {
+            logger.info(profile.getGoals().get(i).getDescription());
+        }
+
         try {
             this.loadMainController(profile);
         } catch (IOException e) {
