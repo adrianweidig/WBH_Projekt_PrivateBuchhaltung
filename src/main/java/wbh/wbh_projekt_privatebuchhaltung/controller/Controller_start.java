@@ -70,7 +70,6 @@ public class Controller_start {
      */
     @FXML
     void onaction_createprofile(ActionEvent event) {
-        dataController.createTables("jdbc:sqlite:db.sqlite");
         Profile profile = new Profile();
         try {
             this.loadMainController(profile);
@@ -87,6 +86,7 @@ public class Controller_start {
      */
     @FXML
     void onaction_loadprofile(ActionEvent event) {
+
         Profile profile = dataController.loadData("jdbc:sqlite:db.sqlite");
 
         //For Debugging
@@ -110,6 +110,8 @@ public class Controller_start {
         {
             logger.info(profile.getExpenses().get(i).GetDescription());
         }
+        logger.info("UserSetting:");
+        logger.info(profile.getUserSettings().GetName() + " " + profile.getUserSettings().GetBirthday() + " " + profile.getUserSettings().GetLanguage());
 
         try {
             this.loadMainController(profile);

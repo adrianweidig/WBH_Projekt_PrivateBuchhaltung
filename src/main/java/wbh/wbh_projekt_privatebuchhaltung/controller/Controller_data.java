@@ -3,6 +3,7 @@ package wbh.wbh_projekt_privatebuchhaltung.controller;
 import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.math.ScalaNumber;
 import wbh.wbh_projekt_privatebuchhaltung.models.*;
 
 import java.sql.*;
@@ -40,7 +41,8 @@ public class Controller_data {
             statement.execute("""             
                 CREATE TABLE IF NOT EXISTS TransactionCategory (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL
+                    name TEXT NOT NULL,
+                    CreatedByUser bit NOT NULL
                 )
             """);
 
@@ -61,14 +63,47 @@ public class Controller_data {
                 )
             """);
 
-            logger.info("Tables were created successful.");
-
-            /// Testimport:
             statement.execute("""
-            Insert into TransactionCategory ([Name]) Values ('Gehalt');
+              Drop Table if Exists [UserSettings];
+            """);
+
+            statement.execute("""                
+                CREATE TABLE IF NOT EXISTS [UserSettings] (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    language INTEGER NOT NULL,
+                    birthday NOT NULL
+                )
+            """);
+
+            logger.info("Tables were created successful.");
+        } catch (SQLException e) {
+            logger.error("Error creating tables: " + e.getMessage());
+        }
+    }
+
+    public Profile loadData(String path)  {
+        Profile profile = new Profile();
+
+        profile.setCategories(getAllTransactionCategories(path));
+        profile.setBankAccounts(getAllBankAccounts(path));
+        profile.setUserSettings(getUserSettings(path));
+
+        getTransactions(profile, path);
+
+        return profile;
+    }
+
+    public void writeTestDataToDb(String path){
+        try (Connection connection = DriverManager.getConnection(path);
+             Statement statement = connection.createStatement()) {
+
+            /// TestData:
+            statement.execute("""
+            Insert into TransactionCategory ([Name], CreatedByUser) Values ('Gehalt', false);
             """);
             statement.execute("""
-            Insert into TransactionCategory ([Name]) Values ('Lebensmittel');
+            Insert into TransactionCategory ([Name], CreatedByUser) Values ('Lebensmittel', true);
             """);
 
             statement.execute("""     
@@ -87,20 +122,20 @@ public class Controller_data {
               (-99.00, 2,1,'2025-01-21', 'Essen')
             """);
 
+            statement.execute("""               
+              INSERT INTO [UserSettings] ([name], birthday, language)
+              VALUES
+              ("Marco",'1994-04-21', 1)
+            """);
+
+
+
+            logger.info("Test data written successful.");
+
         } catch (SQLException e) {
-            logger.error("Error creating tables: " + e.getMessage());
+            logger.error("Error while write testdata to database: " + e.getMessage());
         }
-    }
 
-    public Profile loadData(String path)  {
-        Profile profile = new Profile();
-
-        profile.setCategories(getAllTransactionCategories(path));
-        profile.setBankAccounts(getAllBankAccounts(path));
-
-        getTransactions(profile, path);
-
-        return profile;
     }
 
     public void getTransactions(Profile profile, String dbFilePath) {
@@ -145,10 +180,31 @@ public class Controller_data {
         }
     }
 
+    public UserSettings getUserSettings(String dbFilePath) {
+        String query = "SELECT id, name, birthday, language FROM UserSettings";
+
+        try (Connection connection = DriverManager.getConnection(dbFilePath);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                Date birthday = dateFormat.parse(resultSet.getString("birthday"));
+                Language language = Language.values()[resultSet.getInt("language")];
+
+                return new UserSettings(id, name, birthday, language);
+        } catch (SQLException e) {
+            logger.error("Error while loading UserSettings from DB: " + e.getMessage(), e);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
     public ObservableList<TransactionCategory> getAllTransactionCategories(String dbFilePath){
         ObservableList<TransactionCategory> categories = javafx.collections.FXCollections.observableArrayList() ;
 
-        String query = "SELECT id, name FROM TransactionCategory";
+        String query = "SELECT id, name, CreatedByUser FROM TransactionCategory";
 
         try (Connection connection = DriverManager.getConnection(dbFilePath);
              Statement statement = connection.createStatement();
@@ -157,8 +213,9 @@ public class Controller_data {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
+                boolean createdByUser = resultSet.getBoolean("CreatedByUser");
 
-                TransactionCategory category = new TransactionCategory(id, name);
+                TransactionCategory category = new TransactionCategory(id, name, createdByUser);
                 categories.add(category);
             }
         } catch (SQLException e) {
@@ -190,5 +247,11 @@ public class Controller_data {
             throw new RuntimeException(e);
         }
         return bankAccounts;
+    }
+
+    public void SaveData(String dbFilePath, Profile profile) {
+        createTables(dbFilePath);
+        writeTestDataToDb(dbFilePath);
+        //TODO implement save data from profile
     }
 }
