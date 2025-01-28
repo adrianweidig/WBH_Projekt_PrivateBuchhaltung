@@ -18,6 +18,10 @@ public class Income extends Transaction {
         super(id, value, category, bankAccount, date, description);
     }
 
+    public Income(double value, TransactionCategory category, BankAccount bankAccount, Date date, String description) {
+        super(value, category, bankAccount, date, description);
+    }
+
     @Override
     public String getTyp() {
         return "Income";

@@ -21,6 +21,11 @@ public class TransactionCategory
         this.createdByUser = true;
     }
 
+    public TransactionCategory(String name) {
+        this.name = name;
+        this.createdByUser = true;
+    }
+
     public String getName(){
         return name;
     }

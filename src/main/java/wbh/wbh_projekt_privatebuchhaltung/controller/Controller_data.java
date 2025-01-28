@@ -309,6 +309,20 @@ public class Controller_data {
         // writeTestDataToDb(dbFilePath);
 
         saveUserSettings(dbFilePath, profile.getUserSettings());
+        for (BankAccount account : profile.getBankAccounts()) {
+           saveBankAccount(dbFilePath, account);
+        }
+
+        for(TransactionCategory category : profile.getCategories()){
+            saveTransactionCategory(dbFilePath, category);
+        }
+
+        for (Transaction transaction : profile.getIncomes()) {
+            saveTransaction(dbFilePath, transaction);
+        }
+        for (Transaction transaction : profile.getExpenses()) {
+           saveTransaction(dbFilePath, transaction);
+        }
     }
 
     public void saveUserSettings(String dbFilePath, UserSettings userSettings) {
@@ -320,21 +334,98 @@ public class Controller_data {
         try (Connection connection = DriverManager.getConnection(dbFilePath);
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-                preparedStatement.setString(1, userSettings.getName()); // Name
-                preparedStatement.setString(2,  dateFormat.format(userSettings.getBirthday())); // Geburtstag
-                preparedStatement.setInt(3, userSettings.getLanguage().ordinal()); // Sprache (als ID)
+                preparedStatement.setString(1, userSettings.getName());
+                preparedStatement.setString(2,  dateFormat.format(userSettings.getBirthday()));
+                preparedStatement.setInt(3, userSettings.getLanguage().ordinal());
 
-                // Abfrage ausführen
                 int affectedRows = preparedStatement.executeUpdate();
                 if (affectedRows > 0) {
-                    System.out.println("UserSettings inserted successfully.");
+                    logger.error("UserSettings inserted successfully.");
                 } else {
-                    System.out.println("No UserSettings were inserted.");
+                    logger.error("No UserSettings were inserted.");
             }
 
         } catch (SQLException e) {
-            System.err.println("Error while inserting UserSettings into DB: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error while inserting UserSettings into DB: " + e.getMessage());
+        }
+    }
+
+    public void saveBankAccount(String dbFilePath, BankAccount account) {
+        String query = """
+            INSERT INTO BankAccount ([Name],balance, lastInteraction)
+            VALUES (?, ?, ?);
+        """;
+
+        try (Connection connection = DriverManager.getConnection(dbFilePath);
+            PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, account.getName());
+            preparedStatement.setDouble(2,  account.getBalance());
+            preparedStatement.setString(3, dateFormat.format(account.getLastInteraction()));
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows > 0) {
+                logger.error("BankAccount inserted successfully.");
+            } else {
+                logger.error("BankAccount wasn't inserted.");
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error while inserting BankAccount into DB: " + e.getMessage());
+        }
+    }
+
+    public void saveTransactionCategory(String dbFilePath, TransactionCategory transactionCategory) {
+        String query = """
+            INSERT INTO TransactionCategory (name, CreatedByUser)
+            VALUES (?, ?);
+        """;
+
+        try (Connection connection = DriverManager.getConnection(dbFilePath);
+            PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1,  transactionCategory.getName());
+            preparedStatement.setBoolean(2,  transactionCategory.isCreatedByUser());
+
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows > 0) {
+                logger.error("TransactionCategory inserted successfully.");
+            } else {
+                logger.error("TransactionCategory wasn't inserted.");
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error while inserting TransactionCategory into DB: " + e.getMessage());
+        }
+    }
+
+    public void saveTransaction(String dbFilePath, Transaction transaction) {
+        String query = """
+            INSERT INTO [Transaction] (amount, categoryId , bankAccountId, date, description)
+            VALUES (?, ?, ?,?,?);
+        """;
+
+        try (Connection connection = DriverManager.getConnection(dbFilePath);
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setDouble(1, transaction.getValue());
+
+            //TODO implement logic with new Categories without an ID
+            preparedStatement.setInt(2,  transaction.getCategory().getId());
+            preparedStatement.setInt(3,  transaction.getBankaccount().getId());
+            preparedStatement.setString(4, dateFormat.format(transaction.getDate()));
+            preparedStatement.setString(5, transaction.getDescription());
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows > 0) {
+                logger.error("Transaction inserted successfully.");
+            } else {
+                logger.error("Transaction wasn't inserted.");
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error while inserting Transaction into DB: " + e.getMessage());
         }
     }
 }

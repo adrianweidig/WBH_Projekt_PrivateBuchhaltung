@@ -27,6 +27,12 @@ public class BankAccount
         this.lastInteraction = lastInteraction;
     }
 
+    public BankAccount (String name, double balance, Date lastInteraction) {
+    this.name = name;
+    this.balance = balance;
+    this.lastInteraction = lastInteraction;
+}
+
     /**
      * Get id int.
      *

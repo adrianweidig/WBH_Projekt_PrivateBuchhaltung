@@ -12,8 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wbh.wbh_projekt_privatebuchhaltung.models.Language;
-import wbh.wbh_projekt_privatebuchhaltung.models.Profile;
+import wbh.wbh_projekt_privatebuchhaltung.models.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -106,12 +105,12 @@ public class Controller_start {
         logger.info("Incomes:");
         for(int i = 0; i < profile.getIncomes().size();i++)
         {
-            logger.info(profile.getIncomes().get(i).GetDescription());
+            logger.info(profile.getIncomes().get(i).getDescription());
         }
         logger.info("Expenses:");
         for(int i = 0; i < profile.getExpenses().size();i++)
         {
-            logger.info(profile.getExpenses().get(i).GetDescription());
+            logger.info(profile.getExpenses().get(i).getDescription());
         }
         logger.info("UserSetting:");
         logger.info(profile.getUserSettings().getName() + " " + profile.getUserSettings().getBirthday() + " " + profile.getUserSettings().getLanguage());
@@ -144,6 +143,17 @@ public class Controller_start {
         profile.getUserSettings().setBirthday(dateFormat.parse("1990-01-05"));
         profile.getUserSettings().setLanguage(Language.German);
         profile.getUserSettings().setName("Wbh");
+
+        BankAccount bankAccount = new BankAccount(1,"Sparkasse", 9999.99 , dateFormat.parse("2025-01-10"));
+        profile.addBankAccount(bankAccount);
+        profile.addBankAccount(new BankAccount(2,"Volksbank", 1234567.89, dateFormat.parse("2024-12-31")));
+
+        TransactionCategory category = new TransactionCategory(1,"Sonstiges");
+        profile.addCategory(category);
+
+        profile.addIncome(new Income(111.99, category,bankAccount,dateFormat.parse("2023-12-31"),"Test-Income1"));
+        profile.addIncome(new Income(222.99, category,bankAccount,dateFormat.parse("2024-12-31"),"Test-Income2"));
+        profile.addExpense(new Expense(-333.99, category,bankAccount,dateFormat.parse("2025-12-31"),"Test-Expense1"));
 
         dataController.saveData("jdbc:sqlite:db.sqlite", profile);
     }

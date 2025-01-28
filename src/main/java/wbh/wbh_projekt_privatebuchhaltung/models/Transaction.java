@@ -110,7 +110,7 @@ public abstract class Transaction {
         this.date = date;
     }
 
-    public String GetDescription(){
+    public String getDescription(){
         return description;
     }
 
