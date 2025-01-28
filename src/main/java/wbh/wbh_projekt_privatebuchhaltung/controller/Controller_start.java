@@ -7,16 +7,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wbh.wbh_projekt_privatebuchhaltung.models.Language;
 import wbh.wbh_projekt_privatebuchhaltung.models.Profile;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -71,6 +73,7 @@ public class Controller_start {
     @FXML
     void onaction_createprofile(ActionEvent event) {
         Profile profile = new Profile();
+
         try {
             this.loadMainController(profile);
         } catch (IOException e) {
@@ -111,7 +114,7 @@ public class Controller_start {
             logger.info(profile.getExpenses().get(i).GetDescription());
         }
         logger.info("UserSetting:");
-        logger.info(profile.getUserSettings().GetName() + " " + profile.getUserSettings().GetBirthday() + " " + profile.getUserSettings().GetLanguage());
+        logger.info(profile.getUserSettings().getName() + " " + profile.getUserSettings().getBirthday() + " " + profile.getUserSettings().getLanguage());
 
         logger.info("Goals: (" + profile.getGoals().size() + ")");
         for(int i = 0; i < profile.getGoals().size();i++)
@@ -132,8 +135,17 @@ public class Controller_start {
      * @param event The button click event.
      */
     @FXML
-    void onaction_saveprofile(ActionEvent event) {
-        // TODO: Implement logic
+    void onaction_saveprofile(ActionEvent event) throws ParseException {
+        Profile profile = new Profile();
+
+        //for testing the save function: write Example Data in Profile
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
+
+        profile.getUserSettings().setBirthday(dateFormat.parse("1990-01-05"));
+        profile.getUserSettings().setLanguage(Language.German);
+        profile.getUserSettings().setName("Wbh");
+
+        dataController.saveData("jdbc:sqlite:db.sqlite", profile);
     }
 
     /**

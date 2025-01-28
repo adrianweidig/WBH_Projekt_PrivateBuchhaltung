@@ -9,7 +9,7 @@ import javafx.collections.ObservableList;
 public class Profile {
 
     // Private Felder
-    private UserSettings userSettings;
+    private UserSettings userSettings = new UserSettings();
     private ObservableList<BankAccount> bankAccounts = FXCollections.observableArrayList();
     private ObservableList<Goal> goals = FXCollections.observableArrayList();
     private ObservableList<Income> incomes = FXCollections.observableArrayList();

@@ -28,12 +28,15 @@ public class UserSettings
         this.language = language;
     }
 
+    public UserSettings () {
+    }
+
     /**
      * Get id int.
      *
      * @return the int
      */
-    public int GetId(){
+    public int getId(){
         return id;
     }
 
@@ -42,7 +45,7 @@ public class UserSettings
      *
      * @return the string
      */
-    public String GetName(){
+    public String getName(){
         return name;
     }
 
@@ -51,7 +54,7 @@ public class UserSettings
      *
      * @param name the name
      */
-    public void SetName(String name){
+    public void setName(String name){
         this.name = name;
     }
 
@@ -60,7 +63,7 @@ public class UserSettings
      *
      * @return the date
      */
-    public Date GetBirthday(){
+    public Date getBirthday(){
         return birthday;
     }
 
@@ -69,7 +72,7 @@ public class UserSettings
      *
      * @param birthday the birthday
      */
-    public void SetBirthday(Date birthday){
+    public void setBirthday(Date birthday){
         this.birthday = birthday;
     }
 
@@ -78,7 +81,7 @@ public class UserSettings
      *
      * @return the language
      */
-    public Language GetLanguage(){
+    public Language getLanguage(){
         return language;
     }
 
@@ -87,7 +90,7 @@ public class UserSettings
      *
      * @param language the language
      */
-    public void SetLanguage(Language language){
+    public void setLanguage(Language language){
         this.language = language;
     }
 }

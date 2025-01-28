@@ -71,7 +71,7 @@ public class Controller_data {
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
                     language INTEGER NOT NULL,
-                    birthday NOT NULL
+                    birthday Date
                 )
             """);
 
@@ -304,9 +304,37 @@ public class Controller_data {
         }
     }
 
-    public void SaveData(String dbFilePath, Profile profile) {
+    public void saveData(String dbFilePath, Profile profile) {
         createTables(dbFilePath);
-        writeTestDataToDb(dbFilePath);
-        //TODO implement save data from profile
+        // writeTestDataToDb(dbFilePath);
+
+        saveUserSettings(dbFilePath, profile.getUserSettings());
+    }
+
+    public void saveUserSettings(String dbFilePath, UserSettings userSettings) {
+        String query = """
+            INSERT INTO UserSettings (name, birthday, language)
+            VALUES (?, ?, ?);
+        """;
+
+        try (Connection connection = DriverManager.getConnection(dbFilePath);
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+                preparedStatement.setString(1, userSettings.getName()); // Name
+                preparedStatement.setString(2,  dateFormat.format(userSettings.getBirthday())); // Geburtstag
+                preparedStatement.setInt(3, userSettings.getLanguage().ordinal()); // Sprache (als ID)
+
+                // Abfrage ausführen
+                int affectedRows = preparedStatement.executeUpdate();
+                if (affectedRows > 0) {
+                    System.out.println("UserSettings inserted successfully.");
+                } else {
+                    System.out.println("No UserSettings were inserted.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error while inserting UserSettings into DB: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
