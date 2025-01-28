@@ -19,12 +19,12 @@
     -fx-pref-height: 50px;          /* Fixed height for buttons */
     -fx-background-color: #3E2F5B;  /* Sidebar background color */
     -fx-text-fill: white;           /* White text */
-    -fx-border-radius: 5px;        /* Rounded corners */
-    -fx-background-radius: 5px;    /* Rounded corners */
+    -fx-border-radius: 5px;         /* Rounded corners */
+    -fx-background-radius: 5px;     /* Rounded corners */
     -fx-font-weight: bold;          /* Bold font for emphasis */
     -fx-padding: 10px;              /* Padding inside the button */
-    -fx-cursor: pointer;           /* Pointer cursor on hover */
-    -fx-border: 1px solid #65558F; /* Border color similar to sidebar border */
+    -fx-cursor: pointer;            /* Pointer cursor on hover */
+    -fx-border: 1px solid #65558F;  /* Border color similar to sidebar border */
 }
 
 /* Hover effect for the buttons */
