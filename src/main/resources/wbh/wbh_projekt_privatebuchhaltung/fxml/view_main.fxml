@@ -1,22 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Button?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="wbh.wbh_projekt_privatebuchhaltung.controller.Controller_main">
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
+<?import org.kordamp.ikonli.fontawesome5.*?>
+<?import org.kordamp.ikonli.fontawesome.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wbh.wbh_projekt_privatebuchhaltung.controller.Controller_main">
     <!-- Linke Seitenleiste -->
     <left>
         <VBox fx:id="vbox_background" spacing="10">
-            <Button fx:id="btnDashboard" onAction="#handleDashboard" text="Dashboard" />
-            <Button fx:id="btnSettings" onAction="#handleSettings" text="Settings" />
+            <Button fx:id="btnKontouebersicht"  text="Kontoübersicht">
+                <graphic>
+                    <FontIcon iconLiteral="fas-wallet" iconSize="32" />
+                </graphic>
+            </Button>
+            <Button fx:id="btnDashboard" text="Dashboard">
+                <graphic>
+                    <FontIcon iconLiteral="fa-home" iconSize="32" />
+                </graphic>
+            </Button>
+            <Button fx:id="btnEinstellungen"  text="Einstellungen">
+                <graphic>
+                    <FontIcon iconLiteral="fa-cog" iconSize="32" />
+                </graphic>
+            </Button>
+            <Button fx:id="btnZiele"  text="Ziele">
+                <graphic>
+                    <FontIcon iconLiteral="fa-trophy" iconSize="32" />
+                </graphic>
+            </Button>
+            <Button fx:id="btnOfflineIcon" disable="true" text="Offline">
+                <graphic>
+                    <FontIcon iconLiteral="fa-exclamation-triangle" iconSize="32" />
+                </graphic>
+            </Button>
         </VBox>
     </left>
 
-  <!-- Dynamischer Hauptbereich -->
+    <!-- Dynamischer Hauptbereich -->
     <center>
         <StackPane fx:id="contentPane">
-            <!-- Initiale Ansicht -->
-            <fx:include source="/wbh/wbh_projekt_privatebuchhaltung/fxml/view_dashboard.fxml"/>
+            <fx:include source="view_dashboard.fxml" />
         </StackPane>
     </center>
 </BorderPane>

@@ -13,6 +13,8 @@ module wbh.wbh_projekt_privatebuchhaltung {
     requires org.slf4j;
     requires java.sql;
     requires scala.library;
+    requires org.kordamp.ikonli.fontawesome5;
+    requires org.kordamp.ikonli.core;
 
     opens wbh.wbh_projekt_privatebuchhaltung to javafx.fxml;
     exports wbh.wbh_projekt_privatebuchhaltung;

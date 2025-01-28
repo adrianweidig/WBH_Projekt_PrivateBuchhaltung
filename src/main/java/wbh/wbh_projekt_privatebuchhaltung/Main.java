@@ -56,11 +56,9 @@ public class Main extends JProApplication {
         // Load the FXML file with the ResourceBundle
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setResources(resourceBundle);
+        fxmlLoader.setLocation(this.getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_start.fxml"));
+        Parent fxmlScene = fxmlLoader.load();
 
-        // Load the start view FXML file
-        Parent fxmlScene = fxmlLoader.load(
-                this.getClass().getResourceAsStream("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_start.fxml")
-        );
 
         // Configure the scene and apply the corresponding styles
         Scene scene = new Scene(fxmlScene);

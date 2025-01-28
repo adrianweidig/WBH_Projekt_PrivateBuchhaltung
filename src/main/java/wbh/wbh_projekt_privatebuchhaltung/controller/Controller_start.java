@@ -172,9 +172,8 @@ public class Controller_start {
         fxmlLoader.setResources(resourceBundle);
 
         // Load the main view FXML file
-        Parent fxmlScene = fxmlLoader.load(
-                Objects.requireNonNull(this.getClass().getResourceAsStream("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_main.fxml"))
-        );
+        fxmlLoader.setLocation(this.getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_main.fxml"));
+        Parent fxmlScene = fxmlLoader.load();
 
         // Configure and set the scene
         Scene scene = new Scene(fxmlScene);
