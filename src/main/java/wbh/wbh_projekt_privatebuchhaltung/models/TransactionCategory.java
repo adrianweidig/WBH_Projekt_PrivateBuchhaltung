@@ -32,4 +32,8 @@ public class TransactionCategory
     public void setName(String name){
         this.name = name;
     }
+
+    public boolean isCreatedByUser() {
+        return createdByUser;
+    }
 }

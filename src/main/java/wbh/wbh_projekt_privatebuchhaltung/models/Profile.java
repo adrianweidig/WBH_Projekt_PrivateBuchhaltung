@@ -34,6 +34,14 @@ public class Profile {
         this.bankAccounts = bankAccounts;
     }
 
+    public void addBankAccount(BankAccount bankAccount){
+        this.bankAccounts.add(bankAccount);
+    }
+
+    public void removeBankAccount(BankAccount bankAccount){
+        this.bankAccounts.remove(bankAccount);
+    }
+
     // Getter und Setter für Goals
     public ObservableList<Goal> getGoals() {
         return goals;
@@ -41,6 +49,14 @@ public class Profile {
 
     public void setGoals(ObservableList<Goal> goals) {
         this.goals = goals;
+    }
+
+    public void addGoal(Goal goal){
+        this.goals.add(goal);
+    }
+
+    public void removeGoal(Goal goal){
+        this.goals.remove(goal);
     }
 
     // Getter und Setter für Incomes
@@ -52,6 +68,14 @@ public class Profile {
         this.incomes = incomes;
     }
 
+    public void addIncome(Income income){
+        this.incomes.add(income);
+    }
+
+    public void removeIncome(Income income){
+        this.incomes.remove(income);
+    }
+
     // Getter und Setter für Expenses
     public ObservableList<Expense> getExpenses() {
         return expenses;
@@ -61,6 +85,14 @@ public class Profile {
         this.expenses = expenses;
     }
 
+    public void addExpense(Expense expense){
+        this.expenses.add(expense);
+    }
+
+    public void removeExpense(Expense expense){
+        this.expenses.remove(expense);
+    }
+
     // Getter und Setter für Categories
     public ObservableList<TransactionCategory> getCategories() {
         return categories;
@@ -68,5 +100,16 @@ public class Profile {
 
     public void setCategories(ObservableList<TransactionCategory> categories) {
         this.categories = categories;
+    }
+
+    public void addCategory(TransactionCategory category){
+        this.categories.add(category);
+    }
+
+    public void removeCategory(TransactionCategory category){
+        if(category.isCreatedByUser())
+        {
+            this.categories.remove(category);
+        }
     }
 }
