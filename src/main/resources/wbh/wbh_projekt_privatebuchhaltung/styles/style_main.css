@@ -1,136 +1,84 @@
-/* Global styles */
+/* General styles */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
-}
-
-/* Main container with sidebar and content */
-.main-container {
-    display: flex;
-    height: 100%; /* Change from 100vh to 100% */
+    -fx-margin: 0;
+    -fx-padding: 0;
+    -fx-box-sizing: border-box;
 }
 
 /* Sidebar styles */
 .sidebar {
-    -fx-width: 250px;
-    -fx-background-color: #2c3e50;
-    -fx-text-fill: #fff;
-    -fx-padding: 20px;
+    -fx-background-color: #3E2F5B; /* Sidebar background color */
+    -fx-padding: 20px; /* Padding inside the sidebar */
+    -fx-spacing: 15px; /* Spacing between buttons */
+    -fx-border-width: 0 1px 0 0;
+    -fx-border-color: #65558F; /* Optional border for a clean look */
+}
+
+/* Sidebar buttons */
+.sidebar-button {
+    -fx-background-color: transparent; /* Transparent button background */
+    -fx-padding: 12px; /* Padding inside the button */
+    -fx-border: none;
+    -fx-border-radius: 50%; /* Circular shape for buttons */
+    -fx-min-width: 70px; /* Fixed width for buttons */
+    -fx-min-height: 70px; /* Fixed height for buttons */
     -fx-alignment: center;
-    -fx-spacing: 10px;
-    -fx-position: fixed;
-    -fx-height: 100%;
-    -fx-top: 0;
-    -fx-left: 0;
+    -fx-cursor: pointer;
+    -fx-pref-width: 70px; /* Preferred width to keep button size constant */
+    -fx-pref-height: 70px; /* Preferred height to keep button size constant */
 }
 
-/* Sidebar header (optional, could be logo or app name) */
-.sidebar-header {
-    -fx-font-size: 1.5em;
-    -fx-font-weight: bold;
-    -fx-margin-bottom: 20px;
+.sidebar-button:disabled {
+    -fx-opacity: 0.5; /* Disabled button style */
 }
 
-/* Sidebar links */
-.sidebar a {
-    -fx-text-fill: #fff;
-    -fx-background-color: transparent;
-    -fx-padding: 10px;
-    -fx-margin: 10px 0;
-    -fx-border-radius: 4px;
-    -fx-transition: background-color 0.3s ease;
+.sidebar-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1); /* Subtle hover effect */
 }
 
-/* Hover effect for sidebar links */
-.sidebar a:hover {
-    -fx-background-color: #34495e;
+.sidebar-button:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.2); /* Subtle press effect */
 }
 
-/* Content section */
-.content {
-    -fx-margin-left: 250px; /* Space for the sidebar */
-    -fx-padding: 20px;
-    -fx-background-color: #ecf0f1;
-    -fx-flex-grow: 1;
-}
-
-/* Header in the content area */
-.content-header {
-    -fx-font-size: 2em;
-    -fx-font-weight: bold;
-    -fx-margin-bottom: 20px;
-}
-
-/* Button styles */
-.button {
-    -fx-font-size: 16px;
-    -fx-pref-width: 150px;
-    -fx-pref-height: 40px;
-    -fx-background-color: #007BFF;
-    -fx-text-fill: white;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-}
-
-.button:hover {
-    -fx-background-color: #0056b3;
-}
-
-.button:pressed {
-    -fx-background-color: #003f7f;
-}
-
-/* Footer section (optional) */
-.footer {
-    -fx-background-color: #2c3e50;
-    -fx-text-fill: #fff;
-    -fx-text-alignment: center;
-    -fx-padding: 10px;
-    -fx-position: fixed;
-    -fx-bottom: 0;
-    -fx-width: 100%;
+/* Ikonli specific styles for buttons */
+.sidebar-button .ikonli-font-icon {
+    -fx-icon-size: 36px; /* Default icon size */
+    -fx-icon-color: #65558F; /* Icon color */
 }
 
 /* Responsiveness */
-/* For small devices like mobile phones */
 @media screen and (max-width: 768px) {
-    .main-container {
-        -fx-flex-direction: column;
-    }
-
     .sidebar {
-        -fx-width: 100%;
-        -fx-position: relative;
-        -fx-margin-bottom: 20px;
+        -fx-padding: 15px;
+        -fx-spacing: 10px;
     }
 
-    .content {
-        -fx-margin-left: 0;
+    /* Keep buttons the same size */
+    .sidebar-button {
+        -fx-pref-width: 70px; /* Keep buttons at 70px */
+        -fx-pref-height: 70px; /* Keep buttons at 70px */
     }
 
-    .button {
-        -fx-font-size: 14px;
-        -fx-pref-width: 120px;
-        -fx-pref-height: 35px;
+    /* Slightly adjust the icon size for medium screens */
+    .sidebar-button .ikonli-font-icon {
+        -fx-icon-size: 32px; /* Slightly smaller icon for medium screens */
     }
 }
 
 @media screen and (max-width: 480px) {
-    .button {
-        -fx-font-size: 12px;
-        -fx-pref-width: 100px;
-        -fx-pref-height: 30px;
+    .sidebar {
+        -fx-padding: 10px;
+        -fx-spacing: 8px;
     }
 
-    /* Optional: Adjust sidebar layout */
-    .sidebar {
-        -fx-font-size: 14px;
+    /* Keep buttons the same size */
+    .sidebar-button {
+        -fx-pref-width: 70px; /* Keep buttons at 70px */
+        -fx-pref-height: 70px; /* Keep buttons at 70px */
+    }
+
+    /* Slightly adjust the icon size for small screens */
+    .sidebar-button .ikonli-font-icon {
+        -fx-icon-size: 28px; /* Smaller icon size for small screens */
     }
 }

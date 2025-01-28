@@ -3,45 +3,54 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
-<?import org.kordamp.ikonli.fontawesome5.*?>
-<?import org.kordamp.ikonli.fontawesome.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wbh.wbh_projekt_privatebuchhaltung.controller.Controller_main">
-    <!-- Linke Seitenleiste -->
+    <!-- Left Sidebar -->
     <left>
-        <VBox fx:id="vbox_background" spacing="10">
-            <Button fx:id="btnKontouebersicht"  text="Kontoübersicht">
+        <VBox fx:id="vbox_background" styleClass="sidebar" stylesheets="@../styles/style_main.css">
+            <!-- Dashboard Button -->
+            <Button fx:id="btnDashboard" styleClass="sidebar-button">
                 <graphic>
-                    <FontIcon iconLiteral="fas-wallet" iconSize="32" />
+                    <FontIcon fx:id="btnDashboardIcon" iconLiteral="fa-home" />
                 </graphic>
             </Button>
-            <Button fx:id="btnDashboard" text="Dashboard">
+            <!-- Kontoübersicht Button -->
+            <Button fx:id="btnAccountOverview" styleClass="sidebar-button">
                 <graphic>
-                    <FontIcon iconLiteral="fa-home" iconSize="32" />
+                    <FontIcon fx:id="btnAccountOverviewIcon" iconLiteral="fas-wallet" />
                 </graphic>
             </Button>
-            <Button fx:id="btnEinstellungen"  text="Einstellungen">
+            <!-- Goals Button -->
+            <Button fx:id="btnGoals" styleClass="sidebar-button">
                 <graphic>
-                    <FontIcon iconLiteral="fa-cog" iconSize="32" />
+                    <FontIcon fx:id="btnGoalsIcon" iconLiteral="fa-trophy" />
                 </graphic>
             </Button>
-            <Button fx:id="btnZiele"  text="Ziele">
+
+            <!-- Takes responsive space between the upper buttons so those buttons are at the bottom -->
+            <Region VBox.vgrow="ALWAYS" />
+
+            <!-- Settings Button -->
+            <Button fx:id="btnSettings" styleClass="sidebar-button">
                 <graphic>
-                    <FontIcon iconLiteral="fa-trophy" iconSize="32" />
+                    <FontIcon fx:id="btnSettingsIcon" iconLiteral="fa-gear" />
                 </graphic>
             </Button>
-            <Button fx:id="btnOfflineIcon" disable="true" text="Offline">
+            <!-- Network Button -->
+            <Button fx:id="btnNetwork" styleClass="sidebar-button">
                 <graphic>
-                    <FontIcon iconLiteral="fa-exclamation-triangle" iconSize="32" />
+                    <FontIcon fx:id="btnNetworkIcon" iconLiteral="fa-wifi" />
                 </graphic>
             </Button>
         </VBox>
     </left>
 
-    <!-- Dynamischer Hauptbereich -->
+    <!-- Main Content Area -->
     <center>
-        <StackPane fx:id="contentPane">
-            <fx:include source="view_dashboard.fxml" />
-        </StackPane>
+        <ScrollPane>
+            <StackPane fx:id="contentPane">
+                <fx:include source="view_dashboard.fxml" />
+            </StackPane>
+        </ScrollPane>
     </center>
 </BorderPane>

@@ -1,28 +1,60 @@
-/* Style for the VBox */
+/* General styles */
+* {
+    -fx-margin: 0;
+    -fx-padding: 0;
+    -fx-box-sizing: border-box;
+}
+
+/* Style for VBox */
 .vbox {
     -fx-alignment: center;  /* Centers the content of the VBox */
     -fx-padding: 0;         /* No extra padding */
-    -fx-spacing: 10px;      /* Spacing between the buttons */
+    -fx-spacing: 15px;      /* Spacing between the buttons */
 }
 
 /* Style for the Buttons */
 .button {
-    -fx-font-size: 16px;           /* Standard font size */
-    -fx-pref-width: 150px;         /* Width of the buttons */
-    -fx-pref-height: 40px;         /* Height of the buttons */
-    -fx-background-color: #007BFF; /* Primary color */
-    -fx-text-fill: white;          /* Text color */
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
+    -fx-font-size: 16px;            /* Standard font size */
+    -fx-pref-width: 200px;          /* Fixed width for buttons */
+    -fx-pref-height: 50px;          /* Fixed height for buttons */
+    -fx-background-color: #3E2F5B;  /* Sidebar background color */
+    -fx-text-fill: white;           /* White text */
+    -fx-border-radius: 5px;        /* Rounded corners */
+    -fx-background-radius: 5px;    /* Rounded corners */
+    -fx-font-weight: bold;          /* Bold font for emphasis */
+    -fx-padding: 10px;              /* Padding inside the button */
+    -fx-cursor: pointer;           /* Pointer cursor on hover */
+    -fx-border: 1px solid #65558F; /* Border color similar to sidebar border */
 }
 
+/* Hover effect for the buttons */
 .button:hover {
-    -fx-background-color: #0056b3; /* Color when hovering */
+    -fx-background-color: rgba(62, 47, 91, 0.8); /* Darken the background slightly */
+    -fx-text-fill: white; /* Keep the text white */
 }
 
+/* Pressed effect for the buttons */
 .button:pressed {
-    -fx-background-color: #003f7f; /* Color when clicked */
+    -fx-background-color: rgba(62, 47, 91, 0.9); /* Darker shade of the sidebar color */
+    -fx-text-fill: white; /* Keep the text white */
 }
 
-/* Style adjustments for small screens or windows */
-/* You must handle responsiveness programmatically in JavaFX */
+/* Style for disabled buttons */
+.button:disabled {
+    -fx-opacity: 0.5; /* Disabled button transparency */
+}
+
+/* Responsiveness */
+@media screen and (max-width: 768px) {
+    .button {
+        -fx-pref-width: 150px; /* Adjust width for medium screens */
+        -fx-pref-height: 45px; /* Adjust height for medium screens */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .button {
+        -fx-pref-width: 120px; /* Adjust width for small screens */
+        -fx-pref-height: 40px; /* Adjust height for small screens */
+    }
+}
