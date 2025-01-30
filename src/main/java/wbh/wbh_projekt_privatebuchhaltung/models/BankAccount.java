@@ -42,6 +42,9 @@ public class BankAccount
         return id;
     }
 
+    public void setId(int id){
+        this.id = id;
+    }
     /**
      * Gets balance.
      *

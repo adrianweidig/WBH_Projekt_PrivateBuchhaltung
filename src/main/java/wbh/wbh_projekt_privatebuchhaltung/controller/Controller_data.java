@@ -309,6 +309,7 @@ public class Controller_data {
         // writeTestDataToDb(dbFilePath);
 
         saveUserSettings(dbFilePath, profile.getUserSettings());
+
         for (BankAccount account : profile.getBankAccounts()) {
            saveBankAccount(dbFilePath, account);
         }
@@ -370,10 +371,10 @@ public class Controller_data {
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
                 logger.error("BankAccount inserted successfully.");
+                account.setId(getId(preparedStatement));
             } else {
-                logger.error("BankAccount wasn't inserted.");
+            logger.error("BankAccount wasn't inserted.");
             }
-
         } catch (SQLException e) {
             logger.error("Error while inserting BankAccount into DB: " + e.getMessage());
         }
@@ -395,6 +396,9 @@ public class Controller_data {
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
                 logger.error("TransactionCategory inserted successfully.");
+
+                  transactionCategory.setId(getId(preparedStatement));
+
             } else {
                 logger.error("TransactionCategory wasn't inserted.");
             }
@@ -403,6 +407,19 @@ public class Controller_data {
             logger.error("Error while inserting TransactionCategory into DB: " + e.getMessage());
         }
     }
+
+     public int getId(PreparedStatement preparedStatement) throws SQLException {
+         try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+             if (generatedKeys.next()) {
+                 int newId = generatedKeys.getInt(1);
+                 logger.info("Generated ID " + newId);
+                 return newId;
+             } else {
+                 logger.error("No ID was returned for the new Object.");
+                 return -1;
+             }
+         }
+     }
 
     public void saveTransaction(String dbFilePath, Transaction transaction) {
         String query = """

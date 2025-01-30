@@ -100,7 +100,7 @@ public class Controller_start {
         logger.info("Bank Accounts:");
         for(int i = 0; i < profile.getBankAccounts().size();i++)
         {
-            logger.info(profile.getBankAccounts().get(i).getName()+" "+ profile.getBankAccounts().get(i).getBalance());
+            logger.info( profile.getBankAccounts().get(i).getId() + " " +profile.getBankAccounts().get(i).getName()+" "+ profile.getBankAccounts().get(i).getBalance());
         }
         logger.info("Incomes:");
         for(int i = 0; i < profile.getIncomes().size();i++)
@@ -144,9 +144,9 @@ public class Controller_start {
         profile.getUserSettings().setLanguage(Language.German);
         profile.getUserSettings().setName("Wbh");
 
-        BankAccount bankAccount = new BankAccount(1,"Sparkasse", 9999.99 , dateFormat.parse("2025-01-10"));
+        BankAccount bankAccount = new BankAccount("Sparkasse", 9999.99 , dateFormat.parse("2025-01-10"));
         profile.addBankAccount(bankAccount);
-        profile.addBankAccount(new BankAccount(2,"Volksbank", 1234567.89, dateFormat.parse("2024-12-31")));
+        profile.addBankAccount(new BankAccount("Volksbank", 1234567.89, dateFormat.parse("2024-12-31")));
 
         TransactionCategory category = new TransactionCategory(1,"Sonstiges");
         profile.addCategory(category);
