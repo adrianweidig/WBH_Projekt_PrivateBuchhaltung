@@ -323,6 +323,10 @@ public class Controller_data {
         for (Transaction transaction : profile.getExpenses()) {
            saveTransaction(dbFilePath, transaction);
         }
+
+        for (Goal goal : profile.getGoals()) {
+            saveGoal(dbFilePath, goal);
+        }
     }
 
     public void saveUserSettings(String dbFilePath, UserSettings userSettings) {
@@ -426,6 +430,38 @@ public class Controller_data {
 
         } catch (SQLException e) {
             logger.error("Error while inserting Transaction into DB: " + e.getMessage());
+        }
+    }
+
+    public void saveGoal(String dbFilePath, Goal goal) {
+        String query = """
+        INSERT INTO Goal (name, description, goalValue, bankAccountId, startDate, endDate)
+        VALUES (?, ?, ?, ?, ?, ?);
+    """;
+
+        try (Connection connection = DriverManager.getConnection(dbFilePath);
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, goal.getName());
+            preparedStatement.setString(2, goal.getDescription());
+            preparedStatement.setDouble(3, goal.getGoalValue());
+            preparedStatement.setInt(4, goal.getBankAccount().getId());
+            preparedStatement.setString(5, dateFormat.format(goal.getStartDate()));
+
+            if (goal.getEndDate() != null) {
+                preparedStatement.setString(6, dateFormat.format(goal.getEndDate()));
+            } else {
+                preparedStatement.setNull(6, Types.DATE);
+            }
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows > 0) {
+                logger.info("Goal inserted successfully.");
+            } else {
+                logger.error("Goal wasn't inserted.");
+            }
+        } catch (SQLException e) {
+            logger.error("Error while inserting Goal into DB: " + e.getMessage());
         }
     }
 }

@@ -44,6 +44,22 @@ public class Goal
         this.endDate = endDate;
     }
 
+    public Goal(
+            String name,
+            String description,
+            double goalValue,
+            BankAccount bankAccount,
+            Date startDate,
+            Date endDate)
+    {
+        this.name = name;
+        this.description = description;
+        this.goalValue = goalValue;
+        this.bankAccount = bankAccount;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
     /**
      * Get id int.
      *
@@ -107,11 +123,11 @@ public class Goal
         this.goalValue = goalValue;
     }
 
-    public BankAccount getBanksAccount () {
+    public BankAccount getBankAccount () {
        return bankAccount;
     }
 
-    public void setBanksAccount (BankAccount bankAccount) {
+    public void setBankAccount (BankAccount bankAccount) {
         this.bankAccount = bankAccount;
     }
 

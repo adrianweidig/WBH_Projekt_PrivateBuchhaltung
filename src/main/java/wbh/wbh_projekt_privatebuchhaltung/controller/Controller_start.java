@@ -155,6 +155,8 @@ public class Controller_start {
         profile.addIncome(new Income(222.99, category,bankAccount,dateFormat.parse("2024-12-31"),"Test-Income2"));
         profile.addExpense(new Expense(-333.99, category,bankAccount,dateFormat.parse("2025-12-31"),"Test-Expense1"));
 
+        profile.addGoal(new Goal("Test", "Mein Sparziel bis 2026", 99999.99, bankAccount, dateFormat.parse("2025-01-31"),dateFormat.parse("2025-12-31") ));
+
         dataController.saveData("jdbc:sqlite:db.sqlite", profile);
     }
 
