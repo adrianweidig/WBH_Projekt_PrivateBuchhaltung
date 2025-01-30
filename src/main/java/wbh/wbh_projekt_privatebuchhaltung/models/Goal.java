@@ -107,6 +107,29 @@ public class Goal
         this.goalValue = goalValue;
     }
 
+    public BankAccount getBanksAccount () {
+       return bankAccount;
+    }
+
+    public void setBanksAccount (BankAccount bankAccount) {
+        this.bankAccount = bankAccount;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 
     /**
      * Get completion rate double.
@@ -120,5 +143,4 @@ public class Goal
     public boolean isCompleted(){
         return bankAccount.getBalance() >= goalValue;
     }
-
 }
