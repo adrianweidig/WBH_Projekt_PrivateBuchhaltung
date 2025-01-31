@@ -14,7 +14,7 @@ import java.util.Locale;
 public class Controller_data {
 
     private final Logger logger = LoggerFactory.getLogger(Controller_data.class);
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
 
     public void createTables(String path) {
         try (Connection connection = DriverManager.getConnection(path);
@@ -106,59 +106,12 @@ public class Controller_data {
         profile.setUserSettings(getUserSettings(path));
 
         getGoals(path, profile);
-        getTransactions(profile, path);
+        getTransactions(path, profile);
 
         return profile;
     }
 
-    public void writeTestDataToDb(String path){
-        try (Connection connection = DriverManager.getConnection(path);
-             Statement statement = connection.createStatement()) {
-
-            /// TestData:
-            statement.execute("""
-            Insert into TransactionCategory ([Name], CreatedByUser) Values ('Gehalt', false);
-            """);
-            statement.execute("""
-            Insert into TransactionCategory ([Name], CreatedByUser) Values ('Lebensmittel', true);
-            """);
-
-            statement.execute("""     
-            INSERT INTO BankAccount (Name, balance, lastInteraction) VALUES
-            ('Sparkonto', 1500.75, '2023-01-01');
-            """);
-
-            statement.execute("""               
-              INSERT INTO [Transaction] ([amount], categoryID, bankAccountId, [date], description)
-              VALUES
-              (50.00, 1,1,'2023-11-01', 'Einkauf im Supermarkt')
-            """);
-            statement.execute("""               
-              INSERT INTO [Transaction] ([amount], categoryID, bankAccountId, [date], description)
-              VALUES
-              (-99.00, 2,1,'2025-01-21', 'Essen')
-            """);
-
-            statement.execute("""               
-              INSERT INTO [UserSettings] ([name], birthday, language)
-              VALUES
-              ("Marco",'1994-04-21', 1)
-            """);
-
-            statement.execute("""            
-            INSERT INTO Goal ([name], description, goalValue, bankAccountId, startDate, endDate)
-            VALUES ('Sparen für Urlaub', 'Sparen für eine Reise in den Sommerferien', 2000.00, 1, '2023-10-01', '2024-07-01')
-            """);
-
-            logger.info("Test data written successful.");
-
-        } catch (SQLException e) {
-            logger.error("Error while write testdata to database: " + e.getMessage());
-        }
-
-    }
-
-    public void getTransactions(Profile profile, String dbFilePath) {
+    public void getTransactions(String dbFilePath, Profile profile) {
         String query = "SELECT id, [amount], date, description, categoryId, bankAccountId FROM [Transaction]";
 
         try (Connection connection = DriverManager.getConnection(dbFilePath);
@@ -196,7 +149,7 @@ public class Controller_data {
         } catch (SQLException e) {
            logger.error("Error while loading Transactions from DB. " + e.getMessage(), e);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            logger.error("Error while parsing Date: " + e.getMessage(), e);
         }
     }
 
@@ -304,9 +257,8 @@ public class Controller_data {
         }
     }
 
-    public void saveData(String dbFilePath, Profile profile) {
+    public void saveProfile(String dbFilePath, Profile profile) {
         createTables(dbFilePath);
-        // writeTestDataToDb(dbFilePath);
 
         saveUserSettings(dbFilePath, profile.getUserSettings());
 
@@ -371,7 +323,7 @@ public class Controller_data {
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
                 logger.error("BankAccount inserted successfully.");
-                account.setId(getId(preparedStatement));
+                account.setId(getNewId(preparedStatement));
             } else {
             logger.error("BankAccount wasn't inserted.");
             }
@@ -397,7 +349,7 @@ public class Controller_data {
             if (affectedRows > 0) {
                 logger.error("TransactionCategory inserted successfully.");
 
-                  transactionCategory.setId(getId(preparedStatement));
+                  transactionCategory.setId(getNewId(preparedStatement));
 
             } else {
                 logger.error("TransactionCategory wasn't inserted.");
@@ -408,11 +360,11 @@ public class Controller_data {
         }
     }
 
-     public int getId(PreparedStatement preparedStatement) throws SQLException {
+     private int getNewId(PreparedStatement preparedStatement) throws SQLException {
          try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
              if (generatedKeys.next()) {
                  int newId = generatedKeys.getInt(1);
-                 logger.info("Generated ID " + newId);
+                 logger.info("New generated id : " + newId);
                  return newId;
              } else {
                  logger.error("No ID was returned for the new Object.");
@@ -432,7 +384,6 @@ public class Controller_data {
 
             preparedStatement.setDouble(1, transaction.getValue());
 
-            //TODO implement logic with new Categories without an ID
             preparedStatement.setInt(2,  transaction.getCategory().getId());
             preparedStatement.setInt(3,  transaction.getBankaccount().getId());
             preparedStatement.setString(4, dateFormat.format(transaction.getDate()));
@@ -452,9 +403,9 @@ public class Controller_data {
 
     public void saveGoal(String dbFilePath, Goal goal) {
         String query = """
-        INSERT INTO Goal (name, description, goalValue, bankAccountId, startDate, endDate)
-        VALUES (?, ?, ?, ?, ?, ?);
-    """;
+            INSERT INTO Goal (name, description, goalValue, bankAccountId, startDate, endDate)
+            VALUES (?, ?, ?, ?, ?, ?);
+        """;
 
         try (Connection connection = DriverManager.getConnection(dbFilePath);
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {

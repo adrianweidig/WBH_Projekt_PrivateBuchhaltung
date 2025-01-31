@@ -8,7 +8,6 @@ import javafx.collections.ObservableList;
  */
 public class Profile {
 
-    // Private Felder
     private UserSettings userSettings = new UserSettings();
     private ObservableList<BankAccount> bankAccounts = FXCollections.observableArrayList();
     private ObservableList<Goal> goals = FXCollections.observableArrayList();
@@ -16,16 +15,14 @@ public class Profile {
     private ObservableList<Expense> expenses = FXCollections.observableArrayList();
     private ObservableList<TransactionCategory> categories = FXCollections.observableArrayList();
 
-    // Getter und Setter für UserSettings
+    // Getter and Setter for UserSettings
     public UserSettings getUserSettings() {
         return userSettings;
     }
 
-    public void setUserSettings(UserSettings userSettings) {
-        this.userSettings = userSettings;
-    }
+    public void setUserSettings(UserSettings userSettings) { this.userSettings = userSettings; }
 
-    // Getter und Setter für BankAccounts
+    // Getter and Setter for BankAccounts
     public ObservableList<BankAccount> getBankAccounts() {
         return bankAccounts;
     }
@@ -42,7 +39,7 @@ public class Profile {
         this.bankAccounts.remove(bankAccount);
     }
 
-    // Getter und Setter für Goals
+    // Getter and Setter for Goals
     public ObservableList<Goal> getGoals() {
         return goals;
     }
@@ -59,7 +56,7 @@ public class Profile {
         this.goals.remove(goal);
     }
 
-    // Getter und Setter für Incomes
+    // Getter and Setter for Incomes
     public ObservableList<Income> getIncomes() {
         return incomes;
     }
@@ -76,7 +73,7 @@ public class Profile {
         this.incomes.remove(income);
     }
 
-    // Getter und Setter für Expenses
+    // Getter and Setter for Expenses
     public ObservableList<Expense> getExpenses() {
         return expenses;
     }
@@ -93,7 +90,7 @@ public class Profile {
         this.expenses.remove(expense);
     }
 
-    // Getter und Setter für Categories
+    // Getter and Setter for Categories
     public ObservableList<TransactionCategory> getCategories() {
         return categories;
     }

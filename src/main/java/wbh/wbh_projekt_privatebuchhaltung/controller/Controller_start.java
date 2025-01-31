@@ -157,7 +157,7 @@ public class Controller_start {
 
         profile.addGoal(new Goal("Test", "Mein Sparziel bis 2026", 99999.99, bankAccount, dateFormat.parse("2025-01-31"),dateFormat.parse("2025-12-31") ));
 
-        dataController.saveData("jdbc:sqlite:db.sqlite", profile);
+        dataController.saveProfile("jdbc:sqlite:db.sqlite", profile);
     }
 
     /**
