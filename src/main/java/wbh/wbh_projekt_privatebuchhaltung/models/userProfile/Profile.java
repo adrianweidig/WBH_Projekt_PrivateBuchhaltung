@@ -1,4 +1,4 @@
-package wbh.wbh_projekt_privatebuchhaltung.models;
+package wbh.wbh_projekt_privatebuchhaltung.models.userProfile;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

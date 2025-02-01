@@ -23,9 +23,12 @@
     -fx-background-radius: 5px;     /* Rounded corners */
     -fx-font-weight: bold;          /* Bold font for emphasis */
     -fx-padding: 10px;              /* Padding inside the button */
-    -fx-cursor: pointer;            /* Pointer cursor on hover */
-    -fx-border: 1px solid #65558F;  /* Border color similar to sidebar border */
+    -fx-cursor: hand;               /* Pointer cursor on hover (use 'hand' in JavaFX) */
+    -fx-border-width: 1px;          /* Border width */
+    -fx-border-style: solid;        /* Border style */
+    -fx-border-color: #65558F;      /* Border color similar to sidebar border */
 }
+
 
 /* Hover effect for the buttons */
 .button:hover {

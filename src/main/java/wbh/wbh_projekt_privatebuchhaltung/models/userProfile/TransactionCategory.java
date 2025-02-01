@@ -1,4 +1,4 @@
-package wbh.wbh_projekt_privatebuchhaltung.models;
+package wbh.wbh_projekt_privatebuchhaltung.models.userProfile;
 
 /**
  * The type Transaction category.

@@ -3,7 +3,7 @@ package wbh.wbh_projekt_privatebuchhaltung.controller;
 import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wbh.wbh_projekt_privatebuchhaltung.models.*;
+import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.*;
 
 import java.sql.*;
 import java.text.ParseException;

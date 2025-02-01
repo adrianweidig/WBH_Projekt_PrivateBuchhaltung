@@ -7,10 +7,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wbh.wbh_projekt_privatebuchhaltung.models.Profile;
+import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.Profile;
 
 import java.io.IOException;
 import java.net.URL;
