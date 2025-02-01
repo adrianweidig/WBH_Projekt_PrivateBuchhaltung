@@ -88,38 +88,7 @@ public class Controller_start {
      */
     @FXML
     void onaction_loadprofile(ActionEvent event) {
-
         Profile profile = dataController.loadData("jdbc:sqlite:db.sqlite");
-
-        //For Debugging
-        logger.info("Categories:");
-        for(int i = 0; i < profile.getCategories().size();i++)
-        {
-            logger.info(profile.getCategories().get(i).getName());
-        }
-        logger.info("Bank Accounts:");
-        for(int i = 0; i < profile.getBankAccounts().size();i++)
-        {
-            logger.info( profile.getBankAccounts().get(i).getId() + " " +profile.getBankAccounts().get(i).getName()+" "+ profile.getBankAccounts().get(i).getBalance());
-        }
-        logger.info("Incomes:");
-        for(int i = 0; i < profile.getIncomes().size();i++)
-        {
-            logger.info(profile.getIncomes().get(i).getDescription());
-        }
-        logger.info("Expenses:");
-        for(int i = 0; i < profile.getExpenses().size();i++)
-        {
-            logger.info(profile.getExpenses().get(i).getDescription());
-        }
-        logger.info("UserSetting:");
-        logger.info(profile.getUserSettings().getName() + " " + profile.getUserSettings().getBirthday() + " " + profile.getUserSettings().getLanguage());
-
-        logger.info("Goals: (" + profile.getGoals().size() + ")");
-        for(int i = 0; i < profile.getGoals().size();i++)
-        {
-            logger.info(profile.getGoals().get(i).getDescription());
-        }
 
         try {
             this.loadMainController(profile);

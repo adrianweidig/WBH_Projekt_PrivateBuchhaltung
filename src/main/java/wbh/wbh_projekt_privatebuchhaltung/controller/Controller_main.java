@@ -114,7 +114,7 @@ public class Controller_main {
      */
     public void setProfile(Profile profile) {
         this.profile = profile;
-        logger.info("Profile set");
+        logger.info("Profile set:\n" + profile);
     }
 
     /**

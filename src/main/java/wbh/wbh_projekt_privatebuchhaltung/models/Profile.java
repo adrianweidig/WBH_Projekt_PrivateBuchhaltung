@@ -20,7 +20,9 @@ public class Profile {
         return userSettings;
     }
 
-    public void setUserSettings(UserSettings userSettings) { this.userSettings = userSettings; }
+    public void setUserSettings(UserSettings userSettings) {
+        this.userSettings = userSettings;
+    }
 
     // Getter and Setter for BankAccounts
     public ObservableList<BankAccount> getBankAccounts() {
@@ -31,11 +33,11 @@ public class Profile {
         this.bankAccounts = bankAccounts;
     }
 
-    public void addBankAccount(BankAccount bankAccount){
+    public void addBankAccount(BankAccount bankAccount) {
         this.bankAccounts.add(bankAccount);
     }
 
-    public void removeBankAccount(BankAccount bankAccount){
+    public void removeBankAccount(BankAccount bankAccount) {
         this.bankAccounts.remove(bankAccount);
     }
 
@@ -48,11 +50,11 @@ public class Profile {
         this.goals = goals;
     }
 
-    public void addGoal(Goal goal){
+    public void addGoal(Goal goal) {
         this.goals.add(goal);
     }
 
-    public void removeGoal(Goal goal){
+    public void removeGoal(Goal goal) {
         this.goals.remove(goal);
     }
 
@@ -65,11 +67,11 @@ public class Profile {
         this.incomes = incomes;
     }
 
-    public void addIncome(Income income){
+    public void addIncome(Income income) {
         this.incomes.add(income);
     }
 
-    public void removeIncome(Income income){
+    public void removeIncome(Income income) {
         this.incomes.remove(income);
     }
 
@@ -82,11 +84,11 @@ public class Profile {
         this.expenses = expenses;
     }
 
-    public void addExpense(Expense expense){
+    public void addExpense(Expense expense) {
         this.expenses.add(expense);
     }
 
-    public void removeExpense(Expense expense){
+    public void removeExpense(Expense expense) {
         this.expenses.remove(expense);
     }
 
@@ -99,14 +101,63 @@ public class Profile {
         this.categories = categories;
     }
 
-    public void addCategory(TransactionCategory category){
+    public void addCategory(TransactionCategory category) {
         this.categories.add(category);
     }
 
-    public void removeCategory(TransactionCategory category){
-        if(category.isCreatedByUser())
-        {
+    public void removeCategory(TransactionCategory category) {
+        if (category.isCreatedByUser()) {
             this.categories.remove(category);
         }
+    }
+
+    // Überschreiben der toString-Methode
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+
+        // User Settings
+        result.append("User Settings:\n");
+        result.append("  Name: ").append(userSettings.getName()).append("\n");
+        result.append("  Birthday: ").append(userSettings.getBirthday()).append("\n");
+        result.append("  Language: ").append(userSettings.getLanguage()).append("\n\n");
+
+        // Categories
+        result.append("Categories (").append(categories.size()).append("):\n");
+        for (TransactionCategory category : categories) {
+            result.append("  - ").append(category.getName()).append("\n");
+        }
+        result.append("\n");
+
+        // Bank Accounts
+        result.append("Bank Accounts (").append(bankAccounts.size()).append("):\n");
+        for (BankAccount account : bankAccounts) {
+            result.append("  - ID: ").append(account.getId())
+                    .append(", Name: ").append(account.getName())
+                    .append(", Balance: ").append(account.getBalance()).append("\n");
+        }
+        result.append("\n");
+
+        // Incomes
+        result.append("Incomes (").append(incomes.size()).append("):\n");
+        for (Income income : incomes) {
+            result.append("  - ").append(income.getDescription()).append("\n");
+        }
+        result.append("\n");
+
+        // Expenses
+        result.append("Expenses (").append(expenses.size()).append("):\n");
+        for (Expense expense : expenses) {
+            result.append("  - ").append(expense.getDescription()).append("\n");
+        }
+        result.append("\n");
+
+        // Goals
+        result.append("Goals (").append(goals.size()).append("):\n");
+        for (Goal goal : goals) {
+            result.append("  - ").append(goal.getDescription()).append("\n");
+        }
+
+        return result.toString();
     }
 }
