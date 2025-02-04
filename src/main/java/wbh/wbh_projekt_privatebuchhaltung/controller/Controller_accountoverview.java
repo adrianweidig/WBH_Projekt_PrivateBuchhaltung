@@ -121,13 +121,13 @@ public class Controller_accountoverview implements ProfileAware {
         TextField descriptionField = new TextField(transaction.getDescription());
         TextField dateField = new TextField(dateFormatter.format(transaction.getDate()));
         TextField amountField = new TextField(Double.toString(transaction.getValue()));
-        // DropDown for Categories
-        // TextField typeField = new TextField(transaction.getTyp());
+        ComboBox<TransactionCategory> typeComboBox = new ComboBox<>(this.profile.getCategories());
 
         descriptionField.setPromptText("Enter a new description...");
         dateField.setPromptText("Enter date (dd.MM.yyyy)");
         amountField.setPromptText("Enter amount...");
-        // typeField.setPromptText("Enter transaction type (e.g. Income/Expense)");
+        typeComboBox.setPromptText("Select category...");
+        typeComboBox.setValue(transaction.getCategory());
 
         Button saveButton = new Button("Save");
         Button closeButton = new Button("Close");
@@ -139,8 +139,7 @@ public class Controller_accountoverview implements ProfileAware {
                 transaction.setDescription(descriptionField.getText());
                 transaction.setDate(newDate);
                 transaction.setValue(Double.parseDouble(amountField.getText()));
-                // TODO: DropDown for Categories
-                //transaction.setCategory();
+                transaction.setCategory(typeComboBox.getValue());
 
                 transactionTable.refresh();
                 rootPane.getChildren().remove(dialogContent);
@@ -152,7 +151,7 @@ public class Controller_accountoverview implements ProfileAware {
 
         closeButton.setOnAction(e -> rootPane.getChildren().remove(dialogContent));
 
-        dialogContent.getChildren().addAll(new Label("Edit Date:"), dateField, new Label("Edit Description:"), descriptionField, new Label("Edit Amount:"), amountField,  new HBox(10, saveButton, closeButton));
+        dialogContent.getChildren().addAll(new Label("Edit Date:"), dateField, new Label("Edit Description:"), descriptionField, new Label("Edit Type:"), typeComboBox, new Label("Edit Amount:"), amountField, new HBox(10, saveButton, closeButton));
         rootPane.getChildren().add(dialogContent);
     }
 
