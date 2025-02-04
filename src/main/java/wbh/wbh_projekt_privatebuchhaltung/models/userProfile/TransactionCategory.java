@@ -44,15 +44,12 @@ public class TransactionCategory
         return createdByUser;
     }
 
+    /**
+     * Needs to return only the name, so it can be used in Dropdown Menues
+     * @return the name of the Category
+     */
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
-
-        result.append("Category Details:\n");
-        result.append("  ID: ").append(id).append("\n");
-        result.append("  Name: ").append(name).append("\n");
-        result.append("  Created By User: ").append(createdByUser ? "Yes" : "No").append("\n");
-
-        return result.toString();
+        return this.name;
     }
 }
