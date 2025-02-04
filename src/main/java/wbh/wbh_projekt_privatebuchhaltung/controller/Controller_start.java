@@ -107,7 +107,7 @@ public class Controller_start {
         Profile profile = new Profile();
 
         //for testing the save function: write Example Data in Profile
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
         profile.getUserSettings().setBirthday(dateFormat.parse("1990-01-05"));
         profile.getUserSettings().setLanguage(Language.German);
@@ -156,7 +156,6 @@ public class Controller_start {
 
         Stage primaryStage = (Stage) this.vbox_background.getScene().getWindow();
 
-        // Load internationalized resources
         ResourceBundle resourceBundle = ResourceBundle.getBundle(
                 "wbh/wbh_projekt_privatebuchhaltung/i18n/text_controls", Locale.ENGLISH
         );
@@ -164,12 +163,10 @@ public class Controller_start {
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setResources(resourceBundle);
 
-        // Load the main view FXML file
         fxmlLoader.setLocation(this.getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_main.fxml"));
-        Parent fxmlScene = fxmlLoader.load();
+        Parent fxmlRoot = fxmlLoader.load();
 
-        // Configure and set the scene
-        Scene scene = new Scene(fxmlScene);
+        Scene scene = new Scene(fxmlRoot);
         scene.getStylesheets().add(
                 Objects.requireNonNull(this.getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/styles/style_main.css"))
                         .toExternalForm()
@@ -178,11 +175,10 @@ public class Controller_start {
         primaryStage.setScene(scene);
         logger.info("Main window loaded successfully.");
 
-        // Initialize the main controller
         Controller_main mainController = fxmlLoader.getController();
         mainController.setProfile(profile);
+        mainController.handleDashboard();
 
-        // Pass WebAPI and HostServices to the main controller (for JPro)
         try {
             mainController.setHostServices(this.hostServices);
             mainController.setWebAPI(this.webAPI);
