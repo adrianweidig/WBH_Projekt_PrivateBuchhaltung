@@ -60,7 +60,7 @@ public class Controller_accountoverview implements ProfileAware {
 
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
-        typeColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getTyp()));
+        typeColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
 
         addActionButtons();
 
