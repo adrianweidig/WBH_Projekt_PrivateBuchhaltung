@@ -9,19 +9,19 @@
     <left>
         <VBox fx:id="vbox_background" styleClass="sidebar" stylesheets="@../styles/style_main.css">
             <!-- Dashboard Button -->
-            <Button fx:id="btnDashboard" styleClass="sidebar-button">
+            <Button fx:id="btnDashboard" onAction="#handleDashboard" styleClass="sidebar-button">
                 <graphic>
-                    <FontIcon fx:id="btnDashboardIcon" iconLiteral="fa-home" />
+                    <FontIcon fx:id="btnDashboardIcon"  iconLiteral="fa-home" />
                 </graphic>
             </Button>
             <!-- Kontoübersicht Button -->
-            <Button fx:id="btnAccountOverview" styleClass="sidebar-button">
+            <Button fx:id="btnAccountOverview" onAction="#handleAccountOverview" styleClass="sidebar-button">
                 <graphic>
                     <FontIcon fx:id="btnAccountOverviewIcon" iconLiteral="fas-wallet" />
                 </graphic>
             </Button>
             <!-- Goals Button -->
-            <Button fx:id="btnGoals" styleClass="sidebar-button">
+            <Button fx:id="btnGoals" onAction="#handleGoals" styleClass="sidebar-button">
                 <graphic>
                     <FontIcon fx:id="btnGoalsIcon" iconLiteral="fa-trophy" />
                 </graphic>
@@ -31,13 +31,13 @@
             <Region VBox.vgrow="ALWAYS" />
 
             <!-- Settings Button -->
-            <Button fx:id="btnSettings" styleClass="sidebar-button">
+            <Button fx:id="btnSettings" onAction="#handleSettings" styleClass="sidebar-button">
                 <graphic>
                     <FontIcon fx:id="btnSettingsIcon" iconLiteral="fa-gear" />
                 </graphic>
             </Button>
             <!-- Network Button -->
-            <Button fx:id="btnNetwork" styleClass="sidebar-button">
+            <Button fx:id="btnNetwork" onAction="#handleNetwork" styleClass="sidebar-button">
                 <graphic>
                     <FontIcon fx:id="btnNetworkIcon" iconLiteral="fa-wifi" />
                 </graphic>
@@ -49,7 +49,7 @@
     <center>
         <ScrollPane>
             <StackPane fx:id="contentPane">
-                <fx:include source="view_dashboard.fxml" />
+
             </StackPane>
         </ScrollPane>
     </center>

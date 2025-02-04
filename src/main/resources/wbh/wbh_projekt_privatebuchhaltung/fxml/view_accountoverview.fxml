@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="wbh.wbh_projekt_privatebuchhaltung.controller.Controller_accountoverview">
+    <children>
+        <Label text="Transactions Page" layoutX="50" layoutY="50"/>
+        <TableView fx:id="transactionTable" layoutX="10" layoutY="10" prefWidth="600" prefHeight="400">
+            <columns>
+                <TableColumn fx:id="dateColumn" text="Date" prefWidth="100" />
+                <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="200" />
+                <TableColumn fx:id="amountColumn" text="Amount" prefWidth="100" />
+                <TableColumn fx:id="typeColumn" text="Type" prefWidth="100" />
+                <TableColumn fx:id="actionColumn" text="Actions" prefWidth="100" />
+            </columns>
+        </TableView>
+    </children>
+</AnchorPane>
