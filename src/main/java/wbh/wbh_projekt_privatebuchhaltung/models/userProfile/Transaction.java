@@ -21,7 +21,7 @@ public abstract class Transaction {
      * @param bankaccount the bankaccount
      * @param date        the date
      */
-    public Transaction(double value, TransactionCategory category, BankAccount bankaccount, Date date, String description) {
+    protected Transaction(double value, TransactionCategory category, BankAccount bankaccount, Date date, String description) {
         this.value = value;
         this.category = category;
         this.bankaccount = bankaccount;
@@ -29,7 +29,7 @@ public abstract class Transaction {
         this.description = description;
     }
 
-    public Transaction(int id, double value, TransactionCategory category, BankAccount bankaccount, Date date, String description) {
+    protected Transaction(int id, double value, TransactionCategory category, BankAccount bankaccount, Date date, String description) {
         this.id = id;
         this.value = value;
         this.category = category;
