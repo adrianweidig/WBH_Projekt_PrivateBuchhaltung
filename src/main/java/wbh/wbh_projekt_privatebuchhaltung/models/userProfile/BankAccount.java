@@ -1,5 +1,6 @@
 package wbh.wbh_projekt_privatebuchhaltung.models.userProfile;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -101,5 +102,19 @@ public class BankAccount
      */
     public void setLastInteraction(Date lastInteraction) {
         this.lastInteraction = lastInteraction;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
+
+        result.append("Bank Account Details:\n");
+        result.append("  ID: ").append(id).append("\n");
+        result.append("  Name: ").append(name).append("\n");
+        result.append("  Balance: ").append(String.format("%.2f", balance)).append("\n");
+        result.append("  Last Interaction: ").append(lastInteraction != null ? dateFormatter.format(lastInteraction) : "N/A").append("\n");
+
+        return result.toString();
     }
 }

@@ -43,4 +43,16 @@ public class TransactionCategory
     public boolean isCreatedByUser() {
         return createdByUser;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+
+        result.append("Category Details:\n");
+        result.append("  ID: ").append(id).append("\n");
+        result.append("  Name: ").append(name).append("\n");
+        result.append("  Created By User: ").append(createdByUser ? "Yes" : "No").append("\n");
+
+        return result.toString();
+    }
 }

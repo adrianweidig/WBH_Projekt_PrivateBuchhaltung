@@ -1,5 +1,6 @@
 package wbh.wbh_projekt_privatebuchhaltung.models.userProfile;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -124,4 +125,19 @@ public abstract class Transaction {
      */
     public abstract String getTyp();
 
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
+
+        result.append("Transaction Details:\n");
+        result.append("  ID: ").append(id).append("\n");
+        result.append("  Value: ").append(String.format("%.2f", value)).append("\n");
+        result.append("  Category: ").append(category.getName()).append("\n");
+        result.append("  Bank Account: ").append(bankaccount.getName()).append(" (ID: ").append(bankaccount.getId()).append(")\n");
+        result.append("  Date: ").append(dateFormatter.format(date)).append("\n");
+        result.append("  Description: ").append(description).append("\n");
+
+        return result.toString();
+    }
 }
