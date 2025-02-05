@@ -1,0 +1,66 @@
+/* Root Pane */
+.root {
+    -fx-background-color: #f4f4f9;
+    -fx-padding: 20px;
+    -fx-font-size: 14px;
+}
+
+/* Content Pane */
+.content-pane {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 20px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 5);
+}
+
+/* TableView Styling */
+.table-view {
+    -fx-border-color: transparent;
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10px;
+    -fx-padding: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 5, 0, 0, 2);
+}
+
+/* Entferne Trennlinien */
+.table-view .column-header-background {
+    -fx-background-color: #65558F;
+    -fx-background-radius: 10px 10px 0 0;
+}
+
+.table-view .column-header {
+    -fx-border-color: transparent;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.table-view .table-cell {
+    -fx-border-color: transparent;
+    -fx-padding: 10px;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #65558F;
+    -fx-text-fill: white;
+    -fx-border-radius: 8px;
+    -fx-padding: 10px 20px;
+    -fx-font-size: 14px;
+}
+
+.button:hover {
+    -fx-background-color: #4B3D71;
+}
+
+/* Responsivität */
+@media screen and (max-width: 768px) {
+    .table-view {
+        -fx-font-size: 12px;
+    }
+
+    .button {
+        -fx-font-size: 12px;
+        -fx-padding: 8px 16px;
+    }
+}

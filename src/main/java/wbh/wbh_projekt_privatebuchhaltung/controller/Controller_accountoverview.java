@@ -20,6 +20,7 @@ import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 public class Controller_accountoverview implements ProfileAware {
 
@@ -82,6 +83,20 @@ public class Controller_accountoverview implements ProfileAware {
         });
 
         logger.debug("Transaction table initialized with {} transactions", transactionTable.getItems().size());
+
+        this.rootPane.getStylesheets().add(
+                Objects.requireNonNull(this.getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/styles/style_contentpane.css"))
+                        .toExternalForm()
+        );
+
+        // Stile direkt setzen, falls CSS nicht geladen wird
+        this.transactionTable.getStyleClass().add("table-view");
+        rootPane.getStyleClass().add("root");
+
+        javafx.application.Platform.runLater(() -> {
+            this.rootPane.applyCss();
+            this.rootPane.layout();
+        });
     }
 
     private void addActionButtons() {
@@ -134,7 +149,6 @@ public class Controller_accountoverview implements ProfileAware {
 
         saveButton.setOnAction(e -> {
             try {
-                // Parse the date and handle possible exceptions
                 Date newDate = dateFormatter.parse(dateField.getText());
                 transaction.setDescription(descriptionField.getText());
                 transaction.setDate(newDate);
