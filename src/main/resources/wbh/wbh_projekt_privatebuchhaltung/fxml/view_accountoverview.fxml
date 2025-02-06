@@ -1,24 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
 
-<StackPane fx:id="rootPane" xmlns:fx="http://javafx.com/fxml" fx:controller="wbh.wbh_projekt_privatebuchhaltung.controller.Controller_accountoverview" styleClass="root">
-    <children>
-        <AnchorPane fx:id="contentPane" styleClass="content-pane">
-            <children>
-                <TableView fx:id="transactionTable" styleClass="table-view"
-                           AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                           AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0">
-                    <columns>
-                        <TableColumn fx:id="dateColumn" text="Date" prefWidth="100" />
-                        <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="200" />
-                        <TableColumn fx:id="amountColumn" text="Amount" prefWidth="100" />
-                        <TableColumn fx:id="typeColumn" text="Type" prefWidth="100" />
-                        <TableColumn fx:id="actionColumn" text="Actions" prefWidth="100" />
-                    </columns>
-                </TableView>
-            </children>
-        </AnchorPane>
-    </children>
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wbh.wbh_projekt_privatebuchhaltung.controller.Controller_accountoverview">
+
+    <VBox alignment="TOP_CENTER" spacing="10">
+        <Label styleClass="header-label" text="Transaction Overview" />
+
+        <TableView fx:id="transactionTable" styleClass="table-view">
+            <columns>
+                <TableColumn fx:id="dateColumn" text="Date" />
+                <TableColumn fx:id="descriptionColumn" text="Description" />
+                <TableColumn fx:id="amountColumn" text="Amount" />
+                <TableColumn fx:id="typeColumn" text="Category" />
+                <TableColumn fx:id="actionColumn" text="Actions" />
+            </columns>
+        </TableView>
+
+        <HBox alignment="TOP_RIGHT">
+            <Button onAction="#showAddTransactionForm" styleClass="add-button">
+                <graphic>
+                    <FontIcon iconLiteral="fas-plus" />
+                </graphic>
+            </Button>
+        </HBox>
+      <opaqueInsets>
+         <Insets />
+      </opaqueInsets>
+      <StackPane.margin>
+         <Insets />
+      </StackPane.margin>
+    </VBox>
+
 </StackPane>

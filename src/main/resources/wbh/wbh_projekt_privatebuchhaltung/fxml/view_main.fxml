@@ -47,7 +47,7 @@
 
     <!-- Main Content Area -->
     <center>
-        <ScrollPane fx:id="scrollPane" styleClass="scroll-pane">
+        <ScrollPane fx:id="scrollPane" styleClass="scroll-pane" fitToWidth="true">
             <StackPane fx:id="contentPane" VBox.vgrow="ALWAYS" styleClass="stack-pane">
                 <!-- Hier kommen die eigentlichen Inhalte des StackPanes -->
                 <fx:include source="view_accountoverview.fxml"></fx:include>
