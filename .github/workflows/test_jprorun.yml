@@ -1,4 +1,4 @@
-name: Java CI with Localtunnel (Bypass Tunnel Reminder)
+name: Java CI with Localtunnel (Show Public IP)
 
 on:
   workflow_dispatch:  # Manuelles Auslösen
@@ -7,7 +7,7 @@ jobs:
   build-and-run:
     runs-on: ubuntu-latest
     steps:
-      # 1. Repository auschecken
+      # 1. Code auschecken
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -31,49 +31,46 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 5. JPro-Server im Hintergrund starten
+      # 5. Öffentliche IP abrufen und anzeigen (Tunnel-Passwort)
+      - name: Display Public IP (Tunnel Password)
+        run: |
+          PUBLIC_IP=$(curl --silent ifconfig.me)
+          echo "Tunnel-Passwort (Public IP): $PUBLIC_IP"
+
+      # 6. JPro-Server im Hintergrund starten
       - name: Start JPro server
         run: |
           nohup ./gradlew jprorun > jpro.log 2>&1 &
           echo "Warte 10 Sekunden auf den Start des JPro-Servers..."
           sleep 10
 
-      # 6. Node.js einrichten (zum Installieren von localtunnel)
+      # 7. Node.js einrichten (für localtunnel)
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
 
-      # 7. localtunnel installieren
+      # 8. localtunnel installieren
       - name: Install localtunnel
         run: npm install -g localtunnel
 
-      # 8. localtunnel starten, öffentliche URL ermitteln und den Reminder-Page-Bypass testen
+      # 9. localtunnel starten, öffentliche URL ermitteln und anzeigen
       - name: Start localtunnel and get public URL
-        id: localtunnel
+        id: lt
         run: |
           echo "Starte localtunnel auf Port 8080..."
-          # Starte localtunnel im Hintergrund; lt schreibt Logs in lt.log
           lt --port 8080 > lt.log 2>&1 &
           echo "Warte 10 Sekunden, bis localtunnel initialisiert ist..."
           sleep 10
-          # Extrahiere die öffentliche URL aus lt.log
           LT_URL=$(grep -o 'https://[a-z0-9\-]*\.loca.lt' lt.log | head -n 1)
           if [ -z "$LT_URL" ]; then
             echo "Fehler: Keine öffentliche URL von localtunnel erhalten."
             exit 1
           fi
-          echo "Gefundene URL: $LT_URL"
-          # Teste, ob der Tunnel-Benachrichtigungsbildschirm (Reminder) erscheint, indem ein Request mit zusätzlichen Headern gesendet wird:
-          TEST_CONTENT=$(curl --silent -H "bypass-tunnel-reminder: true" -H "User-Agent: CustomAgent/1.0" "$LT_URL")
-          if echo "$TEST_CONTENT" | grep -qi "Tunnel Password:"; then
-            echo "Fehler: Der Tunnel Reminder erscheint – Bypass funktioniert nicht."
-            exit 1
-          fi
-          echo "Bypass erfolgreich. Dein JPro-Server ist öffentlich erreichbar unter: $LT_URL"
+          echo "Dein JPro-Server ist öffentlich erreichbar unter: $LT_URL"
           echo "::set-output name=public_url::$LT_URL"
 
-      # 9. Workflow offen halten, damit der Tunnel für Tests verfügbar bleibt
+      # 10. Workflow offen halten, damit der Tunnel für Tests verfügbar bleibt
       - name: Wait for manual testing
         run: |
           echo "Server läuft – 5 Minuten Zeit zum Testen."
