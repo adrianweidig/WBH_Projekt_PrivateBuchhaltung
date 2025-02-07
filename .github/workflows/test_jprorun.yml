@@ -1,4 +1,4 @@
-name: Java CI with Localtunnel (Show Public IP)
+name: Java CI with Localtunnel (Continuous Log Output)
 
 on:
   workflow_dispatch:  # Manuelles Auslösen
@@ -54,7 +54,7 @@ jobs:
       - name: Install localtunnel
         run: npm install -g localtunnel
 
-      # 9. localtunnel starten, öffentliche URL ermitteln und anzeigen
+      # 9. localtunnel starten und öffentliche URL ermitteln
       - name: Start localtunnel and get public URL
         id: lt
         run: |
@@ -70,8 +70,8 @@ jobs:
           echo "Dein JPro-Server ist öffentlich erreichbar unter: $LT_URL"
           echo "::set-output name=public_url::$LT_URL"
 
-      # 10. Workflow offen halten, damit der Tunnel für Tests verfügbar bleibt
-      - name: Wait for manual testing
+      # 10. jpro.log kontinuierlich in der Konsole anzeigen für 5 Minuten
+      - name: Stream jpro.log to console
         run: |
-          echo "Server läuft – 5 Minuten Zeit zum Testen."
-          sleep 300
+          echo "Streaming jpro.log für die nächsten 5 Minuten..."
+          timeout 300 tail -f jpro.log
