@@ -1,4 +1,4 @@
-name: Java CI with Localtunnel (Continuous Log Output)
+name: Java CI with Localtunnel
 
 on:
   workflow_dispatch:  # Manuelles Auslösen
@@ -6,23 +6,21 @@ on:
 jobs:
   build-and-run:
     runs-on: ubuntu-latest
+    env:
+      LANG: de_DE.UTF-8  # Setzt die Locale auf Deutsch
     steps:
-      # 1. Code auschecken
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. JDK 21 einrichten
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'zulu'
 
-      # 3. gradlew ausführbar machen
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 4. Gradle-Abhängigkeiten cachen
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
@@ -31,30 +29,25 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 5. Öffentliche IP abrufen und anzeigen (Tunnel-Passwort)
       - name: Display Public IP (Tunnel Password)
         run: |
           PUBLIC_IP=$(curl --silent ifconfig.me)
           echo "Tunnel-Passwort (Public IP): $PUBLIC_IP"
 
-      # 6. JPro-Server im Hintergrund starten
       - name: Start JPro server
         run: |
           nohup ./gradlew jprorun > jpro.log 2>&1 &
           echo "Warte 10 Sekunden auf den Start des JPro-Servers..."
           sleep 10
 
-      # 7. Node.js einrichten (für localtunnel)
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
 
-      # 8. localtunnel installieren
       - name: Install localtunnel
         run: npm install -g localtunnel
 
-      # 9. localtunnel starten und öffentliche URL ermitteln
       - name: Start localtunnel and get public URL
         id: lt
         run: |
@@ -70,7 +63,6 @@ jobs:
           echo "Dein JPro-Server ist öffentlich erreichbar unter: $LT_URL"
           echo "::set-output name=public_url::$LT_URL"
 
-      # 10. jpro.log kontinuierlich in der Konsole anzeigen für 5 Minuten
       - name: Stream jpro.log to console
         run: |
           echo "Streaming jpro.log für die nächsten 5 Minuten..."
