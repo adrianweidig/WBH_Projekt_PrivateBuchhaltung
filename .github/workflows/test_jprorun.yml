@@ -1,14 +1,11 @@
-name: Java CI with JPro (Manual Trigger & Public Access)
+name: Java CI with Localtunnel
 
 on:
-  workflow_dispatch:  # Nur manuelles Starten
+  workflow_dispatch:  # Manuelles Auslösen
 
 jobs:
   build-and-run:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
     steps:
       # 1. Repository auschecken
       - name: Checkout code
@@ -34,53 +31,43 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 5. Öffentliche IP-Adresse des Runners ausgeben (zur Info)
-      - name: Get public IP address
-        run: curl ifconfig.me
-
-      # 6. Hilfsprogramm "jq" zur JSON-Auswertung installieren
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      # 7. ngrok herunterladen und vorbereiten
-      - name: Install ngrok
-        run: |
-          wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-          unzip ngrok-stable-linux-amd64.zip
-          chmod +x ./ngrok
-
-      # 8. JPro-Server starten (im Hintergrund)
-      - name: Start JPro Server
-        env:
-          # Stelle sicher, dass dein JPro-Server auf allen Schnittstellen lauscht
-          JPRO_SERVER_ADDRESS: "0.0.0.0"
-          JPRO_SERVER_PORT: "8080"
+      # 5. JPro-Server im Hintergrund starten
+      - name: Start JPro server
         run: |
           nohup ./gradlew jprorun > jpro.log 2>&1 &
-          echo "Warte auf den Start des JPro-Servers..."
-          sleep 10  # ggf. anpassen, wenn der Server länger benötigt
+          echo "Warte 10 Sekunden auf den Start des JPro-Servers..."
+          sleep 10
 
-      # 9. ngrok-Tunnel starten (im Hintergrund) und ausreichend warten
-      - name: Start ngrok tunnel
-        run: |
-          nohup ./ngrok http 8080 > ngrok.log 2>&1 &
-          echo "Warte auf die Initialisierung von ngrok..."
-          sleep 30  # Erhöhte Wartezeit für ngrok
+      # 6. Node.js einrichten (zum Installieren von localtunnel)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
 
-      # 10. Debug: Ausgabe des ngrok-API-JSON-Outputs (zur Überprüfung)
-      - name: Debug ngrok tunnels output
-        run: |
-          echo "ngrok tunnels JSON output:"
-          curl --silent http://127.0.0.1:4040/api/tunnels
+      # 7. localtunnel installieren
+      - name: Install localtunnel
+        run: npm install -g localtunnel
 
-      # 11. Öffentliche ngrok-URL auslesen und anzeigen
-      - name: Show ngrok public URL
+      # 8. localtunnel starten und öffentliche URL ermitteln
+      - name: Start localtunnel and get public URL
+        id: localtunnel
         run: |
-          NGROK_URL=$(curl --silent http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url')
-          echo "Dein JPro-Server ist nun öffentlich erreichbar unter: $NGROK_URL"
-          if [ -z "$NGROK_URL" ]; then
-            echo "Error: Keine öffentliche URL gefunden. Überprüfe den Tunnel-Status in den Logs."
+          echo "Starte localtunnel auf Port 8080..."
+          # Starte localtunnel im Hintergrund und schreibe die Ausgabe in lt.log
+          lt --port 8080 > lt.log 2>&1 &
+          echo "Warte 10 Sekunden, bis localtunnel initialisiert ist..."
+          sleep 10
+          # Extrahiere die öffentliche URL aus lt.log
+          LT_URL=$(grep -o 'https://[a-z0-9\-]*\.loca.lt' lt.log | head -n 1)
+          if [ -z "$LT_URL" ]; then
+            echo "Fehler: Keine öffentliche URL von localtunnel erhalten."
             exit 1
           fi
+          echo "Dein JPro-Server ist nun öffentlich erreichbar unter: $LT_URL"
+          echo "::set-output name=public_url::$LT_URL"
+
+      # 9. Workflow offen halten, damit der Tunnel für Tests verfügbar ist
+      - name: Wait for manual testing
+        run: |
           echo "Server läuft – 5 Minuten Zeit zum Testen."
           sleep 300
