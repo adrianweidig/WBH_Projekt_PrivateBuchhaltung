@@ -43,6 +43,13 @@ jobs:
           PUBLIC_IP=$(curl --silent ifconfig.me)
           echo "Tunnel-Passwort (Public IP): $PUBLIC_IP"
 
+      - name: Display repository file structure
+        run: |
+          echo "Verzeichnisstruktur des Repositories:"
+          find . -type d -print | sed -e 's;[^/]*/;|____;g; s;____|; |;g'
+          echo "Dateien im Repository:"
+          find . -type f -print | sed -e 's;[^/]*/;|____;g; s;____|; |;g'
+
       - name: Start JPro server
         run: |
           nohup ./gradlew jprorun > jpro.log 2>&1 &
