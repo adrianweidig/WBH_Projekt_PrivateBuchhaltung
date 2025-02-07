@@ -1,0 +1,85 @@
+name: Java CI with Localtunnel
+
+on:
+  workflow_dispatch:  # Manuelles Auslösen
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Install and configure locales
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y locales tzdata
+          sudo locale-gen de_DE.UTF-8 en_US.UTF-8
+          sudo update-locale LANG=de_DE.UTF-8
+          export LANG=de_DE.UTF-8
+          export LC_ALL=de_DE.UTF-8
+          echo "Aktuelle Locale-Einstellungen:"
+          locale
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Display Public IP (Tunnel Password)
+        run: |
+          PUBLIC_IP=$(curl --silent ifconfig.me)
+          echo "Tunnel-Passwort (Public IP): $PUBLIC_IP"
+
+      - name: Display repository file structure
+        run: |
+          echo "Verzeichnisstruktur des Repositories:"
+          find . -type d -print | sed -e 's;[^/]*/;|____;g; s;____|; |;g'
+          echo "Dateien im Repository:"
+          find . -type f -print | sed -e 's;[^/]*/;|____;g; s;____|; |;g'
+
+      - name: Start JPro server
+        run: |
+          nohup ./gradlew jprorun > jpro.log 2>&1 &
+          echo "Warte 10 Sekunden auf den Start des JPro-Servers..."
+          sleep 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install localtunnel
+        run: npm install -g localtunnel
+
+      - name: Start localtunnel and get public URL
+        id: lt
+        run: |
+          echo "Starte localtunnel auf Port 8080..."
+          lt --port 8080 > lt.log 2>&1 &
+          echo "Warte 10 Sekunden, bis localtunnel initialisiert ist..."
+          sleep 10
+          LT_URL=$(grep -o 'https://[a-z0-9\-]*\.loca.lt' lt.log | head -n 1)
+          if [ -z "$LT_URL" ]; then
+            echo "Fehler: Keine öffentliche URL von localtunnel erhalten."
+            exit 1
+          fi
+          echo "Dein JPro-Server ist öffentlich erreichbar unter: $LT_URL"
+          echo "::set-output name=public_url::$LT_URL"
+
+      - name: Stream jpro.log to console
+        run: |
+          echo "Streaming jpro.log für die nächsten 5 Minuten..."
+          timeout 300 tail -f jpro.log
