@@ -49,29 +49,38 @@ jobs:
           unzip ngrok-stable-linux-amd64.zip
           chmod +x ./ngrok
 
-      # 8. JPro-Server starten (hintergrundmäßig)
+      # 8. JPro-Server starten (im Hintergrund)
       - name: Start JPro Server
         env:
-          # Setze hier ggf. weitere JPro-spezifische Umgebungsvariablen
+          # Stelle sicher, dass dein JPro-Server auf allen Schnittstellen lauscht
           JPRO_SERVER_ADDRESS: "0.0.0.0"
           JPRO_SERVER_PORT: "8080"
         run: |
           nohup ./gradlew jprorun > jpro.log 2>&1 &
           echo "Warte auf den Start des JPro-Servers..."
-          sleep 10  # Wartezeit anpassen, falls dein Server länger zum Starten braucht
+          sleep 10  # ggf. anpassen, wenn der Server länger benötigt
 
-      # 9. ngrok starten, um Port 8080 öffentlich verfügbar zu machen (hintergrundmäßig)
+      # 9. ngrok-Tunnel starten (im Hintergrund) und ausreichend warten
       - name: Start ngrok tunnel
         run: |
           nohup ./ngrok http 8080 > ngrok.log 2>&1 &
           echo "Warte auf die Initialisierung von ngrok..."
-          sleep 10  # Warte, bis ngrok vollständig gestartet ist
+          sleep 30  # Erhöhte Wartezeit für ngrok
 
-      # 10. Öffentliche ngrok-URL auslesen und anzeigen
+      # 10. Debug: Ausgabe des ngrok-API-JSON-Outputs (zur Überprüfung)
+      - name: Debug ngrok tunnels output
+        run: |
+          echo "ngrok tunnels JSON output:"
+          curl --silent http://127.0.0.1:4040/api/tunnels
+
+      # 11. Öffentliche ngrok-URL auslesen und anzeigen
       - name: Show ngrok public URL
         run: |
           NGROK_URL=$(curl --silent http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url')
           echo "Dein JPro-Server ist nun öffentlich erreichbar unter: $NGROK_URL"
-          # Halte den Workflow für 5 Minuten, damit du testen kannst
+          if [ -z "$NGROK_URL" ]; then
+            echo "Error: Keine öffentliche URL gefunden. Überprüfe den Tunnel-Status in den Logs."
+            exit 1
+          fi
           echo "Server läuft – 5 Minuten Zeit zum Testen."
           sleep 300
