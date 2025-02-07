@@ -10,6 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wbh.wbh_projekt_privatebuchhaltung.controller.Controller_start;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -40,6 +44,21 @@ public class Main extends JProApplication {
     @Override
     public void start(Stage primaryStage) throws Exception {
         logger.info("Application is starting.");
+
+        // Some OS have problems with temp folders not existing in dev environments so we set them up
+        Path path = Paths.get("/tmp/lang");
+        try {
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+                logger.info("Verzeichnis wurde erstellt: " + path);
+            } else {
+                logger.info("Verzeichnis existiert bereits: " + path);
+            }
+        } catch (IOException e) {
+            logger.error("Fehler beim Erstellen des Verzeichnisses: " + e.getMessage(), e);
+        }
+
+
 
         // Load internationalization resources (i18n)
         ResourceBundle resourceBundle = ResourceBundle.getBundle(
