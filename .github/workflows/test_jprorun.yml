@@ -6,8 +6,6 @@ on:
 jobs:
   build-and-run:
     runs-on: ubuntu-latest
-    env:
-      LANG: de_DE.UTF-8  # Setzt die Locale auf Deutsch
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,6 +18,17 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+
+      - name: Install and configure locales
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y locales tzdata
+          sudo locale-gen de_DE.UTF-8 en_US.UTF-8
+          sudo update-locale LANG=de_DE.UTF-8
+          export LANG=de_DE.UTF-8
+          export LC_ALL=de_DE.UTF-8
+          echo "Aktuelle Locale-Einstellungen:"
+          locale
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
