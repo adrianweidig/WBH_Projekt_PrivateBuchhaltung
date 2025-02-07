@@ -46,6 +46,8 @@ public class Main extends JProApplication {
         logger.info("Application is starting.");
 
         // Some OS have problems with temp folders not existing in dev environments so we set them up
+
+        //TODO: MissingResourceException behandeln um GitHub Actions zu gewährleisten
         Path path = Paths.get("/tmp/lang");
         try {
             if (!Files.exists(path)) {
