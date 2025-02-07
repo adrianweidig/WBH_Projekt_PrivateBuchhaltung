@@ -43,7 +43,7 @@ public class Main extends JProApplication {
 
         // Load internationalization resources (i18n)
         ResourceBundle resourceBundle = ResourceBundle.getBundle(
-                "wbh/wbh_projekt_privatebuchhaltung/i18n/text_controls", Locale.ENGLISH
+                "wbh/wbh_projekt_privatebuchhaltung/i18n/text_controls", Locale.GERMAN
         );
 
         // Set application title from the resource bundle

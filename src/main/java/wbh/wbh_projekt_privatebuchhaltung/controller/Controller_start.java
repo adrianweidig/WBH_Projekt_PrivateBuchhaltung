@@ -107,7 +107,7 @@ public class Controller_start {
         Profile profile = new Profile();
 
         //for testing the save function: write Example Data in Profile
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMAN);
 
         profile.getUserSettings().setBirthday(dateFormat.parse("1990-01-05"));
         profile.getUserSettings().setLanguage(Language.German);
@@ -157,7 +157,7 @@ public class Controller_start {
         Stage primaryStage = (Stage) this.vbox_background.getScene().getWindow();
 
         ResourceBundle resourceBundle = ResourceBundle.getBundle(
-                "wbh/wbh_projekt_privatebuchhaltung/i18n/text_controls", Locale.ENGLISH
+                "wbh/wbh_projekt_privatebuchhaltung/i18n/text_controls", Locale.GERMAN
         );
 
         FXMLLoader fxmlLoader = new FXMLLoader();

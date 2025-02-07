@@ -135,7 +135,7 @@ public class Controller_main implements ProfileAware {
             this.contentPane.getChildren().clear();
 
             ResourceBundle resourceBundle = ResourceBundle.getBundle(
-                    "wbh/wbh_projekt_privatebuchhaltung/i18n/text_controls", Locale.ENGLISH
+                    "wbh/wbh_projekt_privatebuchhaltung/i18n/text_controls", Locale.GERMAN
             );
 
             FXMLLoader fxmlLoader = new FXMLLoader();
