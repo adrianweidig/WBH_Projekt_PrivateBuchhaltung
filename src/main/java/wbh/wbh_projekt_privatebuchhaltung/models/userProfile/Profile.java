@@ -14,6 +14,7 @@ public class Profile {
     private ObservableList<Income> incomes = FXCollections.observableArrayList();
     private ObservableList<Expense> expenses = FXCollections.observableArrayList();
     private ObservableList<TransactionCategory> categories = FXCollections.observableArrayList();
+    private ObservableList<Badge> badges = FXCollections.observableArrayList();
 
     // Getter and Setter for UserSettings
     public UserSettings getUserSettings() {
@@ -111,7 +112,21 @@ public class Profile {
         }
     }
 
-    // Überschreiben der toString-Methode
+    //Getter and Setter for Badges
+    public ObservableList<Badge> getBadges() {
+        return badges;
+    }
+    public void setBadges(ObservableList<Badge> badges) {
+        this.badges = badges;
+    }
+    public void addBadge(Badge badge) {
+        this.badges.add(badge);
+    }
+    public void removeBadge(Badge badge) {
+        this.badges.remove(badge);
+    }
+
+    // Override the  toString-Method
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
@@ -156,6 +171,12 @@ public class Profile {
         result.append("Goals (").append(goals.size()).append("):\n");
         for (Goal goal : goals) {
             result.append("  - ").append(goal.getDescription()).append("\n");
+        }
+
+        // Badges
+        result.append("Badges (").append(badges.size()).append("):\n");
+        for (Badge badge : badges) {
+            result.append(" - ").append(badge.getName()).append(", CompletedOn: ").append(badge.getCompletedDate()).append("\n");
         }
 
         return result.toString();

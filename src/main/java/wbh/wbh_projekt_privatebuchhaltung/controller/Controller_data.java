@@ -92,6 +92,37 @@ public class Controller_data {
                 );
             """);
 
+            statement.execute("""
+            DROP TABLE IF EXISTS [Badge];
+            """);
+
+            statement.execute("""
+                CREATE TABLE IF NOT EXISTS Goal (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    description TEXT,
+                    goalValue REAL NOT NULL,
+                    bankAccountId INTEGER NOT NULL,
+                    startDate DATE NOT NULL,
+                    endDate DATE,
+                      FOREIGN KEY (bankAccountId) REFERENCES BankAccount(id)
+                );
+            """);
+
+            statement.execute("""
+                DROP TABLE IF EXISTS Badge;
+            """);
+
+            statement.execute("""
+                CREATE TABLE IF NOT EXISTS Badge (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    targetReachedGoals INTEGER NOT NULL,
+                    completed BOOLEAN NOT NULL,
+                    completedDate DATE
+                );
+            """);
+
             logger.info("Tables were created successful.");
         } catch (SQLException e) {
             logger.error("Error creating tables: " + e.getMessage());
@@ -107,11 +138,12 @@ public class Controller_data {
 
         getGoals(path, profile);
         getTransactions(path, profile);
+        getAllBadges(path, profile);
 
         return profile;
     }
 
-    public void getTransactions(String dbFilePath, Profile profile) {
+    private void getTransactions(String dbFilePath, Profile profile) {
         String query = "SELECT id, [amount], date, description, categoryId, bankAccountId FROM [Transaction]";
 
         try (Connection connection = DriverManager.getConnection(dbFilePath);
@@ -153,7 +185,7 @@ public class Controller_data {
         }
     }
 
-    public UserSettings getUserSettings(String dbFilePath) {
+    private UserSettings getUserSettings(String dbFilePath) {
         String query = "SELECT id, name, birthday, language FROM UserSettings";
 
         try (Connection connection = DriverManager.getConnection(dbFilePath);
@@ -169,12 +201,12 @@ public class Controller_data {
         } catch (SQLException e) {
             logger.error("Error while loading UserSettings from DB: " + e.getMessage(), e);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            logger.error("Error while parsing Date: " + e.getMessage(), e);
         }
         return null;
     }
 
-    public ObservableList<TransactionCategory> getAllTransactionCategories(String dbFilePath){
+    private ObservableList<TransactionCategory> getAllTransactionCategories(String dbFilePath){
         ObservableList<TransactionCategory> categories = javafx.collections.FXCollections.observableArrayList() ;
 
         String query = "SELECT id, name, CreatedByUser FROM TransactionCategory";
@@ -197,7 +229,7 @@ public class Controller_data {
         return categories;
     }
 
-    public ObservableList<BankAccount> getAllBankAccounts(String dbFilePath) {
+    private ObservableList<BankAccount> getAllBankAccounts(String dbFilePath) {
         ObservableList<BankAccount> bankAccounts = javafx.collections.FXCollections.observableArrayList();
         String query = "SELECT id, Name, balance, lastInteraction FROM BankAccount";
 
@@ -222,7 +254,7 @@ public class Controller_data {
         return bankAccounts;
     }
 
-    public void getGoals(String dbFilePath, Profile profile) {
+    private void getGoals(String dbFilePath, Profile profile) {
 
         String query = "SELECT id, name, description, goalValue, bankAccountId, startDate, endDate FROM Goal";
 
@@ -257,6 +289,37 @@ public class Controller_data {
         }
     }
 
+    private void getAllBadges(String dbFilePath, Profile profile) {
+
+        String query = "SELECT id, name, targetReachedGoals, completed, completedDate FROM Badge";
+
+        try (Connection connection = DriverManager.getConnection(dbFilePath);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                int targetReachedGoals = resultSet.getInt("targetReachedGoals");
+                boolean completed = resultSet.getBoolean("completed");
+                Date completedDate = null;
+
+                // Parse completedDate if not null
+                if (resultSet.getString("completedDate") != null) {
+                    completedDate = dateFormat.parse(resultSet.getString("completedDate"));
+                }
+
+                // Create and add the Badge to the list
+                Badge badge = new Badge(id, name, targetReachedGoals, completed, completedDate);
+                profile.addBadge(badge);
+            }
+        } catch (SQLException e) {
+            logger.error("Error while loading Badges from DB: " + e.getMessage());
+        } catch (ParseException e) {
+            logger.error("Error while parsing Date: " + e.getMessage());
+        }
+    }
+
     public void saveProfile(String dbFilePath, Profile profile) {
         createTables(dbFilePath);
 
@@ -280,6 +343,10 @@ public class Controller_data {
         for (Goal goal : profile.getGoals()) {
             saveGoal(dbFilePath, goal);
         }
+
+        for(Badge badge : profile.getBadges()){
+            saveBadge(dbFilePath, badge);
+        }
     }
 
     public void saveUserSettings(String dbFilePath, UserSettings userSettings) {
@@ -297,13 +364,45 @@ public class Controller_data {
 
                 int affectedRows = preparedStatement.executeUpdate();
                 if (affectedRows > 0) {
-                    logger.error("UserSettings inserted successfully.");
+                    logger.info("UserSettings inserted successfully.");
                 } else {
                     logger.error("No UserSettings were inserted.");
             }
 
         } catch (SQLException e) {
             logger.error("Error while inserting UserSettings into DB: " + e.getMessage());
+        }
+    }
+
+    public void saveBadge(String dbFilePath, Badge badge) {
+        String query = """
+        INSERT INTO Badge (name, targetReachedGoals, completed, completedDate)
+        VALUES (?, ?, ?, ?);
+    """;
+
+        try (Connection connection = DriverManager.getConnection(dbFilePath);
+         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, badge.getName());
+            preparedStatement.setInt(2, badge.getTargetReachedGoals());
+            preparedStatement.setBoolean(3, badge.isCompleted());
+
+            if (badge.getCompletedDate() != null) {
+                preparedStatement.setString(4, dateFormat.format(badge.getCompletedDate()));
+            } else {
+                preparedStatement.setNull(4, Types.DATE);
+            }
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows > 0) {
+                logger.info("Badge inserted successfully.");
+                badge.setId(getNewId(preparedStatement));
+            } else {
+                logger.error("No Badge was inserted.");
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error while inserting Badge into DB: " + e.getMessage(), e);
         }
     }
 
@@ -322,7 +421,7 @@ public class Controller_data {
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
-                logger.error("BankAccount inserted successfully.");
+                logger.info("BankAccount inserted successfully.");
                 account.setId(getNewId(preparedStatement));
             } else {
             logger.error("BankAccount wasn't inserted.");
@@ -347,7 +446,7 @@ public class Controller_data {
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
-                logger.error("TransactionCategory inserted successfully.");
+                logger.info("TransactionCategory inserted successfully.");
 
                   transactionCategory.setId(getNewId(preparedStatement));
 
@@ -391,7 +490,7 @@ public class Controller_data {
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
-                logger.error("Transaction inserted successfully.");
+                logger.info("Transaction inserted successfully.");
             } else {
                 logger.error("Transaction wasn't inserted.");
             }

@@ -72,6 +72,8 @@ public class Controller_start {
     @FXML
     void onaction_createprofile(ActionEvent event) {
         Profile profile = new Profile();
+        profile.addBadge(new Badge("1. Badge", 1, false, null ));
+        profile.addBadge(new Badge("2. Badge", 3, false, null ));
 
         try {
             this.loadMainController(profile);
@@ -125,6 +127,11 @@ public class Controller_start {
         profile.addExpense(new Expense(-333.99, category,bankAccount,dateFormat.parse("2025-12-31"),"Test-Expense1"));
 
         profile.addGoal(new Goal("Test", "Mein Sparziel bis 2026", 99999.99, bankAccount, dateFormat.parse("2025-01-31"),dateFormat.parse("2025-12-31") ));
+
+        profile.addBadge(new Badge("1st Goal reached!", 1, false, null ));
+        profile.addBadge(new Badge("3rd Goal reached!", 3, false, null ));
+        profile.addBadge(new Badge("5th Goal reached!", 5, false, null ));
+        profile.addBadge(new Badge("10th Goal reached!", 10, false, null ));
 
         dataController.saveProfile("jdbc:sqlite:db.sqlite", profile);
     }
