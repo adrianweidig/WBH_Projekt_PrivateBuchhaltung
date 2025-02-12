@@ -72,8 +72,10 @@ public class Controller_start {
     @FXML
     void onaction_createprofile(ActionEvent event) {
         Profile profile = new Profile();
-        profile.addBadge(new Badge("1. Badge", 1, false, null ));
-        profile.addBadge(new Badge("2. Badge", 3, false, null ));
+        profile.addBadge(new Badge("1st Goal reached!", 1, false, null ));
+        profile.addBadge(new Badge("3rd Goal reached!", 3, false, null ));
+        profile.addBadge(new Badge("5th Goal reached!", 5, false, null ));
+        profile.addBadge(new Badge("10th Goal reached!", 10, false, null ));
 
         try {
             this.loadMainController(profile);
