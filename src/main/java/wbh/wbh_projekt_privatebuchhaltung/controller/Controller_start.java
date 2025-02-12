@@ -14,13 +14,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.*;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import com.jpro.webapi.WebAPI;
+
+import javafx.stage.Stage;
+
+import java.io.File;
+
 
 /**
  * Controller for the start view of the application.
@@ -107,7 +115,7 @@ public class Controller_start {
      * @param event The button click event.
      */
     @FXML
-    void onaction_saveprofile(ActionEvent event) throws ParseException {
+    void onaction_saveprofile(ActionEvent event) throws ParseException, MalformedURLException {
         Profile profile = new Profile();
 
         //for testing the save function: write Example Data in Profile
@@ -136,6 +144,10 @@ public class Controller_start {
         profile.addBadge(new Badge("10th Goal reached!", 10, false, null ));
 
         dataController.saveProfile("jdbc:sqlite:db.sqlite", profile);
+
+        File dbfilePath = new File("./db.sqlite");
+        this.webAPI.downloadURL(dbfilePath.toURI().toURL());
+        this.webAPI.makeFileUploadNode(new Button("UploadFile"));
     }
 
     /**
