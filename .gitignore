@@ -50,3 +50,4 @@ logs/*
 tmp/*
 RUNNING_PID
 *.log
+db.sqlite
