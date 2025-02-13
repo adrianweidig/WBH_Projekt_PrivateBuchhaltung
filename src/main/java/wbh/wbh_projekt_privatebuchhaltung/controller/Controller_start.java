@@ -30,10 +30,9 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 
-
 /**
  * Controller for the start view of the application.
- * Manages profile creation and loading, and transitions to the main view.
+ * Manages profile creation, loading, and transitions to the main view.
  */
 public class Controller_start {
 
@@ -47,7 +46,7 @@ public class Controller_start {
     private HostServices hostServices = null;
 
     /* -------------------------------- */
-    /* ------ FXML Variables     ------ */
+    /* ------ FXML Variables ------ */
     /* -------------------------------- */
 
     @FXML
@@ -69,22 +68,23 @@ public class Controller_start {
     private VBox vbox_background;
 
     /* -------------------------------- */
-    /* ------ FXML Methods       ------ */
+    /* ------ FXML Methods ------ */
     /* -------------------------------- */
 
     /**
      * Handles the action for creating a new profile.
-     * Navigates to the main view after initializing a new profile.
+     * Initializes a new profile with sample badges and transitions to the main view.
      *
-     * @param event The button click event.
+     * @param event the button click event.
      */
     @FXML
     void onaction_createprofile(ActionEvent event) {
         Profile profile = new Profile();
-        profile.addBadge(new Badge("1st Goal reached!", 1, false, null ));
-        profile.addBadge(new Badge("3rd Goal reached!", 3, false, null ));
-        profile.addBadge(new Badge("5th Goal reached!", 5, false, null ));
-        profile.addBadge(new Badge("10th Goal reached!", 10, false, null ));
+        // Add sample badges to the profile
+        profile.addBadge(new Badge("1st Goal reached!", 1, false, null));
+        profile.addBadge(new Badge("3rd Goal reached!", 3, false, null));
+        profile.addBadge(new Badge("5th Goal reached!", 5, false, null));
+        profile.addBadge(new Badge("10th Goal reached!", 10, false, null));
 
         try {
             this.loadMainController(profile);
@@ -95,13 +95,13 @@ public class Controller_start {
 
     /**
      * Handles the action for loading an existing profile.
-     * Navigates to the main view after initializing a profile.
+     * Opens a file picker to select a SQLite database file and loads the profile.
      *
-     * @param event The button click event.
+     * @param event the button click event.
      */
     @FXML
     void onaction_loadprofile(ActionEvent event) {
-        // Erstelle den FileOpenPicker (bei WebAPI wird intern automatisch die Webvariante genutzt)
+        // Create the FileOpenPicker (internally uses the web variant if WebAPI is available)
         FileOpenPicker fileOpenPicker = FileOpenPicker.create(btn_loadprofile);
         ExtensionFilter sqliteFilter = ExtensionFilter.of("SQLite Database", ".sqlite");
         fileOpenPicker.getExtensionFilters().clear();
@@ -111,65 +111,67 @@ public class Controller_start {
 
         fileOpenPicker.setOnFilesSelected(fileSources -> {
             if (!fileSources.isEmpty()) {
-                // Vermeide blockierendes join(), stattdessen asynchron verarbeiten:
+                // Process file selection asynchronously instead of using join()
                 fileSources.getFirst().uploadFileAsync().thenAccept(file -> {
-                    // Lade das Profil aus der ausgewählten Datei
+                    // Load the profile from the selected file
                     Profile profile = dataController.loadData("jdbc:sqlite:" + file.getAbsolutePath());
                     try {
                         loadMainController(profile);
                     } catch (IOException e) {
-                        logger.error("Fehler beim Laden des Hauptcontrollers", e);
+                        logger.error("Error while loading the main controller", e);
                     }
                 }).exceptionally(ex -> {
-                    logger.error("Fehler beim Laden der Datei", ex);
+                    logger.error("Error while loading the file", ex);
                     return null;
                 });
             } else {
-                logger.warn("Keine Datei ausgewählt.");
+                logger.warn("No file selected.");
             }
         });
     }
 
-
     /**
      * Handles the action for saving a profile.
+     * Initializes a sample profile, saves it to a temporary file,
+     * and then opens a file save picker for the user to select the target location.
      *
-     * @param event The button click event.
+     * @param event the button click event.
+     * @throws ParseException if date parsing fails.
      */
     @FXML
     void onaction_saveprofile(ActionEvent event) throws ParseException {
         Profile profile = new Profile();
 
-        //for testing the save function: write Example Data in Profile
+        // For testing the save function: populate the profile with example data
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMAN);
 
         profile.getUserSettings().setBirthday(dateFormat.parse("1990-01-05"));
         profile.getUserSettings().setLanguage(Language.German);
         profile.getUserSettings().setName("Wbh");
 
-        BankAccount bankAccount = new BankAccount("Sparkasse", 9999.99 , dateFormat.parse("2025-01-10"));
+        BankAccount bankAccount = new BankAccount("Sparkasse", 9999.99, dateFormat.parse("2025-01-10"));
         profile.addBankAccount(bankAccount);
         profile.addBankAccount(new BankAccount("Volksbank", 1234567.89, dateFormat.parse("2024-12-31")));
 
-        TransactionCategory category = new TransactionCategory(1,"Sonstiges");
+        TransactionCategory category = new TransactionCategory(1, "Sonstiges");
         profile.addCategory(category);
 
-        profile.addIncome(new Income(111.99, category,bankAccount,dateFormat.parse("2023-12-31"),"Test-Income1"));
-        profile.addIncome(new Income(222.99, category,bankAccount,dateFormat.parse("2024-12-31"),"Test-Income2"));
-        profile.addExpense(new Expense(-333.99, category,bankAccount,dateFormat.parse("2025-12-31"),"Test-Expense1"));
+        profile.addIncome(new Income(111.99, category, bankAccount, dateFormat.parse("2023-12-31"), "Test-Income1"));
+        profile.addIncome(new Income(222.99, category, bankAccount, dateFormat.parse("2024-12-31"), "Test-Income2"));
+        profile.addExpense(new Expense(-333.99, category, bankAccount, dateFormat.parse("2025-12-31"), "Test-Expense1"));
 
-        profile.addGoal(new Goal("Test", "Mein Sparziel bis 2026", 99999.99, bankAccount, dateFormat.parse("2025-01-31"),dateFormat.parse("2025-12-31") ));
+        profile.addGoal(new Goal("Test", "Mein Sparziel bis 2026", 99999.99, bankAccount, dateFormat.parse("2025-01-31"), dateFormat.parse("2025-12-31")));
 
-        profile.addBadge(new Badge("1st Goal reached!", 1, false, null ));
-        profile.addBadge(new Badge("3rd Goal reached!", 3, false, null ));
-        profile.addBadge(new Badge("5th Goal reached!", 5, false, null ));
-        profile.addBadge(new Badge("10th Goal reached!", 10, false, null ));
+        profile.addBadge(new Badge("1st Goal reached!", 1, false, null));
+        profile.addBadge(new Badge("3rd Goal reached!", 3, false, null));
+        profile.addBadge(new Badge("5th Goal reached!", 5, false, null));
+        profile.addBadge(new Badge("10th Goal reached!", 10, false, null));
 
-        // Speichere das Profil in eine temporäre Datei
+        // Save the profile to a temporary file
         File tempFile = new File(System.getProperty("java.io.tmpdir"), "profile_temp.sqlite");
         dataController.saveProfile("jdbc:sqlite:" + tempFile.getAbsolutePath(), profile);
 
-        // Erstelle den FileSavePicker (die normale Version, welche intern zur Webversion wird, wenn WebAPI verfügbar ist)
+        // Create the FileSavePicker (the normal version, which internally uses the web variant if WebAPI is available)
         FileSavePicker fileSavePicker = FileSavePicker.create(btn_saveprofile);
         fileSavePicker.initialFileNameProperty().set("profile.sqlite");
         fileSavePicker.getExtensionFilters().clear();
@@ -178,18 +180,16 @@ public class Controller_start {
         fileSavePicker.setOnFileSelected(targetFile -> {
             try {
                 Files.copy(tempFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                logger.info("Profil erfolgreich gespeichert: {}", targetFile.getAbsolutePath());
+                logger.info("Profile successfully saved: {}", targetFile.getAbsolutePath());
             } catch (IOException e) {
-                logger.error("Fehler beim Speichern des Profils", e);
+                logger.error("Error while saving the profile", e);
             }
             return CompletableFuture.completedFuture(null);
         });
     }
 
-
     /**
-     * Ensures that all FXML components are properly injected and available.
-     * Called during the initialization phase of the controller.
+     * Initializes FXML components. This method is automatically called after the FXML file is loaded.
      */
     @FXML
     void initialize() {
@@ -200,30 +200,32 @@ public class Controller_start {
     }
 
     /* -------------------------------- */
-    /* ------ Private Methods    ------ */
+    /* ------ Private Methods ------ */
     /* -------------------------------- */
 
     /**
      * Loads the main controller and initializes it with the given profile.
      *
-     * @param profile The profile object to pass to the main controller.
-     * @throws IOException If there is an issue loading the FXML file.
+     * @param profile the profile object to pass to the main controller.
+     * @throws IOException if there is an issue loading the FXML file.
      */
     private void loadMainController(Profile profile) throws IOException {
         logger.info("Main window is loading.");
 
+        // Get the current stage from the background VBox
         Stage primaryStage = (Stage) this.vbox_background.getScene().getWindow();
 
+        // Load resource bundle for internationalization
         ResourceBundle resourceBundle = ResourceBundle.getBundle(
                 "wbh/wbh_projekt_privatebuchhaltung/i18n/text_controls", Locale.GERMAN
         );
 
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setResources(resourceBundle);
-
         fxmlLoader.setLocation(this.getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_main.fxml"));
         Parent fxmlRoot = fxmlLoader.load();
 
+        // Set up the scene with CSS styling
         Scene scene = new Scene(fxmlRoot);
         scene.getStylesheets().add(
                 Objects.requireNonNull(this.getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/styles/style_main.css"))
@@ -233,6 +235,7 @@ public class Controller_start {
         primaryStage.setScene(scene);
         logger.info("Main window loaded successfully.");
 
+        // Get the main controller instance and initialize it with the profile
         Controller_main mainController = fxmlLoader.getController();
         mainController.setProfile(profile);
         mainController.handleDashboard();
@@ -247,14 +250,14 @@ public class Controller_start {
     }
 
     /* -------------------------------- */
-    /* ------ Public Methods     ------ */
+    /* ------ Public Methods ------ */
     /* -------------------------------- */
 
     /**
      * Sets the WebAPI instance for this controller.
-     * Ensures the WebAPI is only initialized once.
+     * Ensures that the WebAPI is only initialized once.
      *
-     * @param webAPI The WebAPI instance to set.
+     * @param webAPI the WebAPI instance to set.
      */
     public void setWebAPI(final WebAPI webAPI) {
         if (this.webAPI == null) {
@@ -264,9 +267,9 @@ public class Controller_start {
 
     /**
      * Sets the HostServices instance for this controller.
-     * Ensures the HostServices is only initialized once.
+     * Ensures that HostServices is only initialized once.
      *
-     * @param hostServices The HostServices instance to set.
+     * @param hostServices the HostServices instance to set.
      */
     public void setHostServices(final HostServices hostServices) {
         if (this.hostServices == null) {
