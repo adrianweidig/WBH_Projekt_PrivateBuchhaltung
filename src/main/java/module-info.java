@@ -15,6 +15,7 @@ module wbh.wbh_projekt_privatebuchhaltung {
     requires scala.library;
     requires org.kordamp.ikonli.fontawesome5;
     requires org.kordamp.ikonli.core;
+    requires one.jpro.platform.file;
 
     opens wbh.wbh_projekt_privatebuchhaltung to javafx.fxml;
     exports wbh.wbh_projekt_privatebuchhaltung;

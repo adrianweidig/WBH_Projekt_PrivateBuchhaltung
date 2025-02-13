@@ -80,7 +80,7 @@ dependencies {
   implementation group: 'one.jpro.platform', name: 'jpro-mail', version: '0.5.0'
   implementation group: 'one.jpro.platform', name: 'jpro-image-manager', version: '0.5.0'
   implementation group: 'one.jpro.platform', name: 'jpro-html-scrollpane', version: '0.5.0'
-  implementation group: 'one.jpro.platform', name: 'jpro-file', version: '0.5.0'
+  implementation group: 'one.jpro.platform', name: 'jpro-file', version: '0.5.3-SNAPSHOT'
   implementation group: 'one.jpro.platform', name: 'jpro-internal-util', version: '0.4.4'
   implementation group: 'one.jpro.platform', name: 'jpro-internal-openlink', version: '0.4.4'
   implementation group: 'one.jpro.platform', name: 'tree-showing', version: '0.4.4'

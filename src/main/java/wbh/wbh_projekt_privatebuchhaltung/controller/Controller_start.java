@@ -8,26 +8,27 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import one.jpro.platform.file.ExtensionFilter;
+import one.jpro.platform.file.picker.FileOpenPicker;
+import one.jpro.platform.file.picker.FileSavePicker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import com.jpro.webapi.WebAPI;
-
-import javafx.stage.Stage;
-
-import java.io.File;
+import java.util.concurrent.CompletableFuture;
 
 
 /**
@@ -100,14 +101,35 @@ public class Controller_start {
      */
     @FXML
     void onaction_loadprofile(ActionEvent event) {
-        Profile profile = dataController.loadData("jdbc:sqlite:db.sqlite");
+        // Erstelle den FileOpenPicker (bei WebAPI wird intern automatisch die Webvariante genutzt)
+        FileOpenPicker fileOpenPicker = FileOpenPicker.create(btn_loadprofile);
+        ExtensionFilter sqliteFilter = ExtensionFilter.of("SQLite Database", ".sqlite");
+        fileOpenPicker.getExtensionFilters().clear();
+        fileOpenPicker.getExtensionFilters().add(sqliteFilter);
+        fileOpenPicker.setSelectedExtensionFilter(sqliteFilter);
+        fileOpenPicker.setSelectionMode(SelectionMode.SINGLE);
 
-        try {
-            this.loadMainController(profile);
-        } catch (IOException e) {
-            logger.error("Failed to load the main controller with the provided profile.", e);
-        }
+        fileOpenPicker.setOnFilesSelected(fileSources -> {
+            if (!fileSources.isEmpty()) {
+                // Vermeide blockierendes join(), stattdessen asynchron verarbeiten:
+                fileSources.getFirst().uploadFileAsync().thenAccept(file -> {
+                    // Lade das Profil aus der ausgewählten Datei
+                    Profile profile = dataController.loadData("jdbc:sqlite:" + file.getAbsolutePath());
+                    try {
+                        loadMainController(profile);
+                    } catch (IOException e) {
+                        logger.error("Fehler beim Laden des Hauptcontrollers", e);
+                    }
+                }).exceptionally(ex -> {
+                    logger.error("Fehler beim Laden der Datei", ex);
+                    return null;
+                });
+            } else {
+                logger.warn("Keine Datei ausgewählt.");
+            }
+        });
     }
+
 
     /**
      * Handles the action for saving a profile.
@@ -115,7 +137,7 @@ public class Controller_start {
      * @param event The button click event.
      */
     @FXML
-    void onaction_saveprofile(ActionEvent event) throws ParseException, MalformedURLException {
+    void onaction_saveprofile(ActionEvent event) throws ParseException {
         Profile profile = new Profile();
 
         //for testing the save function: write Example Data in Profile
@@ -143,12 +165,27 @@ public class Controller_start {
         profile.addBadge(new Badge("5th Goal reached!", 5, false, null ));
         profile.addBadge(new Badge("10th Goal reached!", 10, false, null ));
 
-        dataController.saveProfile("jdbc:sqlite:db.sqlite", profile);
+        // Speichere das Profil in eine temporäre Datei
+        File tempFile = new File(System.getProperty("java.io.tmpdir"), "profile_temp.sqlite");
+        dataController.saveProfile("jdbc:sqlite:" + tempFile.getAbsolutePath(), profile);
 
-        File dbfilePath = new File("./db.sqlite");
-        this.webAPI.downloadURL(dbfilePath.toURI().toURL());
-        this.webAPI.makeFileUploadNode(new Button("UploadFile"));
+        // Erstelle den FileSavePicker (die normale Version, welche intern zur Webversion wird, wenn WebAPI verfügbar ist)
+        FileSavePicker fileSavePicker = FileSavePicker.create(btn_saveprofile);
+        fileSavePicker.initialFileNameProperty().set("profile.sqlite");
+        fileSavePicker.getExtensionFilters().clear();
+        fileSavePicker.getExtensionFilters().add(ExtensionFilter.of("SQLite Database", ".sqlite"));
+
+        fileSavePicker.setOnFileSelected(targetFile -> {
+            try {
+                Files.copy(tempFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                logger.info("Profil erfolgreich gespeichert: {}", targetFile.getAbsolutePath());
+            } catch (IOException e) {
+                logger.error("Fehler beim Speichern des Profils", e);
+            }
+            return CompletableFuture.completedFuture(null);
+        });
     }
+
 
     /**
      * Ensures that all FXML components are properly injected and available.
