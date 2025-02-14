@@ -218,7 +218,7 @@ public class Controller_start {
      * @param profile the profile object to pass to the main controller.
      * @throws IOException if there is an issue loading the FXML file.
      */
-    protected void loadMainController(Profile profile) throws IOException {
+    private void loadMainController(Profile profile) throws IOException {
         logger.info("Main window is loading.");
 
         // Get the current stage from the background VBox
