@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Objects;
@@ -93,11 +94,21 @@ public class Controller_main implements ProfileAware {
 
         fileSavePicker.setOnFileSelected(targetFile -> {
             try {
-                Files.copy(tempFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                logger.info("Profile successfully saved: {}", targetFile.getAbsolutePath());
+                Path tempFilePath = tempFile.toPath();
+
+                // Copy the temporary SQLite file to the selected target location
+                Files.copy(tempFilePath, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                logger.info("Profile successfully saved: {}", tempFilePath);
+
+                if (Files.deleteIfExists(tempFilePath)) {
+                    logger.info("Temporary SQLite file deleted: {}", tempFilePath);
+                } else {
+                    logger.warn("Temporary SQLite file not found for deletion: {}", tempFilePath);
+                }
             } catch (IOException e) {
                 logger.error("Error while saving the profile", e);
             }
+
             return CompletableFuture.completedFuture(null);
         });
     }

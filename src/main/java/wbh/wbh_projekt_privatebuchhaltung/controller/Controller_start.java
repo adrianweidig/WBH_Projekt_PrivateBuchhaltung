@@ -20,6 +20,8 @@ import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -148,7 +150,7 @@ public class Controller_start {
         assert btn_createsampleprofile != null : "fx:id=\"btn_createsampleprofile\" was not injected: check your FXML file 'view_start.fxml'.";
         assert vbox_background != null : "fx:id=\"vbox_background\" was not injected: check your FXML file 'view_start.fxml'.";
 
-         /*
+        /*
          * Handles the action for loading an existing profile.
          * Opens a file picker to select a SQLite database file and loads the profile.
          */
@@ -163,25 +165,49 @@ public class Controller_start {
 
         fileOpenPicker.setOnFilesSelected(fileSources -> {
             if (!fileSources.isEmpty()) {
-                // Process file selection asynchronously instead of using join()
                 fileSources.getFirst().uploadFileAsync().thenAccept(file -> {
-                    // Load the profile from the selected file
-                    Profile profile = dataController.loadData("jdbc:sqlite:" + file.getAbsolutePath());
+                    // Get the absolute file path
+                    String filePath = file.getAbsolutePath();
+
+                    // Load the profile from the selected SQLite file
+                    Profile profile = dataController.loadData("jdbc:sqlite:" + filePath);
+
+                    // Delete the SQLite file and its folder if empty
+                    try {
+                        Path fileToDelete = Path.of(filePath);
+
+                        // Delete the file if it exists
+                        Files.deleteIfExists(fileToDelete);
+                        logger.info("SQLite file deleted: " + filePath);
+
+                        // Check if the parent directory is empty after deleting the file
+                        Path parentDir = fileToDelete.getParent();
+                        if (parentDir != null && Files.isDirectory(parentDir) && Files.list(parentDir).findAny().isEmpty()) {
+                            // Delete the directory if it is empty
+                            Files.deleteIfExists(parentDir);
+                            logger.info("Directory deleted: " + parentDir);
+                        }
+                    } catch (IOException e) {
+                        logger.error("Error while deleting SQLite file or directory", e);
+                    }
+
+                    // Load the main controller with the loaded profile
                     try {
                         loadMainController(profile);
                     } catch (IOException e) {
                         logger.error("Error while loading the main controller", e);
                     }
                 }).exceptionally(ex -> {
+                    // Handle exceptions that occur during file upload or processing
                     logger.error("Error while loading the file", ex);
                     return null;
                 });
             } else {
+                // Log a warning if no file was selected
                 logger.warn("No file selected.");
             }
         });
     }
-
     /* -------------------------------- */
     /* ------ Private Methods ------ */
     /* -------------------------------- */
@@ -192,7 +218,7 @@ public class Controller_start {
      * @param profile the profile object to pass to the main controller.
      * @throws IOException if there is an issue loading the FXML file.
      */
-    private void loadMainController(Profile profile) throws IOException {
+    protected void loadMainController(Profile profile) throws IOException {
         logger.info("Main window is loading.");
 
         // Get the current stage from the background VBox
