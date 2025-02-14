@@ -66,6 +66,7 @@ public class Controller_start {
 
     @FXML
     private VBox vbox_background;
+    private File tempFile;
 
     /* -------------------------------- */
     /* ------ FXML Methods ------ */
@@ -91,43 +92,6 @@ public class Controller_start {
         } catch (IOException e) {
             logger.error("Failed to load the main controller with the provided profile.", e);
         }
-    }
-
-    /**
-     * Handles the action for loading an existing profile.
-     * Opens a file picker to select a SQLite database file and loads the profile.
-     *
-     * @param event the button click event.
-     */
-    @FXML
-    void onaction_loadprofile(ActionEvent event) {
-        // Create the FileOpenPicker (internally uses the web variant if WebAPI is available)
-        FileOpenPicker fileOpenPicker = FileOpenPicker.create(btn_loadprofile);
-        ExtensionFilter sqliteFilter = ExtensionFilter.of("SQLite Database", ".sqlite");
-        fileOpenPicker.getExtensionFilters().clear();
-        fileOpenPicker.getExtensionFilters().add(sqliteFilter);
-        fileOpenPicker.setSelectedExtensionFilter(sqliteFilter);
-        fileOpenPicker.setSelectionMode(SelectionMode.SINGLE);
-
-        fileOpenPicker.setOnFilesSelected(fileSources -> {
-            if (!fileSources.isEmpty()) {
-                // Process file selection asynchronously instead of using join()
-                fileSources.getFirst().uploadFileAsync().thenAccept(file -> {
-                    // Load the profile from the selected file
-                    Profile profile = dataController.loadData("jdbc:sqlite:" + file.getAbsolutePath());
-                    try {
-                        loadMainController(profile);
-                    } catch (IOException e) {
-                        logger.error("Error while loading the main controller", e);
-                    }
-                }).exceptionally(ex -> {
-                    logger.error("Error while loading the file", ex);
-                    return null;
-                });
-            } else {
-                logger.warn("No file selected.");
-            }
-        });
     }
 
     /**
@@ -168,8 +132,21 @@ public class Controller_start {
         profile.addBadge(new Badge("10th Goal reached!", 10, false, null));
 
         // Save the profile to a temporary file
-        File tempFile = new File(System.getProperty("java.io.tmpdir"), "profile_temp.sqlite");
+        this.tempFile = new File(System.getProperty("java.io.tmpdir"), "profile_temp.sqlite");
         dataController.saveProfile("jdbc:sqlite:" + tempFile.getAbsolutePath(), profile);
+
+
+    }
+
+    /**
+     * Initializes FXML components. This method is automatically called after the FXML file is loaded.
+     */
+    @FXML
+    void initialize() {
+        assert btn_createprofile != null : "fx:id=\"btn_createprofile\" was not injected: check your FXML file 'view_start.fxml'.";
+        assert btn_loadprofile != null : "fx:id=\"btn_loadprofile\" was not injected: check your FXML file 'view_start.fxml'.";
+        assert btn_saveprofile != null : "fx:id=\"btn_saveprofile\" was not injected: check your FXML file 'view_start.fxml'.";
+        assert vbox_background != null : "fx:id=\"vbox_background\" was not injected: check your FXML file 'view_start.fxml'.";
 
         // Create the FileSavePicker (the normal version, which internally uses the web variant if WebAPI is available)
         FileSavePicker fileSavePicker = FileSavePicker.create(btn_saveprofile);
@@ -186,17 +163,39 @@ public class Controller_start {
             }
             return CompletableFuture.completedFuture(null);
         });
-    }
 
-    /**
-     * Initializes FXML components. This method is automatically called after the FXML file is loaded.
-     */
-    @FXML
-    void initialize() {
-        assert btn_createprofile != null : "fx:id=\"btn_createprofile\" was not injected: check your FXML file 'view_start.fxml'.";
-        assert btn_loadprofile != null : "fx:id=\"btn_loadprofile\" was not injected: check your FXML file 'view_start.fxml'.";
-        assert btn_saveprofile != null : "fx:id=\"btn_saveprofile\" was not injected: check your FXML file 'view_start.fxml'.";
-        assert vbox_background != null : "fx:id=\"vbox_background\" was not injected: check your FXML file 'view_start.fxml'.";
+         /*
+         * Handles the action for loading an existing profile.
+         * Opens a file picker to select a SQLite database file and loads the profile.
+         */
+
+        // Create the FileOpenPicker (internally uses the web variant if WebAPI is available)
+        FileOpenPicker fileOpenPicker = FileOpenPicker.create(btn_loadprofile);
+        ExtensionFilter sqliteFilter = ExtensionFilter.of("SQLite Database", ".sqlite");
+        fileOpenPicker.getExtensionFilters().clear();
+        fileOpenPicker.getExtensionFilters().add(sqliteFilter);
+        fileOpenPicker.setSelectedExtensionFilter(sqliteFilter);
+        fileOpenPicker.setSelectionMode(SelectionMode.SINGLE);
+
+        fileOpenPicker.setOnFilesSelected(fileSources -> {
+            if (!fileSources.isEmpty()) {
+                // Process file selection asynchronously instead of using join()
+                fileSources.getFirst().uploadFileAsync().thenAccept(file -> {
+                    // Load the profile from the selected file
+                    Profile profile = dataController.loadData("jdbc:sqlite:" + file.getAbsolutePath());
+                    try {
+                        loadMainController(profile);
+                    } catch (IOException e) {
+                        logger.error("Error while loading the main controller", e);
+                    }
+                }).exceptionally(ex -> {
+                    logger.error("Error while loading the file", ex);
+                    return null;
+                });
+            } else {
+                logger.warn("No file selected.");
+            }
+        });
     }
 
     /* -------------------------------- */
