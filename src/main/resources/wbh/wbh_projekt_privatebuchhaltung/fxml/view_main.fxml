@@ -36,10 +36,16 @@
                     <FontIcon fx:id="btnSettingsIcon" iconLiteral="fa-gear" />
                 </graphic>
             </Button>
+            <!-- Save Button -->
+            <Button fx:id="btnSave" onAction="#handleSave" styleClass="sidebar-button">
+                <graphic>
+                    <FontIcon fx:id="btnSaveIcon" iconLiteral="fas-save" />
+                </graphic>
+            </Button>
             <!-- Network Button -->
             <Button fx:id="btnNetwork" onAction="#handleNetwork" styleClass="sidebar-button">
                 <graphic>
-                    <FontIcon fx:id="btnNetworkIcon" iconLiteral="fa-wifi" />
+                    <FontIcon fx:id="btnNetworkIcon" iconLiteral="fa-wifi" iconColor="green" />
                 </graphic>
             </Button>
         </VBox>

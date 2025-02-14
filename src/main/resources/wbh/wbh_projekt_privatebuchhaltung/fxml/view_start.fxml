@@ -7,6 +7,6 @@
    <children>
       <Button fx:id="btn_createprofile" mnemonicParsing="false" onAction="#onaction_createprofile" text="%button.createprofile" />
       <Button fx:id="btn_loadprofile" mnemonicParsing="false" text="%button.loadprofile" />
-      <Button fx:id="btn_saveprofile" mnemonicParsing="false" onAction="#onaction_saveprofile" text="%button.saveprofile" />
+      <Button fx:id="btn_createsampleprofile" mnemonicParsing="false" onAction="#onaction_createSampleProfile" text="%button.createsampleprofile" />
    </children>
 </VBox>

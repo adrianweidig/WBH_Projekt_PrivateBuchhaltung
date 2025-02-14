@@ -13,7 +13,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import one.jpro.platform.file.ExtensionFilter;
 import one.jpro.platform.file.picker.FileOpenPicker;
-import one.jpro.platform.file.picker.FileSavePicker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.*;
@@ -21,14 +20,11 @@ import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Controller for the start view of the application.
@@ -62,7 +58,7 @@ public class Controller_start {
     private Button btn_loadprofile;
 
     @FXML
-    private Button btn_saveprofile;
+    private Button btn_createsampleprofile;
 
     @FXML
     private VBox vbox_background;
@@ -103,7 +99,7 @@ public class Controller_start {
      * @throws ParseException if date parsing fails.
      */
     @FXML
-    void onaction_saveprofile(ActionEvent event) throws ParseException {
+    void onaction_createSampleProfile(ActionEvent event) throws ParseException {
         Profile profile = new Profile();
 
         // For testing the save function: populate the profile with example data
@@ -135,7 +131,11 @@ public class Controller_start {
         this.tempFile = new File(System.getProperty("java.io.tmpdir"), "profile_temp.sqlite");
         dataController.saveProfile("jdbc:sqlite:" + tempFile.getAbsolutePath(), profile);
 
-
+        try {
+            this.loadMainController(profile);
+        } catch (IOException e) {
+            logger.error("Failed to load the main controller with the provided profile.", e);
+        }
     }
 
     /**
@@ -145,24 +145,8 @@ public class Controller_start {
     void initialize() {
         assert btn_createprofile != null : "fx:id=\"btn_createprofile\" was not injected: check your FXML file 'view_start.fxml'.";
         assert btn_loadprofile != null : "fx:id=\"btn_loadprofile\" was not injected: check your FXML file 'view_start.fxml'.";
-        assert btn_saveprofile != null : "fx:id=\"btn_saveprofile\" was not injected: check your FXML file 'view_start.fxml'.";
+        assert btn_createsampleprofile != null : "fx:id=\"btn_createsampleprofile\" was not injected: check your FXML file 'view_start.fxml'.";
         assert vbox_background != null : "fx:id=\"vbox_background\" was not injected: check your FXML file 'view_start.fxml'.";
-
-        // Create the FileSavePicker (the normal version, which internally uses the web variant if WebAPI is available)
-        FileSavePicker fileSavePicker = FileSavePicker.create(btn_saveprofile);
-        fileSavePicker.initialFileNameProperty().set("profile.sqlite");
-        fileSavePicker.getExtensionFilters().clear();
-        fileSavePicker.getExtensionFilters().add(ExtensionFilter.of("SQLite Database", ".sqlite"));
-
-        fileSavePicker.setOnFileSelected(targetFile -> {
-            try {
-                Files.copy(tempFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                logger.info("Profile successfully saved: {}", targetFile.getAbsolutePath());
-            } catch (IOException e) {
-                logger.error("Error while saving the profile", e);
-            }
-            return CompletableFuture.completedFuture(null);
-        });
 
          /*
          * Handles the action for loading an existing profile.

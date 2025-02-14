@@ -326,6 +326,7 @@ public class Controller_data {
     public void saveProfile(String dbFilePath, Profile profile) {
         this.createTables(dbFilePath);
 
+        // TODO: Implement UserSettings Usage
         this.saveUserSettings(dbFilePath, profile.getUserSettings());
 
         for (BankAccount account : profile.getBankAccounts()) {
@@ -361,7 +362,10 @@ public class Controller_data {
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setString(1, userSettings.getName());
-            preparedStatement.setString(2, this.dateFormat.format(userSettings.getBirthday()));
+            preparedStatement.setString(2, userSettings.getBirthday() != null
+                    ? this.dateFormat.format(userSettings.getBirthday())
+                    : "1970-01-01");
+
             preparedStatement.setInt(3, userSettings.getLanguage().ordinal());
 
             int affectedRows = preparedStatement.executeUpdate();

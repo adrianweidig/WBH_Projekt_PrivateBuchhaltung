@@ -2,6 +2,7 @@ package wbh.wbh_projekt_privatebuchhaltung.controller;
 
 import com.jpro.webapi.WebAPI;
 import javafx.application.HostServices;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,16 +10,22 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import one.jpro.platform.file.ExtensionFilter;
+import one.jpro.platform.file.picker.FileSavePicker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wbh.wbh_projekt_privatebuchhaltung.models.interfaces.ProfileAware;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.Profile;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Controller for the main application view.
@@ -55,6 +62,9 @@ public class Controller_main implements ProfileAware {
     private Button btnNetwork;
 
     @FXML
+    private Button btnSave;
+
+    @FXML
     private VBox vbox_background;
 
     /* -------------------------------- */
@@ -68,6 +78,29 @@ public class Controller_main implements ProfileAware {
     private WebAPI webAPI = null;
 
     private HostServices hostServices = null;
+
+    private File tempFile;
+
+    private final Controller_data dataController = new Controller_data();
+
+    @FXML
+    void initialize() {
+        // Create the FileSavePicker (the normal version, which internally uses the web variant if WebAPI is available)
+        FileSavePicker fileSavePicker = FileSavePicker.create(btnSave);
+        fileSavePicker.initialFileNameProperty().set("profile.sqlite");
+        fileSavePicker.getExtensionFilters().clear();
+        fileSavePicker.getExtensionFilters().add(ExtensionFilter.of("SQLite Database", ".sqlite"));
+
+        fileSavePicker.setOnFileSelected(targetFile -> {
+            try {
+                Files.copy(tempFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                logger.info("Profile successfully saved: {}", targetFile.getAbsolutePath());
+            } catch (IOException e) {
+                logger.error("Error while saving the profile", e);
+            }
+            return CompletableFuture.completedFuture(null);
+        });
+    }
 
     /* -------------------------------- */
     /* ------ FXML Methods       ------ */
@@ -251,5 +284,12 @@ public class Controller_main implements ProfileAware {
         if (this.hostServices == null) {
             this.hostServices = hostServices;
         }
+    }
+
+    @FXML
+    public void handleSave(ActionEvent actionEvent) {
+        // Save the profile to a temporary file
+        this.tempFile = new File(System.getProperty("java.io.tmpdir"), "profile_temp.sqlite");
+        dataController.saveProfile("jdbc:sqlite:" + tempFile.getAbsolutePath(), profile);
     }
 }
