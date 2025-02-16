@@ -162,15 +162,6 @@ public class Controller_main implements ProfileAware {
         this.loadContent("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_bankaccounts.fxml");
     }
 
-    /**
-     * Navigates to the Network view.
-     */
-    @FXML
-    private void handleNetwork() {
-        this.logger.info("Navigating to Network view.");
-        this.loadContent("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_network.fxml");
-    }
-
     /* -------------------------------- */
     /* ------ Private Methods    ------ */
     /* -------------------------------- */

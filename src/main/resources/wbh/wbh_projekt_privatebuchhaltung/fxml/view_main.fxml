@@ -49,7 +49,7 @@
                 </graphic>
             </Button>
             <!-- Network Button -->
-            <Button fx:id="btnNetwork" onAction="#handleNetwork" styleClass="sidebar-button">
+            <Button fx:id="btnNetwork" styleClass="sidebar-button">
                 <graphic>
                     <FontIcon fx:id="btnNetworkIcon" iconLiteral="fa-wifi" iconColor="green" />
                 </graphic>
