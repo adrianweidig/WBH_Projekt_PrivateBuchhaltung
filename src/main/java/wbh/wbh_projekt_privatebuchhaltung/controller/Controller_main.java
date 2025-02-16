@@ -154,6 +154,15 @@ public class Controller_main implements ProfileAware {
     }
 
     /**
+     * Navigates to the Bankaccounts view.
+     */
+    @FXML
+    private void handleBankaccounts() {
+        this.logger.info("Navigating to Bankaccounts view.");
+        this.loadContent("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_bankaccounts.fxml");
+    }
+
+    /**
      * Navigates to the Network view.
      */
     @FXML

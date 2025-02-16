@@ -15,6 +15,12 @@
                 </graphic>
             </Button>
             <!-- Kontoübersicht Button -->
+            <Button fx:id="btnBankaccounts" onAction="#handleBankaccounts" styleClass="sidebar-button">
+                <graphic>
+                    <FontIcon fx:id="btnBankaccountsViewIcon" iconLiteral="fas-piggy-bank" />
+                </graphic>
+            </Button>
+            <!-- Kontoübersicht Button -->
             <Button fx:id="btnAccountOverview" onAction="#handleAccountOverview" styleClass="sidebar-button">
                 <graphic>
                     <FontIcon fx:id="btnAccountOverviewIcon" iconLiteral="fas-wallet" />
