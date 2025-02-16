@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
+
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wbh.wbh_projekt_privatebuchhaltung.controller.Controller_bankAccount">
+
+    <VBox alignment="TOP_CENTER" spacing="10">
+        <Label styleClass="header-label" text="Konto Übersicht" />
+
+        <TableView fx:id="bankAccountTable" styleClass="table-view">
+
+            <columns>
+                <TableColumn fx:id="nameColumn" text="Name" />
+                <TableColumn fx:id="balanceColumn" text="Kontostand" />
+                <TableColumn fx:id="lastInteractionColumn" text="Letzte Interaktion" />
+                <TableColumn fx:id="actionColumn" text="Aktionen" />
+            </columns>
+        </TableView>
+
+        <HBox alignment="TOP_RIGHT">
+            <Button onAction="#showAddBankAccountForm" styleClass="add-button">
+                <graphic>
+                    <FontIcon iconLiteral="fas-plus" />
+                </graphic>
+            </Button>
+        </HBox>
+      <opaqueInsets>
+         <Insets />
+      </opaqueInsets>
+      <StackPane.margin>
+         <Insets />
+      </StackPane.margin>
+    </VBox>
+
+</StackPane>

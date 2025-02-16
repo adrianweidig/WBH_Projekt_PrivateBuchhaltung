@@ -19,4 +19,6 @@ module wbh.wbh_projekt_privatebuchhaltung {
 
     opens wbh.wbh_projekt_privatebuchhaltung to javafx.fxml;
     exports wbh.wbh_projekt_privatebuchhaltung;
+    exports wbh.wbh_projekt_privatebuchhaltung.controller;
+    opens wbh.wbh_projekt_privatebuchhaltung.controller to javafx.fxml;
 }
