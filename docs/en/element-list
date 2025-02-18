@@ -1,4 +1,8 @@
 module:wbh.wbh_projekt_privatebuchhaltung
 wbh.wbh_projekt_privatebuchhaltung
 wbh.wbh_projekt_privatebuchhaltung.controller
+wbh.wbh_projekt_privatebuchhaltung.enums
+wbh.wbh_projekt_privatebuchhaltung.helpers
 wbh.wbh_projekt_privatebuchhaltung.models
+wbh.wbh_projekt_privatebuchhaltung.models.interfaces
+wbh.wbh_projekt_privatebuchhaltung.models.userProfile
