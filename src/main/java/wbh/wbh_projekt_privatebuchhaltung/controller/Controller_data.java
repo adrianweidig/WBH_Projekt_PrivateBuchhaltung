@@ -641,7 +641,7 @@ public class Controller_data {
 
             preparedStatement.setDouble(1, transaction.getValue());
             preparedStatement.setInt(2, transaction.getCategory().getId());
-            preparedStatement.setInt(3, transaction.getBankaccount().getId());
+            preparedStatement.setInt(3, transaction.getBankAccount().getId());
             preparedStatement.setString(4, this.dateFormat.format(transaction.getDate()));
             preparedStatement.setString(5, transaction.getDescription());
 

@@ -22,7 +22,9 @@ import wbh.wbh_projekt_privatebuchhaltung.helpers.DialogButtonHelper;
 import wbh.wbh_projekt_privatebuchhaltung.helpers.ValidationHelperFX;
 import wbh.wbh_projekt_privatebuchhaltung.models.DeleteDialogButton;
 import wbh.wbh_projekt_privatebuchhaltung.models.interfaces.ProfileAware;
-import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.*;
+import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.BankAccount;
+import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.Goal;
+import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.Profile;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Date;

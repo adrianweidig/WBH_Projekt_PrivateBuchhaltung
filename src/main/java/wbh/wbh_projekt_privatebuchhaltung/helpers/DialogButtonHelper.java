@@ -10,63 +10,79 @@ import wbh.wbh_projekt_privatebuchhaltung.enums.EnumGenerals;
 
 /**
  * A helper class for managing dialog buttons and UI components.
- * This class extends VBox and integrates with a given root pane.
+ * This class extends {@link VBox} and integrates with a given root pane.
  */
 public class DialogButtonHelper extends VBox {
+
+    /* -------------------------------- */
+    /* ------ Instance Variables ------ */
+    /* -------------------------------- */
+
     private final StackPane rootPane;
 
+    /* -------------------------------- */
+    /* ------ Constructor        ------ */
+    /* -------------------------------- */
+
     /**
-     * Constructs a DialogButtonHelper instance with a given root pane.
+     * Constructs a {@code DialogButtonHelper} instance with a given root pane.
      *
      * @param rootPane the root pane where dialogs will be displayed
      */
-    public DialogButtonHelper(StackPane rootPane) {
+    public DialogButtonHelper(final StackPane rootPane) {
         super(10);
         this.rootPane = rootPane;
         this.getStyleClass().add(EnumGenerals.CSS_DIALOG_BOX);
-        setAlignment(Pos.CENTER);
+        this.setAlignment(Pos.CENTER);
+    }
+
+    /* -------------------------------- */
+    /* ------ Public Methods     ------ */
+    /* -------------------------------- */
+
+    /**
+     * Displays the given dialog by adding it to the root pane.
+     *
+     * @param dialog the {@link VBox} dialog to be displayed
+     */
+    public void showDialog(final VBox dialog) {
+        this.rootPane.getChildren().add(dialog);
     }
 
     /**
-     * Displays the dialog by adding it to the root pane.
+     * Removes the given dialog from the root pane.
      *
-     * @param dialog the VBox dialog to show
+     * @param dialog the {@link VBox} dialog to be removed
      */
-    public void showDialog(VBox dialog) {
-        rootPane.getChildren().add(dialog);
+    public void removeDialog(final VBox dialog) {
+        this.rootPane.getChildren().remove(dialog);
     }
 
     /**
-     * Removes the dialog from the root pane.
+     * Creates a labeled control container consisting of a label and a UI control.
      *
-     * @param dialog the VBox dialog to remove
+     * @param labelText the text for the label
+     * @param control   the {@link Control} component to be associated with the label
+     * @return a {@link VBox} containing the label and control
      */
-    public void removeDialog(VBox dialog) {
-        rootPane.getChildren().remove(dialog);
-    }
-
-    /**
-     * Creates a labeled control container.
-     *
-     * @param labelText the label text
-     * @param control   the control component
-     * @return a VBox containing the label and control
-     */
-    public VBox createLabeledControl(String labelText, Control control) {
+    public VBox createLabeledControl(final String labelText, final Control control) {
         Label label = new Label(labelText);
         return new VBox(5, label, control);
     }
 
     /**
-     * Creates a styled action button.
+     * Creates a styled action button with a predefined style class.
      *
      * @param text the button text
-     * @return a Button with applied styles
+     * @return a styled {@link Button}
      */
-    public Button createActionButton(String text) {
+    public Button createActionButton(final String text) {
         Button button = new Button(text);
+
+        // Ensure that previous styles are cleared before applying a new style
         button.getStyleClass().clear();
         button.getStyleClass().add(EnumGenerals.CSS_DIALOG_ACTION_BUTTON);
+
         return button;
     }
 }

@@ -3,94 +3,108 @@ package wbh.wbh_projekt_privatebuchhaltung.models.userProfile;
 import java.util.Date;
 
 /**
- * The type User settings.
+ * Represents the user settings, including personal details and language preferences.
  */
-public class UserSettings
-{
+public class UserSettings {
+
+    /* -------------------------------- */
+    /* ------ Instance Variables ------ */
+    /* -------------------------------- */
+
     private int id;
     private String name;
     private Date birthday;
     private Language language;
 
+    /* -------------------------------- */
+    /* ------ Constructors        ------ */
+    /* -------------------------------- */
+
     /**
-     * Instantiates a new User settings.
+     * Instantiates a new UserSettings object with all parameters.
      *
-     * @param id       the id
-     * @param name     the name
-     * @param birthday the birthday
-     * @param language the language
+     * @param id       the user ID
+     * @param name     the user's name
+     * @param birthday the user's birthday
+     * @param language the preferred language
      */
-    public UserSettings (int id, String name, Date birthday, Language language)
-    {
+    public UserSettings(int id, String name, Date birthday, Language language) {
         this.id = id;
         this.name = name;
         this.birthday = birthday;
         this.language = language;
     }
 
-    public UserSettings () {
+    /**
+     * Instantiates a new UserSettings object with default values.
+     */
+    public UserSettings() {
+    }
+
+    /* -------------------------------- */
+    /* ------ Getters & Setters  ------ */
+    /* -------------------------------- */
+
+    /**
+     * Gets the user ID.
+     *
+     * @return the user ID
+     */
+    public int getId() {
+        return this.id;
     }
 
     /**
-     * Get id int.
+     * Gets the user's name.
      *
-     * @return the int
+     * @return the user's name
      */
-    public int getId(){
-        return id;
+    public String getName() {
+        return this.name;
     }
 
     /**
-     * Get name string.
+     * Sets the user's name.
      *
-     * @return the string
+     * @param name the new name
      */
-    public String getName(){
-        return name;
-    }
-
-    /**
-     * Set name.
-     *
-     * @param name the name
-     */
-    public void setName(String name){
+    public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * Get birthday date.
+     * Gets the user's birthday.
      *
-     * @return the date
+     * @return the birthday as a Date object
      */
-    public Date getBirthday(){
-        return birthday;
+    public Date getBirthday() {
+        return this.birthday;
     }
 
     /**
-     * Set birthday.
+     * Sets the user's birthday.
      *
-     * @param birthday the birthday
+     * @param birthday the new birthday
      */
-    public void setBirthday(Date birthday){
+    public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
 
     /**
-     * Get language language.
+     * Gets the preferred language.
      *
-     * @return the language
+     * @return the preferred language
      */
-    public Language getLanguage(){
-        return language;
+    public Language getLanguage() {
+        return this.language;
     }
 
     /**
-     * Set language.
+     * Sets the preferred language.
      *
-     * @param language the language
+     * @param language the new language
      */
-    public void setLanguage(Language language){
+    public void setLanguage(Language language) {
         this.language = language;
     }
 }

@@ -4,116 +4,146 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * The type Bank account.
+ * Represents a bank account with an ID, name, balance, and last interaction date.
  */
-public class BankAccount
-{
+public class BankAccount {
+
+    /* -------------------------------- */
+    /* ------ Instance Variables ------ */
+    /* -------------------------------- */
+
     private int id;
     private String name;
     private double balance;
     private Date lastInteraction;
 
+    /* -------------------------------- */
+    /* ------ Constructors        ------ */
+    /* -------------------------------- */
+
     /**
-     * Instantiates a new Bank account.
+     * Constructs a new BankAccount with all attributes.
      *
-     * @param id              the id
-     * @param name            the name
-     * @param balance         the balance
-     * @param lastInteraction the last interaction
+     * @param id              the unique identifier of the bank account
+     * @param name            the name of the bank account
+     * @param balance         the current balance of the account
+     * @param lastInteraction the date of the last interaction with the account
      */
-    public BankAccount (int id, String name, double balance, Date lastInteraction) {
+    public BankAccount(int id, String name, double balance, Date lastInteraction) {
         this.id = id;
         this.name = name;
         this.balance = balance;
         this.lastInteraction = lastInteraction;
     }
 
-    public BankAccount (String name, double balance, Date lastInteraction) {
-    this.name = name;
-    this.balance = balance;
-    this.lastInteraction = lastInteraction;
-}
-
     /**
-     * Get id int.
+     * Constructs a new BankAccount without an ID.
      *
-     * @return the int
+     * @param name            the name of the bank account
+     * @param balance         the current balance of the account
+     * @param lastInteraction the date of the last interaction with the account
      */
-    public int getId(){
-        return id;
+    public BankAccount(String name, double balance, Date lastInteraction) {
+        this.name = name;
+        this.balance = balance;
+        this.lastInteraction = lastInteraction;
     }
 
-    public void setId(int id){
+    /* -------------------------------- */
+    /* ------ Getters and Setters ------ */
+    /* -------------------------------- */
+
+    /**
+     * Gets the ID of the bank account.
+     *
+     * @return the account ID
+     */
+    public int getId() {
+        return this.id;
+    }
+
+    /**
+     * Sets the ID of the bank account.
+     *
+     * @param id the account ID
+     */
+    public void setId(int id) {
         this.id = id;
     }
+
     /**
-     * Gets balance.
+     * Gets the current balance of the bank account.
      *
-     * @return the balance
+     * @return the account balance
      */
-    public double getBalance()
-    {
-        return balance;
+    public double getBalance() {
+        return this.balance;
     }
 
     /**
-     * Sets balance.
+     * Sets the balance of the bank account.
      *
-     * @param newBalance the new balance
+     * @param newBalance the new account balance
      */
-    public void setBalance(double newBalance)
-    {
-        balance = newBalance;
+    public void setBalance(double newBalance) {
+        this.balance = newBalance;
     }
 
     /**
-     * Gets name.
+     * Gets the name of the bank account.
      *
-     * @return the name
+     * @return the account name
      */
-    public String getName()
-    {
-        return name;
+    public String getName() {
+        return this.name;
     }
 
     /**
-     * Sets name.
+     * Sets the name of the bank account.
      *
-     * @param newName the new name
+     * @param newName the new account name
      */
-    public void setName(String newName)
-    {
-        name = newName;
+    public void setName(String newName) {
+        this.name = newName;
     }
 
     /**
-     * Get last interaction date.
+     * Gets the last interaction date of the bank account.
      *
-     * @return the date
+     * @return the last interaction date
      */
-    public Date getLastInteraction(){
-        return lastInteraction;
+    public Date getLastInteraction() {
+        return this.lastInteraction;
     }
 
     /**
-     * Sets last interaction.
+     * Sets the last interaction date of the bank account.
      *
-     * @param lastInteraction the last interaction
+     * @param lastInteraction the last interaction date
      */
     public void setLastInteraction(Date lastInteraction) {
         this.lastInteraction = lastInteraction;
     }
 
+    /* -------------------------------- */
+    /* ------ Overridden Methods ------ */
+    /* -------------------------------- */
+
+    /**
+     * Returns a formatted string representation of the bank account details.
+     *
+     * @return a formatted string containing bank account information
+     */
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
 
         result.append("Bank Account Details:\n");
-        result.append("  ID: ").append(id).append("\n");
-        result.append("  Name: ").append(name).append("\n");
-        result.append("  Balance: ").append(String.format("%.2f", balance)).append("\n");
-        result.append("  Last Interaction: ").append(lastInteraction != null ? dateFormatter.format(lastInteraction) : "N/A").append("\n");
+        result.append("  ID: ").append(this.id).append("\n");
+        result.append("  Name: ").append(this.name).append("\n");
+        result.append("  Balance: ").append(String.format("%.2f", this.balance)).append("\n");
+        result.append("  Last Interaction: ").append(this.lastInteraction != null ? dateFormatter.format(this.lastInteraction) : "N/A").append("\n");
 
         return result.toString();
     }

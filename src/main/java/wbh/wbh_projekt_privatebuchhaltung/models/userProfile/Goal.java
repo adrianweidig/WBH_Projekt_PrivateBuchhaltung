@@ -3,10 +3,15 @@ package wbh.wbh_projekt_privatebuchhaltung.models.userProfile;
 import java.util.Date;
 
 /**
- * The type Goal.
+ * Represents a financial goal that a user aims to achieve.
+ * A goal is linked to a specific {@link BankAccount} and has a target value.
  */
-public class Goal
-{
+public class Goal {
+
+    /* -------------------------------- */
+    /* ------ Instance Variables ------ */
+    /* -------------------------------- */
+
     private int id;
     private String name;
     private String description;
@@ -15,26 +20,22 @@ public class Goal
     private Date startDate = new Date();
     private Date endDate;
 
+    /* -------------------------------- */
+    /* ------ Constructors       ------ */
+    /* -------------------------------- */
+
     /**
-     * Instantiates a new Goal.
+     * Constructs a Goal with an explicit ID.
      *
-     * @param id          the id
-     * @param name        the name
-     * @param description the description
-     * @param goalValue   the goal value
-     * @param bankAccount the bank account
-     * @param startDate   the start date
-     * @param endDate     the end date
+     * @param id          the unique identifier of the goal
+     * @param name        the name of the goal
+     * @param description a short description of the goal
+     * @param goalValue   the target value to reach
+     * @param bankAccount the associated bank account
+     * @param startDate   the start date of the goal
+     * @param endDate     the end date of the goal
      */
-    public Goal(
-            int id,
-            String name,
-            String description,
-            double goalValue,
-            BankAccount bankAccount,
-            Date startDate,
-            Date endDate)
-    {
+    public Goal(int id, String name, String description, double goalValue, BankAccount bankAccount, Date startDate, Date endDate) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -44,14 +45,17 @@ public class Goal
         this.endDate = endDate;
     }
 
-    public Goal(
-            String name,
-            String description,
-            double goalValue,
-            BankAccount bankAccount,
-            Date startDate,
-            Date endDate)
-    {
+    /**
+     * Constructs a Goal without an explicit ID.
+     *
+     * @param name        the name of the goal
+     * @param description a short description of the goal
+     * @param goalValue   the target value to reach
+     * @param bankAccount the associated bank account
+     * @param startDate   the start date of the goal
+     * @param endDate     the end date of the goal
+     */
+    public Goal(String name, String description, double goalValue, BankAccount bankAccount, Date startDate, Date endDate) {
         this.name = name;
         this.description = description;
         this.goalValue = goalValue;
@@ -60,103 +64,149 @@ public class Goal
         this.endDate = endDate;
     }
 
+    /* -------------------------------- */
+    /* ------ Getters & Setters  ------ */
+    /* -------------------------------- */
+
     /**
-     * Get id int.
+     * Gets the unique identifier of the goal.
      *
-     * @return the int
+     * @return the goal ID
      */
-    public int getId (){
-        return id;
+    public int getId() {
+        return this.id;
     }
 
     /**
-     * Get name string.
+     * Gets the name of the goal.
      *
-     * @return the string
+     * @return the goal name
      */
-    public String  getName (){
-        return name;
+    public String getName() {
+        return this.name;
     }
 
     /**
-     * Set name.
+     * Sets the name of the goal.
      *
-     * @param name the name
+     * @param name the new name of the goal
      */
-    public void setName (String name){
+    public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * Get description string.
+     * Gets the description of the goal.
      *
-     * @return the string
+     * @return the goal description
      */
-    public String getDescription (){
-        return description;
+    public String getDescription() {
+        return this.description;
     }
 
     /**
-     * Set description.
+     * Sets the description of the goal.
      *
-     * @param description the description
+     * @param description the new description of the goal
      */
-    public void setDescription (String description){
+    public void setDescription(String description) {
         this.description = description;
     }
 
     /**
-     * Get goal value double.
+     * Gets the target monetary value for the goal.
      *
-     * @return the double
+     * @return the target value
      */
-    public double getGoalValue (){
-        return goalValue;
+    public double getGoalValue() {
+        return this.goalValue;
     }
 
     /**
-     * Set goal value.
+     * Sets the target monetary value for the goal.
      *
-     * @param goalValue the goal value
+     * @param goalValue the new target value
      */
-    public void setGoalValue (double goalValue){
+    public void setGoalValue(double goalValue) {
         this.goalValue = goalValue;
     }
 
-    public BankAccount getBankAccount () {
-       return bankAccount;
+    /**
+     * Gets the associated bank account.
+     *
+     * @return the bank account
+     */
+    public BankAccount getBankAccount() {
+        return this.bankAccount;
     }
 
-    public void setBankAccount (BankAccount bankAccount) {
+    /**
+     * Sets the associated bank account.
+     *
+     * @param bankAccount the new bank account
+     */
+    public void setBankAccount(BankAccount bankAccount) {
         this.bankAccount = bankAccount;
     }
 
+    /**
+     * Gets the start date of the goal.
+     *
+     * @return the start date
+     */
     public Date getStartDate() {
-        return startDate;
+        return this.startDate;
     }
 
+    /**
+     * Sets the start date of the goal.
+     *
+     * @param startDate the new start date
+     */
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
+    /**
+     * Gets the end date of the goal.
+     *
+     * @return the end date
+     */
     public Date getEndDate() {
-        return endDate;
+        return this.endDate;
     }
 
+    /**
+     * Sets the end date of the goal.
+     *
+     * @param endDate the new end date
+     */
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
+    /* -------------------------------- */
+    /* ------ Business Logic     ------ */
+    /* -------------------------------- */
+
     /**
-     * Get completion rate double.
+     * Calculates the completion rate of the goal based on the current bank balance.
      *
-     * @return the double
+     * @return a value between 0 and 1 representing the completion percentage
      */
-    public double getCompletionRate(){
-        return 1 / goalValue * bankAccount.getBalance();
+    public double getCompletionRate() {
+        if (this.goalValue == 0) {
+            return 0; // Avoid division by zero
+        }
+        return this.bankAccount.getBalance() / this.goalValue;
     }
 
-    public boolean isCompleted(){
-        return bankAccount.getBalance() >= goalValue;
+    /**
+     * Checks if the goal has been completed.
+     *
+     * @return true if the current balance meets or exceeds the goal value, otherwise false
+     */
+    public boolean isCompleted() {
+        return this.bankAccount.getBalance() >= this.goalValue;
     }
 }
