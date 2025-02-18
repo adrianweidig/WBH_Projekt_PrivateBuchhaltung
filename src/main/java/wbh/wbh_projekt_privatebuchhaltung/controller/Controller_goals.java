@@ -26,6 +26,7 @@ import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.BankAccount;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.Goal;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.Profile;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
@@ -230,8 +231,19 @@ public class Controller_goals implements ProfileAware {
         // Create input fields pre-populated with the current goal values.
         TextField nameField = new TextField(goal.getName());
         TextField descriptionField = new TextField(goal.getDescription());
-        DatePicker startDatePicker = new DatePicker(goal.getStartDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
-        DatePicker endDatePicker = new DatePicker(goal.getEndDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
+
+        DatePicker startDatePicker = new DatePicker();
+        configureDatePicker(startDatePicker);
+        // Convert java.util.Date to LocalDate.
+        LocalDate startDate = new java.sql.Date(goal.getStartDate().getTime()).toLocalDate();
+        startDatePicker.setValue(startDate);
+
+        DatePicker endDatePicker = new DatePicker();
+        configureDatePicker(endDatePicker);
+        // Convert java.util.Date to LocalDate.
+        LocalDate endDate = new java.sql.Date(goal.getStartDate().getTime()).toLocalDate();
+        endDatePicker.setValue(startDate);
+
         TextField goalValueField = new TextField(Double.toString(goal.getGoalValue()));
 
         // Create a ComboBox for selecting a bank account.
@@ -267,7 +279,7 @@ public class Controller_goals implements ProfileAware {
                 dialogButtonHelper.createLabeledControl("Name:", nameField),
                 dialogButtonHelper.createLabeledControl("Beschreibung:", descriptionField),
                 dialogButtonHelper.createLabeledControl("Konto:", bankAccountComboBox),
-                dialogButtonHelper.createLabeledControl("Kontostand:", goalValueField),
+                dialogButtonHelper.createLabeledControl("Zielkontostand:", goalValueField),
                 dialogButtonHelper.createLabeledControl("Start Datum:", startDatePicker),
                 dialogButtonHelper.createLabeledControl("End Datum:", endDatePicker),
                 new HBox(HBOX_SPACING, saveButton, closeButton)
@@ -344,8 +356,8 @@ public class Controller_goals implements ProfileAware {
         dialogContent.getChildren().addAll(
                 dialogButtonHelper.createLabeledControl("Name:", nameField),
                 dialogButtonHelper.createLabeledControl("Beschreibung:", descriptionField),
-                dialogButtonHelper.createLabeledControl("Ziel Account:", bankAccountComboBox),
-                dialogButtonHelper.createLabeledControl("Zielwert:", goalValueField),
+                dialogButtonHelper.createLabeledControl("Ziel Bankkonto:", bankAccountComboBox),
+                dialogButtonHelper.createLabeledControl("Zielkontostand:", goalValueField),
                 dialogButtonHelper.createLabeledControl("Start:", startDatePicker),
                 dialogButtonHelper.createLabeledControl("Ende:", endDatePicker),
                 new HBox(HBOX_SPACING, saveButton, closeButton)
