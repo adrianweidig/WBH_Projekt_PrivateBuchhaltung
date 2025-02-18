@@ -1,4 +1,4 @@
-package wbh.wbh_projekt_privatebuchhaltung.models.userProfile;
+package wbh.wbh_projekt_privatebuchhaltung.enums;
 
 /**
  * The enum Language.

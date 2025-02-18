@@ -1,5 +1,7 @@
 package wbh.wbh_projekt_privatebuchhaltung.models.userProfile;
 
+import wbh.wbh_projekt_privatebuchhaltung.enums.Language;
+
 import java.util.Date;
 
 /**

@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wbh.wbh_projekt_privatebuchhaltung.enums.Language;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.*;
 
 import java.sql.*;
