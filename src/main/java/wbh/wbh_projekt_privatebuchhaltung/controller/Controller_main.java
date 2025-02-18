@@ -84,22 +84,33 @@ public class Controller_main implements ProfileAware {
 
     private final Controller_data dataController = new Controller_data();
 
+    /* -------------------------------- */
+    /* ------ FXML Methods       ------ */
+    /* -------------------------------- */
+
+    /**
+     * Initializes the main controller.
+     * Sets up the file save picker for saving the profile.
+     */
     @FXML
     void initialize() {
-        // Create the FileSavePicker (the normal version, which internally uses the web variant if WebAPI is available)
+        // Create the FileSavePicker (uses the web variant internally if WebAPI is available)
         FileSavePicker fileSavePicker = FileSavePicker.create(btnSave);
         fileSavePicker.initialFileNameProperty().set("profile.sqlite");
         fileSavePicker.getExtensionFilters().clear();
         fileSavePicker.getExtensionFilters().add(ExtensionFilter.of("SQLite Database", ".sqlite"));
 
+        // Set the action to be performed when a file is selected.
         fileSavePicker.setOnFileSelected(targetFile -> {
             try {
+                // Get the path of the temporary file containing the profile.
                 Path tempFilePath = tempFile.toPath();
 
-                // Copy the temporary SQLite file to the selected target location
+                // Copy the temporary SQLite file to the user-selected target location.
                 Files.copy(tempFilePath, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 logger.info("Profile successfully saved: {}", tempFilePath);
 
+                // Delete the temporary file after successful copy.
                 if (Files.deleteIfExists(tempFilePath)) {
                     logger.info("Temporary SQLite file deleted: {}", tempFilePath);
                 } else {
@@ -108,14 +119,10 @@ public class Controller_main implements ProfileAware {
             } catch (IOException e) {
                 logger.error("Error while saving the profile", e);
             }
-
+            // Return a completed future as required by the API.
             return CompletableFuture.completedFuture(null);
         });
     }
-
-    /* -------------------------------- */
-    /* ------ FXML Methods       ------ */
-    /* -------------------------------- */
 
     /**
      * Navigates to the Dashboard view.
@@ -167,17 +174,18 @@ public class Controller_main implements ProfileAware {
     /* -------------------------------- */
 
     /**
-     * Loads an FXML file and displays it in the contentPane.
-     * Applies the appropriate CSS, internationalization,
-     * and invokes methods like setProfile, setWebAPI, and setHostServices.
+     * Loads an FXML file and displays its content in the contentPane.
+     * Applies CSS, resource bundles for internationalization, and injects dependencies.
      *
-     * @param fxmlFile Path to the FXML file to be loaded.
+     * @param fxmlFile the path to the FXML file.
      */
     private void loadContent(String fxmlFile) {
         try {
             this.logger.debug("Loading FXML file: {}", fxmlFile);
+            // Clear the current content.
             this.contentPane.getChildren().clear();
 
+            // Load the resource bundle for internationalization.
             ResourceBundle resourceBundle = ResourceBundle.getBundle(
                     "wbh/wbh_projekt_privatebuchhaltung/i18n/text_controls", Locale.GERMAN
             );
@@ -185,25 +193,30 @@ public class Controller_main implements ProfileAware {
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setResources(resourceBundle);
 
+            // Set the location of the FXML file.
             fxmlLoader.setLocation(this.getClass().getResource(fxmlFile));
             Parent fxmlRoot = fxmlLoader.load();
 
+            // Create a new scene with the loaded FXML root.
             Scene scene = new Scene(fxmlRoot);
+            // Apply the CSS stylesheet.
             scene.getStylesheets().add(
                     Objects.requireNonNull(this.getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/styles/style_contentpane.css"))
                             .toExternalForm()
             );
 
-            // Retrieve the controller of the loaded FXML
+            // Retrieve the controller associated with the FXML.
             Object controller = fxmlLoader.getController();
 
+            // Inject dependencies such as Profile, WebAPI, and HostServices.
             if (controller != null) {
                 this.injectDependencies(controller);
             }
 
+            // Add the loaded FXML content to the content pane.
             this.contentPane.getChildren().add(fxmlRoot);
 
-            // Ensures that the GUI gets reloaded after the FX-Thread
+            // Force layout update on the content pane.
             javafx.application.Platform.runLater(() -> {
                 this.contentPane.applyCss();
                 this.contentPane.layout();
@@ -215,9 +228,9 @@ public class Controller_main implements ProfileAware {
     }
 
     /**
-     * Injects dependencies (Profile, WebAPI, HostServices) into the controller if applicable.
+     * Injects dependencies (Profile, WebAPI, HostServices) into the controller if it implements ProfileAware.
      *
-     * @param controller The controller instance to receive dependencies.
+     * @param controller the controller instance.
      */
     private void injectDependencies(Object controller) {
         if (controller instanceof ProfileAware profileAwareController) {
@@ -229,7 +242,9 @@ public class Controller_main implements ProfileAware {
     }
 
     /**
-     * Invokes the setWebAPI method if it exists in the controller.
+     * Invokes the setWebAPI method on the controller if such a method exists.
+     *
+     * @param controller the controller instance.
      */
     private void invokeSetWebAPI(Object controller) {
         try {
@@ -244,7 +259,9 @@ public class Controller_main implements ProfileAware {
     }
 
     /**
-     * Invokes the setHostServices method if it exists in the controller.
+     * Invokes the setHostServices method on the controller if such a method exists.
+     *
+     * @param controller the controller instance.
      */
     private void invokeSetHostServices(Object controller) {
         try {
@@ -263,9 +280,9 @@ public class Controller_main implements ProfileAware {
     /* -------------------------------- */
 
     /**
-     * Sets the profile object to be used throughout the main view.
+     * Sets the Profile for the main controller.
      *
-     * @param profile The Profile object to be set.
+     * @param profile the Profile to set.
      */
     @Override
     public void setProfile(Profile profile) {
@@ -275,9 +292,9 @@ public class Controller_main implements ProfileAware {
 
     /**
      * Sets the WebAPI instance to be used by this controller.
-     * This method ensures that the WebAPI is only set once.
+     * Ensures that the WebAPI is set only once.
      *
-     * @param webAPI The WebAPI instance to be set.
+     * @param webAPI the WebAPI instance.
      */
     public void setWebAPI(final WebAPI webAPI) {
         if (this.webAPI == null) {
@@ -287,9 +304,9 @@ public class Controller_main implements ProfileAware {
 
     /**
      * Sets the HostServices instance to be used by this controller.
-     * This method ensures that the HostServices is only set once.
+     * Ensures that the HostServices is set only once.
      *
-     * @param hostServices The HostServices instance to be set.
+     * @param hostServices the HostServices instance.
      */
     public void setHostServices(final HostServices hostServices) {
         if (this.hostServices == null) {
@@ -297,9 +314,14 @@ public class Controller_main implements ProfileAware {
         }
     }
 
+    /**
+     * Handles the Save action by saving the current profile to a temporary SQLite file.
+     *
+     * @param actionEvent the ActionEvent that triggered the save.
+     */
     @FXML
     public void handleSave(ActionEvent actionEvent) {
-        // Save the profile to a temporary file
+        // Save the profile to a temporary file in the system's temporary directory.
         this.tempFile = new File(System.getProperty("java.io.tmpdir"), "profile_temp.sqlite");
         dataController.saveProfile("jdbc:sqlite:" + tempFile.getAbsolutePath(), profile);
     }

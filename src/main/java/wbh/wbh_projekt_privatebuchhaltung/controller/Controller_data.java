@@ -12,46 +12,103 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * The Controller_data class handles all database operations for the private accounting project.
+ * It provides methods to create tables, load data from the database into a Profile object,
+ * and save various entities (UserSettings, BankAccount, TransactionCategory, Transaction, Goal, Badge)
+ * into the database. All operations are logged using SLF4J.
+ */
 public class Controller_data {
 
+    /* -------------------------------- */
+    /* ------ Instance Variables ------ */
+    /* -------------------------------- */
+
     private final Logger logger = LoggerFactory.getLogger(Controller_data.class);
+    // Date formatter using the pattern "yyyy-MM-dd" and German locale.
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
 
-    // Log-Konstanten
+    // Log message constants.
     private static final String ERROR_MSG = "Error while {}: {}";
     private static final String SUCCESS_MSG = "{} inserted successfully.";
     private static final String FAILURE_MSG = "No {} were inserted.";
     private static final String NEW_ID_MSG = "New generated id: {}";
     private static final String TABLES_CREATED_MSG = "Tables were created successful.";
 
-    // Hilfsmethode für Datenbankverbindung
+    /* -------------------------------- */
+    /* ------ Database Helper Methods ------ */
+    /* -------------------------------- */
+
+    /**
+     * Establishes and returns a database connection using the provided database file path.
+     *
+     * @param dbFilePath the database file path.
+     * @return a Connection object.
+     * @throws SQLException if a database access error occurs.
+     */
     private Connection getConnection(String dbFilePath) throws SQLException {
         return DriverManager.getConnection(dbFilePath);
     }
 
-    // Hilfsmethode zum Ausführen von SQL-Befehlen
+    /**
+     * Executes the given SQL command using the provided Statement.
+     *
+     * @param statement the Statement to execute the SQL command.
+     * @param sql       the SQL command to execute.
+     * @throws SQLException if a database access error occurs.
+     */
     private void executeSQL(Statement statement, String sql) throws SQLException {
         statement.execute(sql);
     }
 
-    // Generische Logger-Hilfsmethode für Fehler
+    /* -------------------------------- */
+    /* ------ Logging Helper Methods ------ */
+    /* -------------------------------- */
+
+    /**
+     * Logs an error message for the given operation and exception.
+     *
+     * @param operation a description of the operation being performed.
+     * @param e         the Exception that was thrown.
+     */
     private void logError(String operation, Exception e) {
         this.logger.error(ERROR_MSG, operation, e.getMessage(), e);
     }
 
-    // Logger-Hilfsmethoden für Erfolg bzw. Misserfolg von DB-Operationen
+    /**
+     * Logs a success message for the given operation.
+     *
+     * @param operation a description of the operation performed.
+     */
     private void logSuccess(String operation) {
         this.logger.info(SUCCESS_MSG, operation);
     }
 
+    /**
+     * Logs a failure message for the given operation.
+     *
+     * @param operation a description of the operation that failed.
+     */
     private void logFailure(String operation) {
         this.logger.error(FAILURE_MSG, operation);
     }
 
+    /* -------------------------------- */
+    /* ------ Table Creation Methods ------ */
+    /* -------------------------------- */
+
+    /**
+     * Creates the necessary database tables. Drops the existing tables if they exist,
+     * and then creates new ones. Note: The "Goal" table is intentionally created twice
+     * to preserve original functionality.
+     *
+     * @param path the database file path.
+     */
     public void createTables(String path) {
         try (Connection connection = this.getConnection(path);
              Statement statement = connection.createStatement()) {
 
+            // Drop and create BankAccount table.
             this.executeSQL(statement, "DROP TABLE IF EXISTS BankAccount;");
             this.executeSQL(statement, """
                 CREATE TABLE IF NOT EXISTS BankAccount (
@@ -62,6 +119,7 @@ public class Controller_data {
                 )
             """);
 
+            // Drop and create TransactionCategory table.
             this.executeSQL(statement, "DROP TABLE IF EXISTS TransactionCategory;");
             this.executeSQL(statement, """
                 CREATE TABLE IF NOT EXISTS TransactionCategory (
@@ -71,6 +129,7 @@ public class Controller_data {
                 )
             """);
 
+            // Drop and create Transaction table.
             this.executeSQL(statement, "DROP TABLE IF EXISTS [Transaction];");
             this.executeSQL(statement, """
                 CREATE TABLE IF NOT EXISTS [Transaction] (
@@ -85,6 +144,7 @@ public class Controller_data {
                 )
             """);
 
+            // Drop and create UserSettings table.
             this.executeSQL(statement, "DROP TABLE IF EXISTS [UserSettings];");
             this.executeSQL(statement, """
                 CREATE TABLE IF NOT EXISTS [UserSettings] (
@@ -95,6 +155,7 @@ public class Controller_data {
                 )
             """);
 
+            // Drop and create Goal table.
             this.executeSQL(statement, "DROP TABLE IF EXISTS [Goal];");
             this.executeSQL(statement, """
                 CREATE TABLE IF NOT EXISTS Goal (
@@ -109,7 +170,7 @@ public class Controller_data {
                 );
             """);
 
-            // Originalcode: Goal wird hier nochmals erstellt – Funktionalität wird beibehalten
+            // Original code: Goal table is created again to preserve functionality.
             this.executeSQL(statement, "DROP TABLE IF EXISTS [Badge];");
             this.executeSQL(statement, """
                 CREATE TABLE IF NOT EXISTS Goal (
@@ -124,6 +185,7 @@ public class Controller_data {
                 );
             """);
 
+            // Drop and create Badge table.
             this.executeSQL(statement, "DROP TABLE IF EXISTS Badge;");
             this.executeSQL(statement, """
                 CREATE TABLE IF NOT EXISTS Badge (
@@ -141,6 +203,18 @@ public class Controller_data {
         }
     }
 
+    /* -------------------------------- */
+    /* ------ Data Loading Methods ------ */
+    /* -------------------------------- */
+
+    /**
+     * Loads data from the database into a Profile object.
+     * It loads transaction categories, bank accounts, user settings, goals,
+     * transactions, and badges.
+     *
+     * @param path the database file path.
+     * @return a Profile object populated with data from the database.
+     */
     public Profile loadData(String path) {
         Profile profile = new Profile();
 
@@ -155,6 +229,12 @@ public class Controller_data {
         return profile;
     }
 
+    /**
+     * Loads transactions from the database and adds them to the Profile.
+     *
+     * @param dbFilePath the database file path.
+     * @param profile    the Profile object to populate.
+     */
     private void getTransactions(String dbFilePath, Profile profile) {
         String query = "SELECT id, [amount], date, description, categoryId, bankAccountId FROM [Transaction]";
         try (Connection connection = this.getConnection(dbFilePath);
@@ -169,18 +249,21 @@ public class Controller_data {
                 int categoryId = resultSet.getInt("categoryId");
                 int bankAccountId = resultSet.getInt("bankAccountId");
 
+                // Find the corresponding TransactionCategory.
                 TransactionCategory category = profile.getCategories()
                         .stream()
                         .filter(c -> c.getId() == categoryId)
                         .findFirst()
                         .orElse(null);
 
+                // Find the corresponding BankAccount.
                 BankAccount account = profile.getBankAccounts()
                         .stream()
                         .filter(a -> a.getId() == bankAccountId)
                         .findFirst()
                         .orElse(null);
 
+                // Determine if the transaction is an Income or an Expense.
                 if (amount >= 0) {
                     Income income = new Income(id, amount, category, account, date, description);
                     profile.getIncomes().add(income);
@@ -196,6 +279,12 @@ public class Controller_data {
         }
     }
 
+    /**
+     * Loads UserSettings from the database.
+     *
+     * @param dbFilePath the database file path.
+     * @return a UserSettings object populated with data from the database, or null if an error occurs.
+     */
     private UserSettings getUserSettings(String dbFilePath) {
         String query = "SELECT id, name, birthday, language FROM UserSettings";
         try (Connection connection = this.getConnection(dbFilePath);
@@ -216,6 +305,12 @@ public class Controller_data {
         return null;
     }
 
+    /**
+     * Loads all TransactionCategories from the database.
+     *
+     * @param dbFilePath the database file path.
+     * @return an ObservableList of TransactionCategory objects.
+     */
     private ObservableList<TransactionCategory> getAllTransactionCategories(String dbFilePath) {
         ObservableList<TransactionCategory> categories = FXCollections.observableArrayList();
         String query = "SELECT id, name, CreatedByUser FROM TransactionCategory";
@@ -238,6 +333,12 @@ public class Controller_data {
         return categories;
     }
 
+    /**
+     * Loads all BankAccounts from the database.
+     *
+     * @param dbFilePath the database file path.
+     * @return an ObservableList of BankAccount objects.
+     */
     private ObservableList<BankAccount> getAllBankAccounts(String dbFilePath) {
         ObservableList<BankAccount> bankAccounts = FXCollections.observableArrayList();
         String query = "SELECT id, Name, balance, lastInteraction FROM BankAccount";
@@ -263,6 +364,12 @@ public class Controller_data {
         return bankAccounts;
     }
 
+    /**
+     * Loads all Goals from the database and adds them to the Profile.
+     *
+     * @param dbFilePath the database file path.
+     * @param profile    the Profile object to populate.
+     */
     private void getGoals(String dbFilePath, Profile profile) {
         String query = "SELECT id, name, description, goalValue, bankAccountId, startDate, endDate FROM Goal";
         try (Connection connection = this.getConnection(dbFilePath);
@@ -278,6 +385,7 @@ public class Controller_data {
                 Date startDate = this.dateFormat.parse(resultSet.getString("startDate"));
                 Date endDate = this.dateFormat.parse(resultSet.getString("endDate"));
 
+                // Find the corresponding BankAccount.
                 BankAccount bankAccount = profile.getBankAccounts().stream()
                         .filter(account -> account.getId() == bankAccountId)
                         .findFirst()
@@ -295,6 +403,12 @@ public class Controller_data {
         }
     }
 
+    /**
+     * Loads all Badges from the database and adds them to the Profile.
+     *
+     * @param dbFilePath the database file path.
+     * @param profile    the Profile object to populate.
+     */
     private void getAllBadges(String dbFilePath, Profile profile) {
         String query = "SELECT id, name, targetReachedGoals, completed, completedDate FROM Badge";
         try (Connection connection = this.getConnection(dbFilePath);
@@ -309,6 +423,7 @@ public class Controller_data {
                 Date completedDate = null;
                 String completedDateStr = resultSet.getString("completedDate");
 
+                // Parse completedDate if it exists.
                 if (completedDateStr != null) {
                     completedDate = this.dateFormat.parse(completedDateStr);
                 }
@@ -323,6 +438,18 @@ public class Controller_data {
         }
     }
 
+    /* -------------------------------- */
+    /* ------ Data Saving Methods ------ */
+    /* -------------------------------- */
+
+    /**
+     * Saves the entire Profile to the database.
+     * It creates the necessary tables and then saves UserSettings, BankAccounts,
+     * TransactionCategories, Transactions (incomes and expenses), Goals, and Badges.
+     *
+     * @param dbFilePath the database file path.
+     * @param profile    the Profile object to save.
+     */
     public void saveProfile(String dbFilePath, Profile profile) {
         this.createTables(dbFilePath);
 
@@ -353,6 +480,12 @@ public class Controller_data {
         }
     }
 
+    /**
+     * Saves UserSettings to the database.
+     *
+     * @param dbFilePath   the database file path.
+     * @param userSettings the UserSettings object to save.
+     */
     public void saveUserSettings(String dbFilePath, UserSettings userSettings) {
         String query = """
             INSERT INTO UserSettings (name, birthday, language)
@@ -365,7 +498,6 @@ public class Controller_data {
             preparedStatement.setString(2, userSettings.getBirthday() != null
                     ? this.dateFormat.format(userSettings.getBirthday())
                     : "1970-01-01");
-
             preparedStatement.setInt(3, userSettings.getLanguage().ordinal());
 
             int affectedRows = preparedStatement.executeUpdate();
@@ -379,6 +511,12 @@ public class Controller_data {
         }
     }
 
+    /**
+     * Saves a Badge to the database.
+     *
+     * @param dbFilePath the database file path.
+     * @param badge      the Badge object to save.
+     */
     public void saveBadge(String dbFilePath, Badge badge) {
         String query = """
             INSERT INTO Badge (name, targetReachedGoals, completed, completedDate)
@@ -408,6 +546,12 @@ public class Controller_data {
         }
     }
 
+    /**
+     * Saves a BankAccount to the database.
+     *
+     * @param dbFilePath the database file path.
+     * @param account    the BankAccount object to save.
+     */
     public void saveBankAccount(String dbFilePath, BankAccount account) {
         String query = """
             INSERT INTO BankAccount ([Name], balance, lastInteraction)
@@ -432,6 +576,12 @@ public class Controller_data {
         }
     }
 
+    /**
+     * Saves a TransactionCategory to the database.
+     *
+     * @param dbFilePath          the database file path.
+     * @param transactionCategory the TransactionCategory object to save.
+     */
     public void saveTransactionCategory(String dbFilePath, TransactionCategory transactionCategory) {
         String query = """
             INSERT INTO TransactionCategory (name, CreatedByUser)
@@ -455,7 +605,13 @@ public class Controller_data {
         }
     }
 
-    // Hilfsmethode zum Abrufen der neu generierten ID
+    /**
+     * Retrieves the newly generated ID after an insert operation.
+     *
+     * @param preparedStatement the PreparedStatement used for the insert.
+     * @return the generated ID, or -1 if no ID was returned.
+     * @throws SQLException if a database access error occurs.
+     */
     private int getNewId(PreparedStatement preparedStatement) throws SQLException {
         try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
             if (generatedKeys.next()) {
@@ -469,6 +625,12 @@ public class Controller_data {
         }
     }
 
+    /**
+     * Saves a Transaction to the database.
+     *
+     * @param dbFilePath  the database file path.
+     * @param transaction the Transaction object to save.
+     */
     public void saveTransaction(String dbFilePath, Transaction transaction) {
         String query = """
             INSERT INTO [Transaction] (amount, categoryId, bankAccountId, date, description)
@@ -494,6 +656,12 @@ public class Controller_data {
         }
     }
 
+    /**
+     * Saves a Goal to the database.
+     *
+     * @param dbFilePath the database file path.
+     * @param goal       the Goal object to save.
+     */
     public void saveGoal(String dbFilePath, Goal goal) {
         String query = """
             INSERT INTO Goal (name, description, goalValue, bankAccountId, startDate, endDate)

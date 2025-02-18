@@ -64,6 +64,8 @@ public class Controller_start {
 
     @FXML
     private VBox vbox_background;
+
+    // Temporary file used for saving the profile.
     private File tempFile;
 
     /* -------------------------------- */
@@ -79,7 +81,7 @@ public class Controller_start {
     @FXML
     void onaction_createprofile(ActionEvent event) {
         Profile profile = new Profile();
-        // Add sample badges to the profile
+        // Add sample badges to the profile.
         profile.addBadge(new Badge("1st Goal reached!", 1, false, null));
         profile.addBadge(new Badge("3rd Goal reached!", 3, false, null));
         profile.addBadge(new Badge("5th Goal reached!", 5, false, null));
@@ -93,9 +95,9 @@ public class Controller_start {
     }
 
     /**
-     * Handles the action for saving a profile.
-     * Initializes a sample profile, saves it to a temporary file,
-     * and then opens a file save picker for the user to select the target location.
+     * Handles the action for creating a sample profile.
+     * Initializes a sample profile with test data, saves it to a temporary file,
+     * and then transitions to the main view.
      *
      * @param event the button click event.
      * @throws ParseException if date parsing fails.
@@ -104,7 +106,7 @@ public class Controller_start {
     void onaction_createSampleProfile(ActionEvent event) throws ParseException {
         Profile profile = new Profile();
 
-        // For testing the save function: populate the profile with example data
+        // For testing the save function: populate the profile with example data.
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMAN);
 
         profile.getUserSettings().setBirthday(dateFormat.parse("1990-01-05"));
@@ -129,7 +131,7 @@ public class Controller_start {
         profile.addBadge(new Badge("5th Goal reached!", 5, false, null));
         profile.addBadge(new Badge("10th Goal reached!", 10, false, null));
 
-        // Save the profile to a temporary file
+        // Save the profile to a temporary file.
         this.tempFile = new File(System.getProperty("java.io.tmpdir"), "profile_temp.sqlite");
         dataController.saveProfile("jdbc:sqlite:" + tempFile.getAbsolutePath(), profile);
 
@@ -141,7 +143,8 @@ public class Controller_start {
     }
 
     /**
-     * Initializes FXML components. This method is automatically called after the FXML file is loaded.
+     * Initializes FXML components.
+     * This method is automatically called after the FXML file is loaded.
      */
     @FXML
     void initialize() {
@@ -155,7 +158,7 @@ public class Controller_start {
          * Opens a file picker to select a SQLite database file and loads the profile.
          */
 
-        // Create the FileOpenPicker (internally uses the web variant if WebAPI is available)
+        // Create the FileOpenPicker (uses the web variant if WebAPI is available).
         FileOpenPicker fileOpenPicker = FileOpenPicker.create(btn_loadprofile);
         ExtensionFilter sqliteFilter = ExtensionFilter.of("SQLite Database", ".sqlite");
         fileOpenPicker.getExtensionFilters().clear();
@@ -166,24 +169,24 @@ public class Controller_start {
         fileOpenPicker.setOnFilesSelected(fileSources -> {
             if (!fileSources.isEmpty()) {
                 fileSources.getFirst().uploadFileAsync().thenAccept(file -> {
-                    // Get the absolute file path
+                    // Retrieve the absolute file path.
                     String filePath = file.getAbsolutePath();
 
-                    // Load the profile from the selected SQLite file
+                    // Load the profile from the selected SQLite file.
                     Profile profile = dataController.loadData("jdbc:sqlite:" + filePath);
 
-                    // Delete the SQLite file and its folder if empty
+                    // Delete the SQLite file and its folder if empty.
                     try {
                         Path fileToDelete = Path.of(filePath);
 
-                        // Delete the file if it exists
+                        // Delete the file if it exists.
                         Files.deleteIfExists(fileToDelete);
                         logger.info("SQLite file deleted: " + filePath);
 
-                        // Check if the parent directory is empty after deleting the file
+                        // Check if the parent directory is empty after deletion.
                         Path parentDir = fileToDelete.getParent();
                         if (parentDir != null && Files.isDirectory(parentDir) && Files.list(parentDir).findAny().isEmpty()) {
-                            // Delete the directory if it is empty
+                            // Delete the directory if it is empty.
                             Files.deleteIfExists(parentDir);
                             logger.info("Directory deleted: " + parentDir);
                         }
@@ -191,23 +194,24 @@ public class Controller_start {
                         logger.error("Error while deleting SQLite file or directory", e);
                     }
 
-                    // Load the main controller with the loaded profile
+                    // Load the main controller with the loaded profile.
                     try {
                         loadMainController(profile);
                     } catch (IOException e) {
                         logger.error("Error while loading the main controller", e);
                     }
                 }).exceptionally(ex -> {
-                    // Handle exceptions that occur during file upload or processing
+                    // Log any exceptions that occur during file upload or processing.
                     logger.error("Error while loading the file", ex);
                     return null;
                 });
             } else {
-                // Log a warning if no file was selected
+                // Log a warning if no file was selected.
                 logger.warn("No file selected.");
             }
         });
     }
+
     /* -------------------------------- */
     /* ------ Private Methods ------ */
     /* -------------------------------- */
@@ -221,10 +225,10 @@ public class Controller_start {
     private void loadMainController(Profile profile) throws IOException {
         logger.info("Main window is loading.");
 
-        // Get the current stage from the background VBox
+        // Retrieve the current stage from the background VBox.
         Stage primaryStage = (Stage) this.vbox_background.getScene().getWindow();
 
-        // Load resource bundle for internationalization
+        // Load the resource bundle for internationalization.
         ResourceBundle resourceBundle = ResourceBundle.getBundle(
                 "wbh/wbh_projekt_privatebuchhaltung/i18n/text_controls", Locale.GERMAN
         );
@@ -234,7 +238,7 @@ public class Controller_start {
         fxmlLoader.setLocation(this.getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/fxml/view_main.fxml"));
         Parent fxmlRoot = fxmlLoader.load();
 
-        // Set up the scene with CSS styling
+        // Set up the scene with CSS styling.
         Scene scene = new Scene(fxmlRoot);
         scene.getStylesheets().add(
                 Objects.requireNonNull(this.getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/styles/style_main.css"))
@@ -244,7 +248,7 @@ public class Controller_start {
         primaryStage.setScene(scene);
         logger.info("Main window loaded successfully.");
 
-        // Get the main controller instance and initialize it with the profile
+        // Retrieve and initialize the main controller with the profile.
         Controller_main mainController = fxmlLoader.getController();
         mainController.setProfile(profile);
         mainController.handleDashboard();

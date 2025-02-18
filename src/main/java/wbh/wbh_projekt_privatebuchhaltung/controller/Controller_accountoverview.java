@@ -30,18 +30,18 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- * Controller_accountoverview verwaltet die Übersicht über Transaktionen.
- * Es werden Transaktionen (Einnahmen und Ausgaben) in einer TableView angezeigt und
- * über verschiedene Dialoge (zum Hinzufügen, Bearbeiten und Löschen) bearbeitet.
+ * The Controller_accountoverview manages the overview of transactions.
+ * Transactions (incomes and expenses) are displayed in a TableView and
+ * can be manipulated via various dialogs (for adding, editing, and deleting).
  *
- * Wichtige Hinweise:
- * - Die Validierung erfolgt über den selbst implementierten ValidationHelperFX, der fehlerhafte Eingaben
- *   durch rote Markierung und sanfte Hintergrundfüllung hervorhebt.
- * - Wiederverwendbare Logik, z.B. zum Erzeugen von Dialog-Buttons, wurde in eigene Methoden ausgelagert.
- * - Die inneren Klassen (DialogButtonHelper und ValidationHelperFX) bleiben vorerst in dieser Datei.
- *   TODO: In Zukunft in separate Dateien auslagern.
+ * Important notes:
+ * - Validation is performed using the custom ValidationHelperFX, which highlights invalid inputs
+ *   with red markings and gentle background fill.
+ * - Reusable logic, e.g., for creating dialog buttons, has been delegated to separate methods.
+ * - The inner classes (DialogButtonHelper and ValidationHelperFX) currently remain in this file.
+ *   TODO: In the future, extract them into separate files.
  *
- * Implementiert das ProfileAware-Interface, um das Benutzerprofil zu empfangen und zu aktualisieren.
+ * Implements the ProfileAware interface to receive and update the user profile.
  */
 public class Controller_accountoverview implements ProfileAware {
 
@@ -51,10 +51,10 @@ public class Controller_accountoverview implements ProfileAware {
 
     private final Logger logger = LoggerFactory.getLogger(Controller_accountoverview.class);
     private Profile profile = new Profile();
-    // Moderne Datumsformatierung: Alle Nutzer teilen diesen DateTimeFormatter.
+    // Modern date formatting: All users share this DateTimeFormatter.
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
-    // Gemeinsame Strings
+    // Common constants
     private static final int HBOX_SPACING = 10;
 
     @FXML
@@ -72,7 +72,7 @@ public class Controller_accountoverview implements ProfileAware {
     @FXML
     private StackPane rootPane;
 
-    // Instanz des DialogButtonHelper (enthält benutzerspezifische Zustände)
+    // Instance of DialogButtonHelper (contains user-specific states)
     private DialogButtonHelper dialogButtonHelper = null;
 
     /* -------------------------------- */
@@ -80,8 +80,8 @@ public class Controller_accountoverview implements ProfileAware {
     /* -------------------------------- */
 
     /**
-     * Initialisiert den Controller, nachdem das FXML-Root-Element vollständig geladen wurde.
-     * Ruft die Methode zur Einrichtung der Transaktionstabelle auf.
+     * Initializes the controller after the FXML root element has been fully loaded.
+     * Calls the method to set up the transaction table.
      */
     @FXML
     public void initialize() {
@@ -94,11 +94,12 @@ public class Controller_accountoverview implements ProfileAware {
     /* -------------------------------- */
 
     /**
-     * Richtet die Transaktionstabelle ein, indem die Spalten an die entsprechenden Eigenschaften
-     * der Transaktion gebunden und die Tabelle mit den Transaktionen aus dem Profil befüllt wird.
-     * Zudem werden CSS-Stile angewendet und Listener registriert, die die Tabelle bei Änderungen im Profil aktualisieren.
+     * Sets up the transaction table by binding the columns to the corresponding properties
+     * of a transaction and populating the table with transactions from the profile.
+     * Additionally, CSS styles are applied and listeners are registered to update the table
+     * when changes occur in the profile.
      *
-     * TODO: Weitere Logik zur Befüllung und Listener-Registrierung könnte in separate Methoden ausgelagert werden.
+     * TODO: Further logic for populating and listener registration could be extracted into separate methods.
      */
     private void setupTransactionTable() {
         // Configure column data bindings
@@ -138,7 +139,7 @@ public class Controller_accountoverview implements ProfileAware {
         allTransactions.addAll(profile.getExpenses());
         transactionTable.setItems(allTransactions);
 
-        // Add change listeners
+        // Add change listeners to update table when incomes or expenses change
         profile.getIncomes().addListener((ListChangeListener<Transaction>) change -> updateTable());
         profile.getExpenses().addListener((ListChangeListener<Transaction>) change -> updateTable());
 
@@ -164,10 +165,10 @@ public class Controller_accountoverview implements ProfileAware {
     }
 
     /**
-     * Erzeugt und liefert eine Cell-Factory für die Aktionsspalte.
-     * Jede nicht-leere Zelle erhält zwei Buttons (Bearbeiten und Löschen).
+     * Creates and returns a cell factory for the action column.
+     * Each non-empty cell receives two buttons (Edit and Delete).
      *
-     * @return Callback für die Zellen-Erzeugung.
+     * @return Callback for cell creation.
      */
     private Callback<TableColumn<Transaction, Void>, TableCell<Transaction, Void>> createActionCellFactory() {
         return param -> new TableCell<>() {
@@ -175,11 +176,10 @@ public class Controller_accountoverview implements ProfileAware {
             private final Button deleteButton = new Button("", new FontIcon("fas-trash"));
 
             {
-
-                // CSS-Klassen anwenden.
+                // Apply CSS classes to buttons.
                 editButton.getStyleClass().add(EnumGenerals.CSS_DIALOG_BUTTON);
                 deleteButton.getStyleClass().add(EnumGenerals.CSS_DIALOG_BUTTON);
-                // Beim Klick den entsprechenden Dialog öffnen.
+                // Open the corresponding dialog when clicked.
                 editButton.setOnAction(event -> showEditDialog(getTableView().getItems().get(getIndex())));
                 deleteButton.setOnAction(event -> showDeleteConfirmation(getTableView().getItems().get(getIndex())));
             }
@@ -195,9 +195,9 @@ public class Controller_accountoverview implements ProfileAware {
     }
 
     /**
-     * Aggregiert Einnahmen und Ausgaben neu und aktualisiert die Transaktionstabelle.
+     * Re-aggregates incomes and expenses and updates the transaction table.
      *
-     * TODO: Prüfen, ob ein diff-basierter Update-Mechanismus die Performance verbessert.
+     * TODO: Check if a diff-based update mechanism would improve performance.
      */
     private void updateTable() {
         ObservableList<Transaction> allTransactions = FXCollections.observableArrayList(profile.getIncomes());
@@ -207,17 +207,18 @@ public class Controller_accountoverview implements ProfileAware {
     }
 
     /**
-     * Zeigt einen Bestätigungsdialog zum Löschen der angegebenen Transaktion an.
-     * Der Dialog wird mit CSS-Klassen gestylt und dem Root-Pane hinzugefügt.
+     * Displays a confirmation dialog to delete the specified transaction.
+     * The dialog is styled with CSS classes and added to the root pane.
      *
-     * TODO: Die Dialogerstellung könnte weiter in einen Builder ausgelagert werden.
+     * TODO: The dialog creation could be further delegated to a builder.
      *
-     * @param transaction die zu löschende Transaktion.
+     * @param transaction the transaction to be deleted.
      */
     private void showDeleteConfirmation(Transaction transaction) {
         DeleteDialogButton deleteDialogButton = new DeleteDialogButton(this.rootPane);
         deleteDialogButton.show("diese Transaktion", v -> {
             boolean success = true;
+            // Determine the type of transaction and remove it from the corresponding list.
             if (transaction instanceof Income) {
                 profile.getIncomes().remove(transaction);
             } else if (transaction instanceof Expense) {
@@ -232,15 +233,14 @@ public class Controller_accountoverview implements ProfileAware {
         });
     }
 
-
     /**
-     * Zeigt einen Bearbeitungsdialog für die angegebene Transaktion an.
-     * Im Dialog können Beschreibung, Datum, Betrag und Kategorie geändert werden.
-     * Es wird ein DatePicker zur Datumsauswahl verwendet.
+     * Displays an edit dialog for the specified transaction.
+     * In the dialog, the description, date, amount, and category can be modified.
+     * A DatePicker is used for date selection.
      *
-     * TODO: Weitere Layoutlogik könnte bei Bedarf ausgelagert werden.
+     * TODO: Additional layout logic could be extracted if needed.
      *
-     * @param transaction die zu bearbeitende Transaktion.
+     * @param transaction the transaction to be edited.
      */
     private void showEditDialog(Transaction transaction) {
         VBox dialogContent = new VBox(10);
@@ -251,6 +251,7 @@ public class Controller_accountoverview implements ProfileAware {
 
         DatePicker datePicker = new DatePicker();
         configureDatePicker(datePicker);
+        // Convert java.util.Date to LocalDate
         LocalDate localDate = new java.sql.Date(transaction.getDate().getTime()).toLocalDate();
         datePicker.setValue(localDate);
 
@@ -298,10 +299,9 @@ public class Controller_accountoverview implements ProfileAware {
     }
 
     /**
-     * Zeigt einen Dialog zum Hinzufügen einer neuen Transaktion an.
-     * Es wird ein DatePicker zur Datumsauswahl verwendet und alle Pflichtfelder werden validiert.
-     * Der Transaktionstyp (Einnahme oder Ausgabe) wird anhand des Betrags bestimmt.
-     *
+     * Displays a dialog for adding a new transaction.
+     * A DatePicker is used for date selection and all mandatory fields are validated.
+     * The transaction type (income or expense) is determined based on the amount.
      *
      * @see Income
      * @see Expense
@@ -347,6 +347,7 @@ public class Controller_accountoverview implements ProfileAware {
                     TransactionCategory category = categoryComboBox.getValue();
                     BankAccount account = accountComboBox.getValue();
                     String description = descriptionField.getText();
+                    // Determine transaction type based on amount: positive for income, negative for expense.
                     if (value >= 0) {
                         profile.getIncomes().add(new Income(value, category, account, date, description));
                     } else {
@@ -373,11 +374,11 @@ public class Controller_accountoverview implements ProfileAware {
     }
 
     /**
-     * Formatiert ein Datum mithilfe des angegebenen Datumsformats.
-     * Verwendet Java 8's DateTimeFormatter für moderne Datumsbehandlung.
+     * Formats a date using the specified date format.
+     * Uses Java 8's DateTimeFormatter for modern date handling.
      *
-     * @param date das zu formatierende Datum
-     * @return der formatierte Datum-String oder ein leerer String, wenn das Datum null ist
+     * @param date the date to format
+     * @return the formatted date string or an empty string if the date is null
      */
     private String formatDate(Date date) {
         String result = "";
@@ -388,10 +389,10 @@ public class Controller_accountoverview implements ProfileAware {
     }
 
     /**
-     * Konfiguriert einen DatePicker, indem die entsprechende CSS-Klasse angewendet wird
-     * und sichergestellt wird, dass beim Klicken auf den Editor der Kalender geöffnet wird.
+     * Configures a DatePicker by applying the appropriate CSS class
+     * and ensuring that clicking on the editor opens the calendar.
      *
-     * @param datePicker der zu konfigurierende DatePicker
+     * @param datePicker the DatePicker to be configured
      */
     private void configureDatePicker(DatePicker datePicker) {
         datePicker.getStyleClass().add(EnumGenerals.CSS_DATE_PICKER);
@@ -403,11 +404,11 @@ public class Controller_accountoverview implements ProfileAware {
     /* -------------------------------- */
 
     /**
-     * Setzt das Profil für diesen Controller und aktualisiert die Transaktionstabelle entsprechend.
+     * Sets the profile for this controller and updates the transaction table accordingly.
      *
-     * @param profile das zu setzende Profil
+     * @param profile the profile to set
      *
-     * TODO: Das Profil vor dem Update validieren und ggf. andere Komponenten benachrichtigen.
+     * TODO: Validate the profile before updating and, if necessary, notify other components.
      */
     @Override
     public void setProfile(Profile profile) {
