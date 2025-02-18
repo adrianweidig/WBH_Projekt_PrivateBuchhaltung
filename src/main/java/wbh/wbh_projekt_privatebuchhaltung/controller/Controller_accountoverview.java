@@ -18,7 +18,9 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wbh.wbh_projekt_privatebuchhaltung.enums.EnumGenerals;
+import wbh.wbh_projekt_privatebuchhaltung.helpers.DialogButtonHelper;
 import wbh.wbh_projekt_privatebuchhaltung.helpers.ValidationHelperFX;
+import wbh.wbh_projekt_privatebuchhaltung.models.DeleteDialogButton;
 import wbh.wbh_projekt_privatebuchhaltung.models.interfaces.ProfileAware;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.*;
 
@@ -36,7 +38,7 @@ import java.util.Objects;
  * - Die Validierung erfolgt über den selbst implementierten ValidationHelperFX, der fehlerhafte Eingaben
  *   durch rote Markierung und sanfte Hintergrundfüllung hervorhebt.
  * - Wiederverwendbare Logik, z.B. zum Erzeugen von Dialog-Buttons, wurde in eigene Methoden ausgelagert.
- * - Die inneren Klassen (DialogHelper und ValidationHelperFX) bleiben vorerst in dieser Datei.
+ * - Die inneren Klassen (DialogButtonHelper und ValidationHelperFX) bleiben vorerst in dieser Datei.
  *   TODO: In Zukunft in separate Dateien auslagern.
  *
  * Implementiert das ProfileAware-Interface, um das Benutzerprofil zu empfangen und zu aktualisieren.
@@ -53,7 +55,6 @@ public class Controller_accountoverview implements ProfileAware {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     // Gemeinsame Strings
-    private static final String DELETE_CONFIRMATION_MESSAGE = "Are you sure you want to delete this transaction?";
     private static final int HBOX_SPACING = 10;
 
     @FXML
@@ -71,8 +72,8 @@ public class Controller_accountoverview implements ProfileAware {
     @FXML
     private StackPane rootPane;
 
-    // Instanz des DialogHelper (enthält benutzerspezifische Zustände)
-    private final DialogHelper dialogHelper = new DialogHelper();
+    // Instanz des DialogButtonHelper (enthält benutzerspezifische Zustände)
+    private DialogButtonHelper dialogButtonHelper = null;
 
     /* -------------------------------- */
     /* ------ FXML Methods       ------ */
@@ -85,6 +86,7 @@ public class Controller_accountoverview implements ProfileAware {
     @FXML
     public void initialize() {
         setupTransactionTable();
+        this.dialogButtonHelper = new DialogButtonHelper(this.rootPane);
     }
 
     /* -------------------------------- */
@@ -128,7 +130,7 @@ public class Controller_accountoverview implements ProfileAware {
 
         // Configure table behavior
         transactionTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-        transactionTable.setPlaceholder(new Label("No transactions found"));
+        transactionTable.setPlaceholder(new Label("Keine Transaktionen gefunden"));
 
         // Combine incomes and expenses
         ObservableList<Transaction> allTransactions = FXCollections.observableArrayList();
@@ -213,14 +215,8 @@ public class Controller_accountoverview implements ProfileAware {
      * @param transaction die zu löschende Transaktion.
      */
     private void showDeleteConfirmation(Transaction transaction) {
-        VBox dialogContent = dialogHelper.createDialogContainer();
-        dialogContent.getStyleClass().add(EnumGenerals.CSS_DELETE_DIALOG);
-
-        Label confirmationLabel = new Label(DELETE_CONFIRMATION_MESSAGE);
-        Button confirmButton = dialogHelper.createActionButton("Delete");
-        Button cancelButton = dialogHelper.createActionButton("Cancel");
-
-        confirmButton.setOnAction(e -> {
+        DeleteDialogButton deleteDialogButton = new DeleteDialogButton(this.rootPane);
+        deleteDialogButton.show("diese Transaktion", v -> {
             boolean success = true;
             if (transaction instanceof Income) {
                 profile.getIncomes().remove(transaction);
@@ -230,16 +226,12 @@ public class Controller_accountoverview implements ProfileAware {
                 success = false;
             }
             if (success) {
-                dialogHelper.removeDialog(dialogContent);
                 updateTable();
-                logger.debug("Transaktion gelöscht: {}", transaction);
+                logger.debug("Transaction deleted: {}", transaction);
             }
         });
-        cancelButton.setOnAction(e -> dialogHelper.removeDialog(dialogContent));
-
-        dialogContent.getChildren().addAll(confirmationLabel, new HBox(HBOX_SPACING, confirmButton, cancelButton));
-        dialogHelper.showDialog(dialogContent);
     }
+
 
     /**
      * Zeigt einen Bearbeitungsdialog für die angegebene Transaktion an.
@@ -251,7 +243,8 @@ public class Controller_accountoverview implements ProfileAware {
      * @param transaction die zu bearbeitende Transaktion.
      */
     private void showEditDialog(Transaction transaction) {
-        VBox dialogContent = dialogHelper.createDialogContainer();
+        VBox dialogContent = new VBox(10);
+        dialogContent.getStyleClass().add(EnumGenerals.CSS_DIALOG_BOX);
 
         TextField descriptionField = new TextField(transaction.getDescription());
         descriptionField.getStyleClass().add(EnumGenerals.CSS_TEXT_FIELD);
@@ -268,15 +261,15 @@ public class Controller_accountoverview implements ProfileAware {
         typeComboBox.getStyleClass().add(EnumGenerals.CSS_COMBO_BOX);
         typeComboBox.setValue(transaction.getCategory());
 
-        Button saveButton = dialogHelper.createActionButton("Save");
-        Button closeButton = dialogHelper.createActionButton("Close");
+        Button saveButton = dialogButtonHelper.createActionButton("Speichern");
+        Button closeButton = dialogButtonHelper.createActionButton("Schließen");
 
         saveButton.setOnAction(e -> {
             boolean valid;
             ValidationHelperFX validationHelper = new ValidationHelperFX();
 
             valid = validationHelper.validateMandatoryFieldsFX(descriptionField, datePicker, amountField, typeComboBox);
-            valid = valid && validationHelper.isValidAmount(amountField.getText());
+            valid = valid && validationHelper.isValidAmount(amountField);
             if (valid) {
                 try {
                     Date newDate = java.sql.Date.valueOf(datePicker.getValue());
@@ -285,31 +278,23 @@ public class Controller_accountoverview implements ProfileAware {
                     transaction.setValue(Double.parseDouble(amountField.getText()));
                     transaction.setCategory(typeComboBox.getValue());
                     transactionTable.refresh();
-                    dialogHelper.removeDialog(dialogContent);
+                    dialogButtonHelper.removeDialog(dialogContent);
                     logger.debug("Transaktion aktualisiert: {}", transaction);
                 } catch (Exception ex) {
                     logger.error("Ungültige Eingabe.", ex);
                 }
-            } else {
-                if (!validationHelper.isValidAmount(amountField.getText())) {
-                    if (!amountField.getStyleClass().contains(EnumGenerals.CSS_ERROR)) {
-                        amountField.getStyleClass().add(EnumGenerals.CSS_ERROR);
-                    }
-                } else {
-                    amountField.getStyleClass().removeAll(EnumGenerals.CSS_ERROR);
-                }
             }
         });
-        closeButton.setOnAction(e -> dialogHelper.removeDialog(dialogContent));
+        closeButton.setOnAction(e -> dialogButtonHelper.removeDialog(dialogContent));
 
         dialogContent.getChildren().addAll(
-                dialogHelper.createLabeledControl("Edit Beschreibung:", descriptionField),
-                dialogHelper.createLabeledControl("Edit Datum:", datePicker),
-                dialogHelper.createLabeledControl("Edit Betrag:", amountField),
-                dialogHelper.createLabeledControl("Edit Kategorie:", typeComboBox),
+                dialogButtonHelper.createLabeledControl("Beschreibung:", descriptionField),
+                dialogButtonHelper.createLabeledControl("Datum:", datePicker),
+                dialogButtonHelper.createLabeledControl("Betrag:", amountField),
+                dialogButtonHelper.createLabeledControl("Kategorie:", typeComboBox),
                 new HBox(HBOX_SPACING, saveButton, closeButton)
         );
-        dialogHelper.showDialog(dialogContent);
+        dialogButtonHelper.showDialog(dialogContent);
     }
 
     /**
@@ -317,14 +302,14 @@ public class Controller_accountoverview implements ProfileAware {
      * Es wird ein DatePicker zur Datumsauswahl verwendet und alle Pflichtfelder werden validiert.
      * Der Transaktionstyp (Einnahme oder Ausgabe) wird anhand des Betrags bestimmt.
      *
-     * TODO: In Zukunft könnte das Dialoglayout in eine separate FXML-Datei ausgelagert werden.
      *
      * @see Income
      * @see Expense
      */
     @FXML
     private void showAddTransactionForm() {
-        VBox dialogContent = dialogHelper.createDialogContainer();
+        VBox dialogContent = new VBox(10);
+        dialogContent.getStyleClass().add(EnumGenerals.CSS_DIALOG_BOX);
 
         TextField descriptionField = new TextField();
         descriptionField.getStyleClass().add(EnumGenerals.CSS_TEXT_FIELD);
@@ -346,15 +331,15 @@ public class Controller_accountoverview implements ProfileAware {
         accountComboBox.getStyleClass().add(EnumGenerals.CSS_COMBO_BOX);
         accountComboBox.setPromptText("Bankkonto auswählen");
 
-        Button saveButton = dialogHelper.createActionButton("Save");
-        Button closeButton = dialogHelper.createActionButton("Close");
+        Button saveButton = dialogButtonHelper.createActionButton("Speichern");
+        Button closeButton = dialogButtonHelper.createActionButton("Schließen");
 
         saveButton.setOnAction(e -> {
-            boolean valid = true;
+            boolean valid;
             ValidationHelperFX validationHelper = new ValidationHelperFX();
 
-            valid = valid && validationHelper.validateMandatoryFieldsFX(descriptionField, datePicker, amountField, categoryComboBox, accountComboBox);
-            valid = valid && validationHelper.isValidAmount(amountField.getText());
+            valid = validationHelper.validateMandatoryFieldsFX(descriptionField, datePicker, amountField, categoryComboBox, accountComboBox);
+            valid = valid && validationHelper.isValidAmount(amountField);
             if (valid) {
                 try {
                     double value = Double.parseDouble(amountField.getText());
@@ -368,33 +353,23 @@ public class Controller_accountoverview implements ProfileAware {
                         profile.getExpenses().add(new Expense(Math.abs(value), category, account, date, description));
                     }
                     updateTable();
-                    dialogHelper.removeDialog(dialogContent);
-                    valid = true;
+                    dialogButtonHelper.removeDialog(dialogContent);
                 } catch (Exception ex) {
                     logger.error("Ungültiges Eingabeformat!", ex);
-                    valid = false;
-                }
-            } else {
-                if (!validationHelper.isValidAmount(amountField.getText())) {
-                    if (!amountField.getStyleClass().contains(EnumGenerals.CSS_ERROR)) {
-                        amountField.getStyleClass().add(EnumGenerals.CSS_ERROR);
-                    }
-                } else {
-                    amountField.getStyleClass().removeAll(EnumGenerals.CSS_ERROR);
                 }
             }
         });
-        closeButton.setOnAction(e -> dialogHelper.removeDialog(dialogContent));
+        closeButton.setOnAction(e -> dialogButtonHelper.removeDialog(dialogContent));
 
         dialogContent.getChildren().addAll(
-                dialogHelper.createLabeledControl("Beschreibung:", descriptionField),
-                dialogHelper.createLabeledControl("Datum:", datePicker),
-                dialogHelper.createLabeledControl("Betrag:", amountField),
-                dialogHelper.createLabeledControl("Kategorie:", categoryComboBox),
-                dialogHelper.createLabeledControl("Bankkonto:", accountComboBox),
+                dialogButtonHelper.createLabeledControl("Beschreibung:", descriptionField),
+                dialogButtonHelper.createLabeledControl("Datum:", datePicker),
+                dialogButtonHelper.createLabeledControl("Betrag:", amountField),
+                dialogButtonHelper.createLabeledControl("Kategorie:", categoryComboBox),
+                dialogButtonHelper.createLabeledControl("Bankkonto:", accountComboBox),
                 new HBox(HBOX_SPACING, saveButton, closeButton)
         );
-        dialogHelper.showDialog(dialogContent);
+        dialogButtonHelper.showDialog(dialogContent);
     }
 
     /**
@@ -421,51 +396,6 @@ public class Controller_accountoverview implements ProfileAware {
     private void configureDatePicker(DatePicker datePicker) {
         datePicker.getStyleClass().add(EnumGenerals.CSS_DATE_PICKER);
         datePicker.getEditor().setOnMouseClicked(event -> datePicker.show());
-    }
-
-    /* -------------------------------- */
-    /* ------ Inner Classes      ------ */
-    /* -------------------------------- */
-
-    /**
-     * DialogHelper kapselt Methoden zur Erstellung und Verwaltung von Dialogen.
-     * Diese innere Klasse gruppiert Methoden, die Dialog-Container, beschriftete Steuerelemente
-     * erstellen und das Anzeigen sowie Entfernen von Dialogen aus dem Root-Pane übernehmen.
-     */
-    private class DialogHelper {
-        VBox createDialogContainer() {
-            VBox dialog = new VBox(10);
-            dialog.getStyleClass().add(EnumGenerals.CSS_DIALOG_BOX);
-            StackPane.setAlignment(dialog, Pos.CENTER);
-            return dialog;
-        }
-
-        void showDialog(VBox dialog) {
-            rootPane.getChildren().add(dialog);
-        }
-
-        void removeDialog(VBox dialog) {
-            rootPane.getChildren().remove(dialog);
-        }
-
-        VBox createLabeledControl(String labelText, Control control) {
-            Label label = new Label(labelText);
-            return new VBox(5, label, control);
-        }
-
-        /**
-         * Erstellt einen Dialog-Action-Button mit dem angegebenen Text.
-         * Dieser Button erhält die CSS-Klasse "dialog-action-button", die in der CSS-Datei definiert sein sollte.
-         *
-         * @param text der Text des Buttons
-         * @return ein neu erstellter Button
-         */
-        Button createActionButton(String text) {
-            Button button = new Button(text);
-            button.getStyleClass().clear();
-            button.getStyleClass().add(EnumGenerals.CSS_DIALOG_ACTION_BUTTON);
-            return button;
-        }
     }
 
     /* -------------------------------- */

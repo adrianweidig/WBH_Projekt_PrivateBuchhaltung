@@ -18,11 +18,12 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wbh.wbh_projekt_privatebuchhaltung.enums.EnumGenerals;
+import wbh.wbh_projekt_privatebuchhaltung.helpers.DialogButtonHelper;
 import wbh.wbh_projekt_privatebuchhaltung.helpers.ValidationHelperFX;
+import wbh.wbh_projekt_privatebuchhaltung.models.DeleteDialogButton;
 import wbh.wbh_projekt_privatebuchhaltung.models.interfaces.ProfileAware;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.*;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
@@ -40,7 +41,6 @@ public class Controller_goals implements ProfileAware {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     // Gemeinsame Strings
-    private static final String DELETE_CONFIRMATION_MESSAGE = "Are you sure you want to delete this goal?";
     private static final int HBOX_SPACING = 10;
 
     @FXML
@@ -60,8 +60,8 @@ public class Controller_goals implements ProfileAware {
     @FXML
     private StackPane rootPane;
 
-    // Instanz des DialogHelper (enthält benutzerspezifische Zustände)
-    private final DialogHelper dialogHelper = new DialogHelper();
+    // Instanz des DialogButtonHelper (enthält benutzerspezifische Zustände)
+    private DialogButtonHelper dialogButtonHelper = null;
 
     /* -------------------------------- */
     /* ------ FXML Methods       ------ */
@@ -70,6 +70,7 @@ public class Controller_goals implements ProfileAware {
     @FXML
     public void initialize() {
         setupGoalTable();
+        this.dialogButtonHelper = new DialogButtonHelper(this.rootPane);
     }
 
     /* -------------------------------- */
@@ -171,107 +172,64 @@ public class Controller_goals implements ProfileAware {
     }
 
     private void showDeleteConfirmation(Goal goal) {
-        VBox dialogContent = dialogHelper.createDialogContainer();
-        dialogContent.getStyleClass().add(EnumGenerals.CSS_DELETE_DIALOG);
-
-        Label confirmationLabel = new Label(DELETE_CONFIRMATION_MESSAGE);
-        Button confirmButton = dialogHelper.createActionButton("Delete");
-        Button cancelButton = dialogHelper.createActionButton("Cancel");
-
-        confirmButton.setOnAction(e -> {
+        DeleteDialogButton deleteDialogButton = new DeleteDialogButton(this.rootPane);
+        deleteDialogButton.show("dieses Ziel", v -> {
             profile.getGoals().remove(goal);
-
-            dialogHelper.removeDialog(dialogContent);
-            updateTable();
-            logger.debug("Goal deleted: {}", goal);
-
+            Controller_goals.this.updateTable();
         });
-        cancelButton.setOnAction(e -> dialogHelper.removeDialog(dialogContent));
-
-        dialogContent.getChildren().addAll(confirmationLabel, new HBox(HBOX_SPACING, confirmButton, cancelButton));
-        dialogHelper.showDialog(dialogContent);
     }
 
     private void showEditDialog(Goal goal) {
-        VBox dialogContent = dialogHelper.createDialogContainer();
+        VBox dialogContent = new VBox(10);
+        dialogContent.getStyleClass().add(EnumGenerals.CSS_DIALOG_BOX);
 
         TextField nameField = new TextField(goal.getName());
-        nameField.getStyleClass().add(EnumGenerals.CSS_TEXT_FIELD);
-
         TextField descriptionField = new TextField(goal.getDescription());
-        descriptionField.getStyleClass().add(EnumGenerals.CSS_TEXT_FIELD);
-
-        DatePicker startDatePicker = new DatePicker();
-        configureDatePicker(startDatePicker);
-        LocalDate localStartDate = new java.sql.Date(goal.getStartDate().getTime()).toLocalDate();
-        startDatePicker.setValue(localStartDate);
-
-        DatePicker endDatePicker = new DatePicker();
-        configureDatePicker(endDatePicker);
-        LocalDate localEndDate = new java.sql.Date(goal.getEndDate().getTime()).toLocalDate();
-        endDatePicker.setValue(localEndDate);
-
+        DatePicker startDatePicker = new DatePicker(goal.getStartDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
+        DatePicker endDatePicker = new DatePicker(goal.getEndDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
         TextField goalValueField = new TextField(Double.toString(goal.getGoalValue()));
-        goalValueField.getStyleClass().add(EnumGenerals.CSS_TEXT_FIELD);
 
-        ComboBox<BankAccount> bankAccountComboBox = new ComboBox<>(this.profile.getBankAccounts());
-        bankAccountComboBox.getStyleClass().add(EnumGenerals.CSS_COMBO_BOX);
+        ComboBox<BankAccount> bankAccountComboBox = new ComboBox<>(profile.getBankAccounts());
         bankAccountComboBox.setValue(goal.getBankAccount());
 
-        Button saveButton = dialogHelper.createActionButton("Save");
-        Button closeButton = dialogHelper.createActionButton("Close");
+        Button saveButton = dialogButtonHelper.createActionButton("Speichern");
+        Button closeButton = dialogButtonHelper.createActionButton("Schließen");
 
         saveButton.setOnAction(e -> {
-            boolean valid;
             ValidationHelperFX validationHelper = new ValidationHelperFX();
-            valid = validationHelper.validateMandatoryFieldsFX(nameField, descriptionField, bankAccountComboBox, startDatePicker, endDatePicker);
-            valid = valid && validationHelper.isValidAmount(goalValueField.getText());
-            if (valid) {
-                try {
-                    Date newStartDate = java.sql.Date.valueOf(startDatePicker.getValue());
-                    Date newEndDate = java.sql.Date.valueOf(endDatePicker.getValue());
+            if (validationHelper.validateMandatoryFieldsFX(nameField, descriptionField, bankAccountComboBox, startDatePicker, endDatePicker)
+                    && validationHelper.isValidAmount(goalValueField)) {
 
-                    goal.setDescription(descriptionField.getText());
-                    goal.setStartDate(newStartDate);
-                    goal.setEndDate(newEndDate);
-                    goal.setGoalValue(Double.parseDouble(goalValueField.getText()));
-                    goal.setName(nameField.getText());
-                    goalTable.refresh();
-                    dialogHelper.removeDialog(dialogContent);
-                    logger.debug("Goal updated: {}", goal);
-                } catch (Exception ex) {
-                    logger.error("Ungültige Eingabe.", ex);
-                }
-            } else {
-                if (!validationHelper.isValidAmount(goalValueField.getText())) {
-                    if (!goalValueField.getStyleClass().contains(EnumGenerals.CSS_ERROR)) {
-                        goalValueField.getStyleClass().add(EnumGenerals.CSS_ERROR);
-                    }
-                } else {
-                    goalValueField.getStyleClass().removeAll(EnumGenerals.CSS_ERROR);
-                }
+                goal.setDescription(descriptionField.getText());
+                goal.setStartDate(java.sql.Date.valueOf(startDatePicker.getValue()));
+                goal.setEndDate(java.sql.Date.valueOf(endDatePicker.getValue()));
+                goal.setGoalValue(Double.parseDouble(goalValueField.getText()));
+                goal.setName(nameField.getText());
+
+                goalTable.refresh();
+                dialogButtonHelper.removeDialog(dialogContent);
             }
         });
-        closeButton.setOnAction(e -> dialogHelper.removeDialog(dialogContent));
+
+        closeButton.setOnAction(e -> dialogButtonHelper.removeDialog(dialogContent));
 
         dialogContent.getChildren().addAll(
-                dialogHelper.createLabeledControl("Name:", nameField),
-                dialogHelper.createLabeledControl("Beschreibung:", descriptionField),
-                dialogHelper.createLabeledControl("Ziel-Konto:", bankAccountComboBox),
-                dialogHelper.createLabeledControl("Ziel-Wert:", goalValueField),
-                dialogHelper.createLabeledControl("Start Datum:", startDatePicker),
-                dialogHelper.createLabeledControl("End Datum:", endDatePicker),
-
+                dialogButtonHelper.createLabeledControl("Name:", nameField),
+                dialogButtonHelper.createLabeledControl("Beschreibung:", descriptionField),
+                dialogButtonHelper.createLabeledControl("Konto:", bankAccountComboBox),
+                dialogButtonHelper.createLabeledControl("Kontostand:", goalValueField),
+                dialogButtonHelper.createLabeledControl("Start Datum:", startDatePicker),
+                dialogButtonHelper.createLabeledControl("End Datum:", endDatePicker),
                 new HBox(HBOX_SPACING, saveButton, closeButton)
         );
-        dialogHelper.showDialog(dialogContent);
+
+        dialogButtonHelper.showDialog(dialogContent);
     }
 
     @FXML
     private void showAddGoalForm() {
-
-        //________________
-        VBox dialogContent = dialogHelper.createDialogContainer();
+        VBox dialogContent = new VBox(10);
+        dialogContent.getStyleClass().add(EnumGenerals.CSS_DIALOG_BOX);
 
         TextField nameField = new TextField();
         nameField.getStyleClass().add(EnumGenerals.CSS_TEXT_FIELD);
@@ -291,60 +249,54 @@ public class Controller_goals implements ProfileAware {
         ComboBox<BankAccount> bankAccountComboBox = new ComboBox<>(this.profile.getBankAccounts());
         bankAccountComboBox.getStyleClass().add(EnumGenerals.CSS_COMBO_BOX);
 
-
-        Button saveButton = dialogHelper.createActionButton("Save");
-        Button closeButton = dialogHelper.createActionButton("Close");
+        Button saveButton = dialogButtonHelper.createActionButton("Speichern");
+        Button closeButton = dialogButtonHelper.createActionButton("Schließen");
 
         saveButton.setOnAction(e -> {
             boolean valid;
             ValidationHelperFX validationHelper = new ValidationHelperFX();
 
             valid = validationHelper.validateMandatoryFieldsFX(nameField, descriptionField, bankAccountComboBox, startDatePicker, endDatePicker);
-            valid = valid && validationHelper.isValidAmount(goalValueField.getText());
+            valid = valid && validationHelper.isValidAmount(goalValueField);
             if (valid) {
                 try {
                     String name = nameField.getText();
-                    String description =descriptionField.getText();
+                    String description = descriptionField.getText();
 
                     Date newStartDate = java.sql.Date.valueOf(startDatePicker.getValue());
                     Date newEndDate = java.sql.Date.valueOf(endDatePicker.getValue());
 
-                    double goalvalue = (Double.parseDouble(goalValueField.getText()));
+                    double goalValue = Double.parseDouble(goalValueField.getText());
 
-                    Goal goal  = new Goal( name,description,goalvalue, bankAccountComboBox.getValue(), newStartDate, newEndDate);
+                    Goal goal = new Goal(name, description, goalValue, bankAccountComboBox.getValue(), newStartDate, newEndDate);
                     profile.addGoal(goal);
 
                     goalTable.refresh();
                     updateTable();
-                    dialogHelper.removeDialog(dialogContent);
+                    dialogButtonHelper.removeDialog(dialogContent);
                     logger.debug("Goal inserted: {}", goal);
                 } catch (Exception ex) {
-                    logger.error("Ungültige Eingabe.", ex);
-                }
-            } else {
-                if (!validationHelper.isValidAmount(goalValueField.getText())) {
-                    if (!goalValueField.getStyleClass().contains(EnumGenerals.CSS_ERROR)) {
-                        goalValueField.getStyleClass().add(EnumGenerals.CSS_ERROR);
-                    }
-                } else {
-                    goalValueField.getStyleClass().removeAll(EnumGenerals.CSS_ERROR);
+                    logger.error("Invalid input.", ex);
                 }
             }
         });
-        closeButton.setOnAction(e -> dialogHelper.removeDialog(dialogContent));
+
+        closeButton.setOnAction(e -> dialogButtonHelper.removeDialog(dialogContent));
 
         dialogContent.getChildren().addAll(
-                dialogHelper.createLabeledControl("Name:", nameField),
-                dialogHelper.createLabeledControl("Beschreibung:", descriptionField),
-                dialogHelper.createLabeledControl("Ziel-Konto:", bankAccountComboBox),
-                dialogHelper.createLabeledControl("Ziel-Wert:", goalValueField),
-                dialogHelper.createLabeledControl("Start Datum:", startDatePicker),
-                dialogHelper.createLabeledControl("End Datum:", endDatePicker),
+                dialogButtonHelper.createLabeledControl("Name:", nameField),
+                dialogButtonHelper.createLabeledControl("Beschreibung:", descriptionField),
+                dialogButtonHelper.createLabeledControl("Ziel Account:", bankAccountComboBox),
+                dialogButtonHelper.createLabeledControl("Zielwert:", goalValueField),
+                dialogButtonHelper.createLabeledControl("Start:", startDatePicker),
+                dialogButtonHelper.createLabeledControl("Ende:", endDatePicker),
                 new HBox(HBOX_SPACING, saveButton, closeButton)
         );
-        dialogHelper.showDialog(dialogContent);
 
+        dialogButtonHelper.showDialog(dialogContent);
     }
+
+
 
     private void configureDatePicker(DatePicker datePicker) {
         datePicker.getStyleClass().add(EnumGenerals.CSS_DATE_PICKER);
@@ -354,35 +306,6 @@ public class Controller_goals implements ProfileAware {
     /* -------------------------------- */
     /* ------ Inner Classes      ------ */
     /* -------------------------------- */
-
-    private class DialogHelper {
-        VBox createDialogContainer() {
-            VBox dialog = new VBox(10);
-            dialog.getStyleClass().add(EnumGenerals.CSS_DIALOG_BOX);
-            StackPane.setAlignment(dialog, Pos.CENTER);
-            return dialog;
-        }
-
-        void showDialog(VBox dialog) {
-            rootPane.getChildren().add(dialog);
-        }
-
-        void removeDialog(VBox dialog) {
-            rootPane.getChildren().remove(dialog);
-        }
-
-        VBox createLabeledControl(String labelText, Control control) {
-            Label label = new Label(labelText);
-            return new VBox(5, label, control);
-        }
-
-        Button createActionButton(String text) {
-            Button button = new Button(text);
-            button.getStyleClass().clear();
-            button.getStyleClass().add(EnumGenerals.CSS_DIALOG_ACTION_BUTTON);
-            return button;
-        }
-    }
 
     /* -------------------------------- */
     /* ------ Interface Methods   ------ */

@@ -8,15 +8,15 @@
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wbh.wbh_projekt_privatebuchhaltung.controller.Controller_accountoverview">
 
     <VBox alignment="TOP_CENTER" spacing="10">
-        <Label styleClass="header-label" text="Transaction Overview" />
+        <Label styleClass="header-label" text="Transaktionsübersicht" />
 
         <TableView fx:id="transactionTable" styleClass="table-view">
             <columns>
-                <TableColumn fx:id="dateColumn" text="Date" />
-                <TableColumn fx:id="descriptionColumn" text="Description" />
-                <TableColumn fx:id="amountColumn" text="Amount" />
-                <TableColumn fx:id="typeColumn" text="Category" />
-                <TableColumn fx:id="actionColumn" text="Actions" />
+                <TableColumn fx:id="dateColumn" text="Datum" />
+                <TableColumn fx:id="descriptionColumn" text="Beschreibung" />
+                <TableColumn fx:id="amountColumn" text="Betrag" />
+                <TableColumn fx:id="typeColumn" text="Kategorie" />
+                <TableColumn fx:id="actionColumn" text="Aktionen" />
             </columns>
         </TableView>
 

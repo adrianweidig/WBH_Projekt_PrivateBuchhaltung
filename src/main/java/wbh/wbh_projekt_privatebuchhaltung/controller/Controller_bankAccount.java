@@ -17,7 +17,9 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wbh.wbh_projekt_privatebuchhaltung.enums.EnumGenerals;
+import wbh.wbh_projekt_privatebuchhaltung.helpers.DialogButtonHelper;
 import wbh.wbh_projekt_privatebuchhaltung.helpers.ValidationHelperFX;
+import wbh.wbh_projekt_privatebuchhaltung.models.DeleteDialogButton;
 import wbh.wbh_projekt_privatebuchhaltung.models.interfaces.ProfileAware;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.BankAccount;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.Profile;
@@ -51,7 +53,8 @@ public class Controller_bankAccount implements ProfileAware {
     @FXML private TableColumn<BankAccount, Void> actionColumn;
     @FXML private StackPane rootPane;
 
-    private final DialogHelper dialogHelper = new DialogHelper();
+    // Instanz des DialogButtonHelper (enthält benutzerspezifische Zustände)
+    private DialogButtonHelper dialogButtonHelper = null;
 
     /* -------------------------------- */
     /* ------ FXML Methods       ------ */
@@ -60,6 +63,7 @@ public class Controller_bankAccount implements ProfileAware {
     @FXML
     public void initialize() {
         setupBankAccountTable();
+        this.dialogButtonHelper = new DialogButtonHelper(this.rootPane);
     }
 
     /* -------------------------------- */
@@ -78,7 +82,7 @@ public class Controller_bankAccount implements ProfileAware {
 
         // Configure table behavior
         bankAccountTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-        bankAccountTable.setPlaceholder(new Label("No bank accounts found"));
+        bankAccountTable.setPlaceholder(new Label("Keine Bankkonten gefunden"));
 
         // Combine data from the profile
         bankAccountTable.setItems(profile.getBankAccounts());
@@ -133,27 +137,18 @@ public class Controller_bankAccount implements ProfileAware {
     }
 
     private void showDeleteConfirmation(BankAccount bankAccount) {
-        VBox dialogContent = dialogHelper.createDialogContainer();
-
-        Label confirmationLabel = new Label("Are you sure you want to delete this bank account?");
-        Button confirmButton = dialogHelper.createActionButton("Delete");
-        Button cancelButton = dialogHelper.createActionButton("Cancel");
-
-        confirmButton.setOnAction(e -> {
+        DeleteDialogButton deleteDialogButton = new DeleteDialogButton(this.rootPane);
+        deleteDialogButton.show("diesen Bank-Account", v -> {
             profile.getBankAccounts().remove(bankAccount);
-            dialogHelper.removeDialog(dialogContent);
             updateTable();
             logger.debug("Bank account deleted: {}", bankAccount);
         });
-
-        cancelButton.setOnAction(e -> dialogHelper.removeDialog(dialogContent));
-
-        dialogContent.getChildren().addAll(confirmationLabel, new HBox(HBOX_SPACING, confirmButton, cancelButton));
-        dialogHelper.showDialog(dialogContent);
     }
 
+
     private void showEditDialog(BankAccount bankAccount) {
-        VBox dialogContent = dialogHelper.createDialogContainer();
+        VBox dialogContent = new VBox(10);
+        dialogContent.getStyleClass().add(EnumGenerals.CSS_DIALOG_BOX);
 
         TextField nameField = new TextField(bankAccount.getName());
         TextField balanceField = new TextField(Double.toString(bankAccount.getBalance()));
@@ -163,15 +158,15 @@ public class Controller_bankAccount implements ProfileAware {
         LocalDate lastInteractionDate = new java.sql.Date(bankAccount.getLastInteraction().getTime()).toLocalDate();
         lastInteractionDatePicker.setValue(lastInteractionDate);
 
-        Button saveButton = dialogHelper.createActionButton("Save");
-        Button closeButton = dialogHelper.createActionButton("Close");
+        Button saveButton = dialogButtonHelper.createActionButton("Speichern");
+        Button closeButton = dialogButtonHelper.createActionButton("Schließen");
 
         saveButton.setOnAction(e -> {
-            boolean valid = true;
+            boolean valid;
             ValidationHelperFX validationHelper = new ValidationHelperFX();
 
-            valid = valid && validationHelper.validateMandatoryFieldsFX(nameField, lastInteractionDatePicker);
-            valid = valid && validationHelper.isValidAmount(balanceField.getText());
+            valid = validationHelper.validateMandatoryFieldsFX(nameField, lastInteractionDatePicker);
+            valid = valid && validationHelper.isValidAmount(balanceField);
 
             if (valid) {
                 try {
@@ -180,7 +175,7 @@ public class Controller_bankAccount implements ProfileAware {
                     bankAccount.setLastInteraction(java.sql.Date.valueOf(lastInteractionDatePicker.getValue()));
 
                     bankAccountTable.refresh();
-                    dialogHelper.removeDialog(dialogContent);
+                    dialogButtonHelper.removeDialog(dialogContent);
                     logger.debug("Bank account updated: {}", bankAccount);
 
                 } catch (Exception ex) {
@@ -189,36 +184,38 @@ public class Controller_bankAccount implements ProfileAware {
             }
         });
 
-        closeButton.setOnAction(e -> dialogHelper.removeDialog(dialogContent));
+        closeButton.setOnAction(e -> dialogButtonHelper.removeDialog(dialogContent));
 
         dialogContent.getChildren().addAll(
-                dialogHelper.createLabeledControl("Name:", nameField),
-                dialogHelper.createLabeledControl("Balance:", balanceField),
-                dialogHelper.createLabeledControl("Last Interaction Date:", lastInteractionDatePicker),
+                dialogButtonHelper.createLabeledControl("Name:", nameField),
+                dialogButtonHelper.createLabeledControl("Saldo:", balanceField),
+                dialogButtonHelper.createLabeledControl("Letzte Interaktion:", lastInteractionDatePicker),
                 new HBox(HBOX_SPACING, saveButton, closeButton)
         );
 
-        dialogHelper.showDialog(dialogContent);
+        dialogButtonHelper.showDialog(dialogContent);
     }
+
 
     @FXML
     private void showAddBankAccountForm() {
-        VBox dialogContent = dialogHelper.createDialogContainer();
+        VBox dialogContent = new VBox(10);
+        dialogContent.getStyleClass().add(EnumGenerals.CSS_DIALOG_BOX);
 
         TextField nameField = new TextField();
         TextField balanceField = new TextField();
         DatePicker lastInteractionDatePicker = new DatePicker();
         configureDatePicker(lastInteractionDatePicker);
 
-        Button saveButton = dialogHelper.createActionButton("Save");
-        Button closeButton = dialogHelper.createActionButton("Close");
+        Button saveButton = dialogButtonHelper.createActionButton("Speichern");
+        Button closeButton = dialogButtonHelper.createActionButton("Schließen");
 
         saveButton.setOnAction(e -> {
             boolean valid;
             ValidationHelperFX validationHelper = new ValidationHelperFX();
 
             valid = validationHelper.validateMandatoryFieldsFX(nameField, lastInteractionDatePicker);
-            valid = valid && validationHelper.isValidAmount(balanceField.getText());
+            valid = !(!valid || !validationHelper.isValidAmount(balanceField));
 
             if (valid) {
                 try {
@@ -231,7 +228,7 @@ public class Controller_bankAccount implements ProfileAware {
 
                     bankAccountTable.refresh();
                     updateTable();
-                    dialogHelper.removeDialog(dialogContent);
+                    dialogButtonHelper.removeDialog(dialogContent);
 
                     logger.debug("Bank account added: {}", bankAccount);
 
@@ -241,17 +238,18 @@ public class Controller_bankAccount implements ProfileAware {
             }
         });
 
-        closeButton.setOnAction(e -> dialogHelper.removeDialog(dialogContent));
+        closeButton.setOnAction(e -> dialogButtonHelper.removeDialog(dialogContent));
 
         dialogContent.getChildren().addAll(
-                dialogHelper.createLabeledControl("Name:", nameField),
-                dialogHelper.createLabeledControl("Balance:", balanceField),
-                dialogHelper.createLabeledControl("Last Interaction Date:", lastInteractionDatePicker),
+                dialogButtonHelper.createLabeledControl("Name:", nameField),
+                dialogButtonHelper.createLabeledControl("Kontostand:", balanceField),
+                dialogButtonHelper.createLabeledControl("Letzte Interaktion:", lastInteractionDatePicker),
                 new HBox(HBOX_SPACING, saveButton, closeButton)
         );
 
-        dialogHelper.showDialog(dialogContent);
+        dialogButtonHelper.showDialog(dialogContent);
     }
+
 
     private void configureDatePicker(DatePicker datePicker) {
         datePicker.getStyleClass().add(EnumGenerals.CSS_DATE_PICKER);
@@ -260,39 +258,6 @@ public class Controller_bankAccount implements ProfileAware {
 
     private String formatDate(Date date) {
         return date == null ? "" : DATE_FORMAT.format(date);
-    }
-
-    /* -------------------------------- */
-    /* ------ Inner Classes      ------ */
-    /* -------------------------------- */
-
-    private class DialogHelper {
-        VBox createDialogContainer() {
-            VBox dialog = new VBox(10);
-            dialog.getStyleClass().add(EnumGenerals.CSS_DIALOG_BOX);
-            StackPane.setAlignment(dialog, Pos.CENTER);
-            return dialog;
-        }
-
-        void showDialog(VBox dialog) {
-            rootPane.getChildren().add(dialog);
-        }
-
-        void removeDialog(VBox dialog) {
-            rootPane.getChildren().remove(dialog);
-        }
-
-        VBox createLabeledControl(String labelText, Control control) {
-            Label label = new Label(labelText);
-            return new VBox(5, label, control);
-        }
-
-        Button createActionButton(String text) {
-            Button button = new Button(text);
-            button.getStyleClass().clear();
-            button.getStyleClass().add(EnumGenerals.CSS_DIALOG_BUTTON);
-            return button;
-        }
     }
 
     /* -------------------------------- */

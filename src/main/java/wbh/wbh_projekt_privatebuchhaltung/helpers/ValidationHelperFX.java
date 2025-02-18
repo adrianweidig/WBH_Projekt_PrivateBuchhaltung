@@ -71,19 +71,29 @@ public class ValidationHelperFX {
         } else if (!control.getStyleClass().contains(CSS_ERROR)) {
             control.getStyleClass().add(CSS_ERROR);
         }
+
+        javafx.application.Platform.runLater(() -> {
+            control.applyCss();
+            control.layout();
+        });
     }
 
     /**
      * Validates if the given input is a valid monetary amount (numeric and non-zero).
      *
-     * @param input the string input to validate
+     * @param textField the string input to validate
      * @return true if the input is a valid amount, false otherwise
      */
-    public boolean isValidAmount(String input) {
+    public boolean isValidAmount(TextField textField) {
+        boolean isValid;
+
         try {
-            return Double.parseDouble(input) != 0;
+            isValid = Double.parseDouble(textField.getText()) != 0;
         } catch (NumberFormatException e) {
-            return false;
+            isValid = false;
         }
+        updateControlStyle(textField, isValid);
+        return isValid;
+
     }
 }
