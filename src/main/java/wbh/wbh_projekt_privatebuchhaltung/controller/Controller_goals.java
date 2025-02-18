@@ -1,7 +1,6 @@
 package wbh.wbh_projekt_privatebuchhaltung.controller;
 
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -18,6 +17,8 @@ import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wbh.wbh_projekt_privatebuchhaltung.enums.EnumGenerals;
+import wbh.wbh_projekt_privatebuchhaltung.helpers.ValidationHelperFX;
 import wbh.wbh_projekt_privatebuchhaltung.models.interfaces.ProfileAware;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.*;
 
@@ -37,19 +38,6 @@ public class Controller_goals implements ProfileAware {
     private Profile profile = new Profile();
     // Moderne Datumsformatierung: Alle Nutzer teilen diesen DateTimeFormatter.
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-
-    // CSS-Klassenkonstanten (global für alle Nutzer)
-    private static final String CSS_ROOT = "root";
-    private static final String CSS_TABLE_VIEW = "table-view";
-    private static final String CSS_DIALOG_BOX = "dialog-box";
-    private static final String CSS_DELETE_DIALOG = "delete-dialog";
-    private static final String CSS_DIALOG_BUTTON = "dialog-button";
-    private static final String CSS_TEXT_FIELD = "text-field";
-    private static final String CSS_DATE_PICKER = "date-picker";
-    private static final String CSS_COMBO_BOX = "combo-box";
-    private static final String CSS_ERROR = "error";
-    private static final String CSS_TABLE_COLUMN = "table-column";
-    private static final String CSS_DIALOG_ACTION_BUTTON = "dialog-action-button";
 
     // Gemeinsame Strings
     private static final String DELETE_CONFIRMATION_MESSAGE = "Are you sure you want to delete this goal?";
@@ -132,18 +120,18 @@ public class Controller_goals implements ProfileAware {
         profile.getGoals().addListener((ListChangeListener<Goal>) change -> updateTable());
 
         // Apply styling
-        goalTable.getStyleClass().add(CSS_TABLE_VIEW);
+        goalTable.getStyleClass().add(EnumGenerals.CSS_TABLE_VIEW);
         rootPane.getStylesheets().add(
                 Objects.requireNonNull(getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/styles/style_contentpane.css"))
                         .toExternalForm()
         );
 
         // Apply CSS classes to columns
-        nameColumn.getStyleClass().add(CSS_TABLE_COLUMN);
-        descriptionColumn.getStyleClass().add(CSS_TABLE_COLUMN);
-        bankAccountColumn.getStyleClass().add(CSS_TABLE_COLUMN);
+        nameColumn.getStyleClass().add(EnumGenerals.CSS_TABLE_COLUMN);
+        descriptionColumn.getStyleClass().add(EnumGenerals.CSS_TABLE_COLUMN);
+        bankAccountColumn.getStyleClass().add(EnumGenerals.CSS_TABLE_COLUMN);
 
-        actionColumn.getStyleClass().add(CSS_TABLE_COLUMN);
+        actionColumn.getStyleClass().add(EnumGenerals.CSS_TABLE_COLUMN);
 
         // Force layout update
         Platform.runLater(() -> {
@@ -159,8 +147,8 @@ public class Controller_goals implements ProfileAware {
 
             {
                 // CSS-Klassen anwenden.
-                editButton.getStyleClass().add(CSS_DIALOG_BUTTON);
-                deleteButton.getStyleClass().add(CSS_DIALOG_BUTTON);
+                editButton.getStyleClass().add(EnumGenerals.CSS_DIALOG_BUTTON);
+                deleteButton.getStyleClass().add(EnumGenerals.CSS_DIALOG_BUTTON);
                 // Beim Klick den entsprechenden Dialog öffnen.
                 editButton.setOnAction(event -> showEditDialog(getTableView().getItems().get(getIndex())));
                 deleteButton.setOnAction(event -> showDeleteConfirmation(getTableView().getItems().get(getIndex())));
@@ -184,7 +172,7 @@ public class Controller_goals implements ProfileAware {
 
     private void showDeleteConfirmation(Goal goal) {
         VBox dialogContent = dialogHelper.createDialogContainer();
-        dialogContent.getStyleClass().add(CSS_DELETE_DIALOG);
+        dialogContent.getStyleClass().add(EnumGenerals.CSS_DELETE_DIALOG);
 
         Label confirmationLabel = new Label(DELETE_CONFIRMATION_MESSAGE);
         Button confirmButton = dialogHelper.createActionButton("Delete");
@@ -208,10 +196,10 @@ public class Controller_goals implements ProfileAware {
         VBox dialogContent = dialogHelper.createDialogContainer();
 
         TextField nameField = new TextField(goal.getName());
-        nameField.getStyleClass().add(CSS_TEXT_FIELD);
+        nameField.getStyleClass().add(EnumGenerals.CSS_TEXT_FIELD);
 
         TextField descriptionField = new TextField(goal.getDescription());
-        descriptionField.getStyleClass().add(CSS_TEXT_FIELD);
+        descriptionField.getStyleClass().add(EnumGenerals.CSS_TEXT_FIELD);
 
         DatePicker startDatePicker = new DatePicker();
         configureDatePicker(startDatePicker);
@@ -224,19 +212,20 @@ public class Controller_goals implements ProfileAware {
         endDatePicker.setValue(localEndDate);
 
         TextField goalValueField = new TextField(Double.toString(goal.getGoalValue()));
-        goalValueField.getStyleClass().add(CSS_TEXT_FIELD);
+        goalValueField.getStyleClass().add(EnumGenerals.CSS_TEXT_FIELD);
 
         ComboBox<BankAccount> bankAccountComboBox = new ComboBox<>(this.profile.getBankAccounts());
-        bankAccountComboBox.getStyleClass().add(CSS_COMBO_BOX);
+        bankAccountComboBox.getStyleClass().add(EnumGenerals.CSS_COMBO_BOX);
         bankAccountComboBox.setValue(goal.getBankAccount());
 
         Button saveButton = dialogHelper.createActionButton("Save");
         Button closeButton = dialogHelper.createActionButton("Close");
 
         saveButton.setOnAction(e -> {
-            boolean valid = true;
-            valid = valid && ValidationHelperFX.validateMandatoryFieldsFX(nameField, descriptionField, bankAccountComboBox, startDatePicker, endDatePicker);
-            valid = valid && ValidationHelperFX.isValidAmount(goalValueField.getText());
+            boolean valid;
+            ValidationHelperFX validationHelper = new ValidationHelperFX();
+            valid = validationHelper.validateMandatoryFieldsFX(nameField, descriptionField, bankAccountComboBox, startDatePicker, endDatePicker);
+            valid = valid && validationHelper.isValidAmount(goalValueField.getText());
             if (valid) {
                 try {
                     Date newStartDate = java.sql.Date.valueOf(startDatePicker.getValue());
@@ -250,18 +239,16 @@ public class Controller_goals implements ProfileAware {
                     goalTable.refresh();
                     dialogHelper.removeDialog(dialogContent);
                     logger.debug("Goal updated: {}", goal);
-                    valid = true;
                 } catch (Exception ex) {
                     logger.error("Ungültige Eingabe.", ex);
-                    valid = false;
                 }
             } else {
-                if (!ValidationHelperFX.isValidAmount(goalValueField.getText())) {
-                    if (!goalValueField.getStyleClass().contains(CSS_ERROR)) {
-                        goalValueField.getStyleClass().add(CSS_ERROR);
+                if (!validationHelper.isValidAmount(goalValueField.getText())) {
+                    if (!goalValueField.getStyleClass().contains(EnumGenerals.CSS_ERROR)) {
+                        goalValueField.getStyleClass().add(EnumGenerals.CSS_ERROR);
                     }
                 } else {
-                    goalValueField.getStyleClass().removeAll(CSS_ERROR);
+                    goalValueField.getStyleClass().removeAll(EnumGenerals.CSS_ERROR);
                 }
             }
         });
@@ -287,10 +274,10 @@ public class Controller_goals implements ProfileAware {
         VBox dialogContent = dialogHelper.createDialogContainer();
 
         TextField nameField = new TextField();
-        nameField.getStyleClass().add(CSS_TEXT_FIELD);
+        nameField.getStyleClass().add(EnumGenerals.CSS_TEXT_FIELD);
 
         TextField descriptionField = new TextField();
-        descriptionField.getStyleClass().add(CSS_TEXT_FIELD);
+        descriptionField.getStyleClass().add(EnumGenerals.CSS_TEXT_FIELD);
 
         DatePicker startDatePicker = new DatePicker();
         configureDatePicker(startDatePicker);
@@ -299,19 +286,21 @@ public class Controller_goals implements ProfileAware {
         configureDatePicker(endDatePicker);
 
         TextField goalValueField = new TextField();
-        goalValueField.getStyleClass().add(CSS_TEXT_FIELD);
+        goalValueField.getStyleClass().add(EnumGenerals.CSS_TEXT_FIELD);
 
         ComboBox<BankAccount> bankAccountComboBox = new ComboBox<>(this.profile.getBankAccounts());
-        bankAccountComboBox.getStyleClass().add(CSS_COMBO_BOX);
+        bankAccountComboBox.getStyleClass().add(EnumGenerals.CSS_COMBO_BOX);
 
 
         Button saveButton = dialogHelper.createActionButton("Save");
         Button closeButton = dialogHelper.createActionButton("Close");
 
         saveButton.setOnAction(e -> {
-            boolean valid = true;
-            valid = valid && ValidationHelperFX.validateMandatoryFieldsFX(nameField, descriptionField, bankAccountComboBox, startDatePicker, endDatePicker);
-            valid = valid && ValidationHelperFX.isValidAmount(goalValueField.getText());
+            boolean valid;
+            ValidationHelperFX validationHelper = new ValidationHelperFX();
+
+            valid = validationHelper.validateMandatoryFieldsFX(nameField, descriptionField, bankAccountComboBox, startDatePicker, endDatePicker);
+            valid = valid && validationHelper.isValidAmount(goalValueField.getText());
             if (valid) {
                 try {
                     String name = nameField.getText();
@@ -329,18 +318,16 @@ public class Controller_goals implements ProfileAware {
                     updateTable();
                     dialogHelper.removeDialog(dialogContent);
                     logger.debug("Goal inserted: {}", goal);
-                    valid = true;
                 } catch (Exception ex) {
                     logger.error("Ungültige Eingabe.", ex);
-                    valid = false;
                 }
             } else {
-                if (!ValidationHelperFX.isValidAmount(goalValueField.getText())) {
-                    if (!goalValueField.getStyleClass().contains(CSS_ERROR)) {
-                        goalValueField.getStyleClass().add(CSS_ERROR);
+                if (!validationHelper.isValidAmount(goalValueField.getText())) {
+                    if (!goalValueField.getStyleClass().contains(EnumGenerals.CSS_ERROR)) {
+                        goalValueField.getStyleClass().add(EnumGenerals.CSS_ERROR);
                     }
                 } else {
-                    goalValueField.getStyleClass().removeAll(CSS_ERROR);
+                    goalValueField.getStyleClass().removeAll(EnumGenerals.CSS_ERROR);
                 }
             }
         });
@@ -359,16 +346,8 @@ public class Controller_goals implements ProfileAware {
 
     }
 
-    private String formatDate(Date date) {
-        String result = "";
-        result = (date == null) ? "" : DATE_FORMATTER.format(
-                new java.sql.Date(date.getTime()).toLocalDate()
-        );
-        return result;
-    }
-
     private void configureDatePicker(DatePicker datePicker) {
-        datePicker.getStyleClass().add(CSS_DATE_PICKER);
+        datePicker.getStyleClass().add(EnumGenerals.CSS_DATE_PICKER);
         datePicker.getEditor().setOnMouseClicked(event -> datePicker.show());
     }
 
@@ -379,7 +358,7 @@ public class Controller_goals implements ProfileAware {
     private class DialogHelper {
         VBox createDialogContainer() {
             VBox dialog = new VBox(10);
-            dialog.getStyleClass().add(CSS_DIALOG_BOX);
+            dialog.getStyleClass().add(EnumGenerals.CSS_DIALOG_BOX);
             StackPane.setAlignment(dialog, Pos.CENTER);
             return dialog;
         }
@@ -400,59 +379,8 @@ public class Controller_goals implements ProfileAware {
         Button createActionButton(String text) {
             Button button = new Button(text);
             button.getStyleClass().clear();
-            button.getStyleClass().add(CSS_DIALOG_ACTION_BUTTON);
+            button.getStyleClass().add(EnumGenerals.CSS_DIALOG_ACTION_BUTTON);
             return button;
-        }
-    }
-
-    private static class ValidationHelperFX {
-        static boolean validateMandatoryFieldsFX(Control... controls) {
-            boolean valid = true;
-            for (Control c : controls) {
-                if (c instanceof TextField) {
-                    TextField tf = (TextField) c;
-                    valid = valid && (tf.getText() != null && !tf.getText().trim().isEmpty());
-                    if (!(tf.getText() != null && !tf.getText().trim().isEmpty())) {
-                        if (!tf.getStyleClass().contains(CSS_ERROR)) {
-                            tf.getStyleClass().add(CSS_ERROR);
-                        }
-                    } else {
-                        tf.getStyleClass().removeAll(CSS_ERROR);
-                    }
-                } else if (c instanceof DatePicker) {
-                    DatePicker dp = (DatePicker) c;
-                    valid = valid && (dp.getValue() != null);
-                    if (dp.getValue() == null) {
-                        if (!dp.getStyleClass().contains(CSS_ERROR)) {
-                            dp.getStyleClass().add(CSS_ERROR);
-                        }
-                    } else {
-                        dp.getStyleClass().removeAll(CSS_ERROR);
-                    }
-                } else if (c instanceof ComboBox<?>) {
-                    ComboBox<?> cb = (ComboBox<?>) c;
-                    valid = valid && (cb.getValue() != null);
-                    if (cb.getValue() == null) {
-                        if (!cb.getStyleClass().contains(CSS_ERROR)) {
-                            cb.getStyleClass().add(CSS_ERROR);
-                        }
-                    } else {
-                        cb.getStyleClass().removeAll(CSS_ERROR);
-                    }
-                }
-            }
-            return valid;
-        }
-
-        static boolean isValidAmount(String input) {
-            boolean valid;
-            try {
-                double value = Double.parseDouble(input);
-                valid = (value != 0);
-            } catch (NumberFormatException e) {
-                valid = false;
-            }
-            return valid;
         }
     }
 

@@ -16,6 +16,8 @@ import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wbh.wbh_projekt_privatebuchhaltung.enums.EnumGenerals;
+import wbh.wbh_projekt_privatebuchhaltung.helpers.ValidationHelperFX;
 import wbh.wbh_projekt_privatebuchhaltung.models.interfaces.ProfileAware;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.BankAccount;
 import wbh.wbh_projekt_privatebuchhaltung.models.userProfile.Profile;
@@ -25,6 +27,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
+
+import static wbh.wbh_projekt_privatebuchhaltung.enums.EnumGenerals.CSS_TABLE_VIEW;
 
 public class Controller_bankAccount implements ProfileAware {
 
@@ -36,13 +40,6 @@ public class Controller_bankAccount implements ProfileAware {
     private Profile profile = new Profile();
     // Date formatter for display
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
-
-    // CSS classes
-    private static final String CSS_TABLE_VIEW = "table-view";
-    private static final String CSS_DIALOG_BOX = "dialog-box";
-    private static final String CSS_DIALOG_BUTTON = "dialog-button";
-    private static final String CSS_TABLE_COLUMN = "table-column";
-    private static final String CSS_DATE_PICKER = "date-picker";
 
     // Gemeinsame Strings
     private static final int HBOX_SPACING = 10;
@@ -91,10 +88,10 @@ public class Controller_bankAccount implements ProfileAware {
 
         // Apply styling
         bankAccountTable.getStyleClass().add(CSS_TABLE_VIEW);
-        nameColumn.getStyleClass().add(CSS_TABLE_COLUMN);
-        balanceColumn.getStyleClass().add(CSS_TABLE_COLUMN);
-        lastInteractionColumn.getStyleClass().add(CSS_TABLE_COLUMN);
-        actionColumn.getStyleClass().add(CSS_TABLE_COLUMN);
+        nameColumn.getStyleClass().add(EnumGenerals.CSS_TABLE_COLUMN);
+        balanceColumn.getStyleClass().add(EnumGenerals.CSS_TABLE_COLUMN);
+        lastInteractionColumn.getStyleClass().add(EnumGenerals.CSS_TABLE_COLUMN);
+        actionColumn.getStyleClass().add(EnumGenerals.CSS_TABLE_COLUMN);
         rootPane.getStylesheets().add(
                 Objects.requireNonNull(getClass().getResource("/wbh/wbh_projekt_privatebuchhaltung/styles/style_contentpane.css"))
                         .toExternalForm()
@@ -112,8 +109,8 @@ public class Controller_bankAccount implements ProfileAware {
             private final Button deleteButton = new Button("", new FontIcon("fas-trash"));
 
             {
-                editButton.getStyleClass().add(CSS_DIALOG_BUTTON);
-                deleteButton.getStyleClass().add(CSS_DIALOG_BUTTON);
+                editButton.getStyleClass().add(EnumGenerals.CSS_DIALOG_BUTTON);
+                deleteButton.getStyleClass().add(EnumGenerals.CSS_DIALOG_BUTTON);
 
                 editButton.setOnAction(event -> showEditDialog(getTableView().getItems().get(getIndex())));
                 deleteButton.setOnAction(event -> showDeleteConfirmation(getTableView().getItems().get(getIndex())));
@@ -171,10 +168,10 @@ public class Controller_bankAccount implements ProfileAware {
 
         saveButton.setOnAction(e -> {
             boolean valid = true;
+            ValidationHelperFX validationHelper = new ValidationHelperFX();
 
-            // Validate inputs
-            valid = valid && ValidationHelperFX.validateMandatoryFieldsFX(nameField, lastInteractionDatePicker);
-            valid = valid && ValidationHelperFX.isValidAmount(balanceField.getText());
+            valid = valid && validationHelper.validateMandatoryFieldsFX(nameField, lastInteractionDatePicker);
+            valid = valid && validationHelper.isValidAmount(balanceField.getText());
 
             if (valid) {
                 try {
@@ -217,11 +214,11 @@ public class Controller_bankAccount implements ProfileAware {
         Button closeButton = dialogHelper.createActionButton("Close");
 
         saveButton.setOnAction(e -> {
-            boolean valid = true;
+            boolean valid;
+            ValidationHelperFX validationHelper = new ValidationHelperFX();
 
-            // Validate inputs
-            valid = valid && ValidationHelperFX.validateMandatoryFieldsFX(nameField, lastInteractionDatePicker);
-            valid = valid && ValidationHelperFX.isValidAmount(balanceField.getText());
+            valid = validationHelper.validateMandatoryFieldsFX(nameField, lastInteractionDatePicker);
+            valid = valid && validationHelper.isValidAmount(balanceField.getText());
 
             if (valid) {
                 try {
@@ -257,7 +254,7 @@ public class Controller_bankAccount implements ProfileAware {
     }
 
     private void configureDatePicker(DatePicker datePicker) {
-        datePicker.getStyleClass().add(CSS_DATE_PICKER);
+        datePicker.getStyleClass().add(EnumGenerals.CSS_DATE_PICKER);
         datePicker.getEditor().setOnMouseClicked(event -> datePicker.show());
     }
 
@@ -272,7 +269,7 @@ public class Controller_bankAccount implements ProfileAware {
     private class DialogHelper {
         VBox createDialogContainer() {
             VBox dialog = new VBox(10);
-            dialog.getStyleClass().add(CSS_DIALOG_BOX);
+            dialog.getStyleClass().add(EnumGenerals.CSS_DIALOG_BOX);
             StackPane.setAlignment(dialog, Pos.CENTER);
             return dialog;
         }
@@ -293,32 +290,8 @@ public class Controller_bankAccount implements ProfileAware {
         Button createActionButton(String text) {
             Button button = new Button(text);
             button.getStyleClass().clear();
-            button.getStyleClass().add(CSS_DIALOG_BUTTON);
+            button.getStyleClass().add(EnumGenerals.CSS_DIALOG_BUTTON);
             return button;
-        }
-    }
-
-    private static class ValidationHelperFX {
-        static boolean validateMandatoryFieldsFX(Control... controls) {
-            boolean valid = true;
-            for (Control c : controls) {
-                if (c instanceof TextField) {
-                    TextField tf = (TextField) c;
-                    valid = valid && !(tf.getText() == null || tf.getText().trim().isEmpty());
-                } else if (c instanceof DatePicker) {
-                    DatePicker dp = (DatePicker) c;
-                    valid = valid && dp.getValue() != null;
-                }
-            }
-            return valid;
-        }
-
-        static boolean isValidAmount(String input) {
-            try {
-                return Double.parseDouble(input) > 0;
-            } catch (NumberFormatException e) {
-                return false;
-            }
         }
     }
 
